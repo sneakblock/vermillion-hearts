@@ -72,6 +72,7 @@ void initialize()
 {
     REG_DISPCTL = MODE0; // Bitwise OR the BG(s) you want to use and Bitwise OR SPRITE_ENABLE if you want to use sprites
     // Don't forget to set up whatever BGs you enabled in the line above!
+    //Testing changing main and committing.
 
     buttons = BUTTONS;
     oldButtons = 0;
