@@ -1327,6 +1327,28 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 4 "main.c" 2
 
 
+# 1 "startimage.h" 1
+# 22 "startimage.h"
+extern const unsigned short startimageTiles[1632];
+
+
+extern const unsigned short startimageMap[1024];
+
+
+extern const unsigned short startimagePal[256];
+# 7 "main.c" 2
+# 1 "testgameimage.h" 1
+# 22 "testgameimage.h"
+extern const unsigned short testgameimageTiles[3232];
+
+
+extern const unsigned short testgameimageMap[1024];
+
+
+extern const unsigned short testgameimagePal[256];
+# 8 "main.c" 2
+
+
 void initialize();
 
 
@@ -1394,9 +1416,8 @@ int main()
 
 void initialize()
 {
-    (*(volatile unsigned short *)0x4000000) = 0;
-
-
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+    (*(volatile unsigned short *)0x4000008) = (0 << 14) | (1 << 7) | ((0) << 2) | ((28) << 8);
 
     buttons = (*(volatile unsigned short *)0x04000130);
     oldButtons = 0;
@@ -1405,13 +1426,44 @@ void initialize()
 }
 
 
-void goToStart() {}
+void goToStart() {
+
+    DMANow(3, startimagePal, ((unsigned short *)0x5000000), 512 / 2);
+    DMANow(3, startimageTiles, &((charblock *)0x6000000)[0], 3264 / 2);
+ DMANow(3, startimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
+
+    hideSprites();
+    waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+
+    state = START;
+
+}
 
 
-void start() {}
+void start() {
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
 
-void goToGame() {}
+        goToGame();
+
+    }
+
+}
+
+
+void goToGame() {
+
+    DMANow(3, testgameimagePal, ((unsigned short *)0x5000000), 512 / 2);
+    DMANow(3, testgameimageTiles, &((charblock *)0x6000000)[0], 6464 / 2);
+ DMANow(3, testgameimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
+
+    waitForVBlank();
+
+    state = GAME;
+
+}
 
 
 void game() {}

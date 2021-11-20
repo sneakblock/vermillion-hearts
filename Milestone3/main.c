@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include "myLib.h"
 
+//Inclusions of Usenti images, for TESTS only right now.
+#include "startimage.h"
+#include "testgameimage.h"
+
+//Game.h stuff
+#include "game.h"
+
 // Prototypes
 void initialize();
 
@@ -10,6 +17,8 @@ void goToStart();
 void start();
 void goToGame();
 void game();
+void goToDialogue();
+void dialogue();
 void goToPause();
 void pause();
 void goToWin();
@@ -22,6 +31,7 @@ enum
 {
     START,
     GAME,
+    DIALOUGE,
     PAUSE,
     WIN,
     LOSE
@@ -54,6 +64,9 @@ int main()
         case GAME:
             game();
             break;
+        case DIALOUGE:
+            dialogue();
+            break;
         case PAUSE:
             pause();
             break;
@@ -70,9 +83,8 @@ int main()
 // Sets up GBA
 void initialize()
 {
-    REG_DISPCTL = MODE0; // Bitwise OR the BG(s) you want to use and Bitwise OR SPRITE_ENABLE if you want to use sprites
-    // Don't forget to set up whatever BGs you enabled in the line above!
-    //Testing changing main and committing.
+    REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
+    REG_BG0CNT = BG_SIZE_SMALL | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(28);
 
     buttons = BUTTONS;
     oldButtons = 0;
@@ -81,16 +93,55 @@ void initialize()
 }
 
 // Sets up the start state
-void goToStart() {}
+void goToStart() {
+
+    DMANow(3, startimagePal, PALETTE, startimagePalLen / 2);
+    DMANow(3, startimageTiles, &CHARBLOCK[0], startimageTilesLen / 2);
+	DMANow(3, startimageMap, &SCREENBLOCK[28], startimageMapLen / 2);
+
+    hideSprites();
+    waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 512);
+
+    state = START;
+
+}
 
 // Runs every frame of the start state
-void start() {}
+void start() {
+
+    if (BUTTON_PRESSED(BUTTON_START)) {
+
+        //glitchVisuals();
+        goToGame();
+
+    }
+
+}
 
 // Sets up the game state
-void goToGame() {}
+void goToGame() {
+
+    DMANow(3, testgameimagePal, PALETTE, testgameimagePalLen / 2);
+    DMANow(3, testgameimageTiles, &CHARBLOCK[0], testgameimageTilesLen / 2);
+	DMANow(3, testgameimageMap, &SCREENBLOCK[28], testgameimageMapLen / 2);
+
+    waitForVBlank();
+
+    state = GAME;
+
+}
 
 // Runs every frame of the game state
 void game() {}
+
+void goToDialogue() {
+
+}
+
+void dialogue() {
+
+}
 
 // Sets up the pause state
 void goToPause() {}
