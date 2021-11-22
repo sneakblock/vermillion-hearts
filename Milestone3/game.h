@@ -93,7 +93,6 @@ typedef struct
     int screenCol;
     int worldRow;
     int worldCol;
-    // the speed of the NPC
     int rdel;
     int cdel;
     int width;
@@ -125,6 +124,8 @@ typedef struct
     DIALOGUE dialogues[NUM_DIALOGUES];
     //The current index of the dialogues array.
     int dialoguesIndex;
+    //npc's name
+    char* name;
 
     // -------------- Movement and Patrolling -----------------
 
@@ -149,7 +150,6 @@ typedef struct
     int screenCol;
     int worldRow;
     int worldCol;
-    // the speed of the NPC
     int rdel;
     int cdel;
     int width;
