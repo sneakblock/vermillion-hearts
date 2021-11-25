@@ -1304,16 +1304,6 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 4 "main.c" 2
 
 
-# 1 "startimage.h" 1
-# 22 "startimage.h"
-extern const unsigned short startimageTiles[1664];
-
-
-extern const unsigned short startimageMap[1024];
-
-
-extern const unsigned short startimagePal[256];
-# 7 "main.c" 2
 # 1 "testgameimage.h" 1
 # 22 "testgameimage.h"
 extern const unsigned short testgameimageTiles[3232];
@@ -1323,7 +1313,7 @@ extern const unsigned short testgameimageMap[1024];
 
 
 extern const unsigned short testgameimagePal[256];
-# 8 "main.c" 2
+# 7 "main.c" 2
 
 
 # 1 "game.h" 1
@@ -1500,7 +1490,7 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 11 "main.c" 2
+# 10 "main.c" 2
 
 
 # 1 "spritesheet.h" 1
@@ -1512,14 +1502,18 @@ extern const unsigned short spritesheetMap[1024];
 
 
 extern const unsigned short spritesheetPal[256];
-# 14 "main.c" 2
+# 13 "main.c" 2
 
 
 # 1 "text.h" 1
-void drawString(int x, int y, char* string);
-void drawChar(int x, int y, char ch);
-void hideText();
-# 17 "main.c" 2
+
+void drawChar3(int col, int row, char ch, unsigned short color);
+void drawString3(int col, int row, char *str, unsigned short color);
+
+
+void drawChar4(int col, int row, char ch, unsigned char colorIndex);
+void drawString4(int col, int row, char *str, unsigned char colorIndex);
+# 16 "main.c" 2
 
 
 void initialize();
@@ -1601,8 +1595,10 @@ int main()
 
 void initialize()
 {
-    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
-    (*(volatile unsigned short *)0x4000008) = (0 << 14) | (1 << 7) | ((0) << 2) | ((28) << 8);
+
+
+
+
 
 
 
@@ -1615,25 +1611,23 @@ void initialize()
 
 void goToStart() {
 
-    DMANow(3, startimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, startimageTiles, &((charblock *)0x6000000)[0], 3328 / 2);
- DMANow(3, startimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
 
-    DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512 / 2);
-
-
-    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 1056 / 2);
+    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
 
 
-    hideSprites();
-    drawChar(50, 50, 'A');
+
+    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
+    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
+
+    fillScreen4(1);
+
+
+    char* string = "Death to Persia";
+    drawString4(50, 50, string, 0);
+
     waitForVBlank();
-    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 8);
-
-
+    flipPage();
 
 
     state = START;

@@ -10,6 +10,11 @@
 	.eabi_attribute 18, 4
 	.file	"main.c"
 	.text
+	.section	.rodata.str1.4,"aMS",%progbits,1
+	.align	2
+.LC0:
+	.ascii	"Death to Persia\000"
+	.text
 	.align	2
 	.global	goToStart
 	.arch armv4t
@@ -21,80 +26,45 @@ goToStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
-	mov	r3, #256
-	ldr	r4, .L4
-	mov	r2, #83886080
-	mov	r0, #3
-	ldr	r1, .L4+4
-	mov	lr, pc
-	bx	r4
-	mov	r3, #1664
-	mov	r2, #100663296
-	mov	r0, #3
-	ldr	r1, .L4+8
-	mov	lr, pc
-	bx	r4
-	mov	r3, #1024
-	mov	r0, #3
-	ldr	r2, .L4+12
-	ldr	r1, .L4+16
-	mov	lr, pc
-	bx	r4
-	mov	r3, #256
-	mov	r0, #3
-	ldr	r2, .L4+20
-	ldr	r1, .L4+24
-	mov	lr, pc
-	bx	r4
-	mov	r0, #3
-	ldr	r2, .L4+28
-	ldr	r1, .L4+32
-	mov	r3, #528
-	mov	lr, pc
-	bx	r4
-	ldr	r3, .L4+36
+	push	{r4, r5, r6, lr}
+	mov	r2, #67108864
+	mov	r4, #0
+	mov	r3, #83886080
+	mvn	r0, #32768
+	ldr	r1, .L4
+	strh	r0, [r3]	@ movhi
+	strh	r1, [r2]	@ movhi
+	mov	r0, #1
+	strh	r4, [r3, #2]	@ movhi
+	ldr	r3, .L4+4
 	mov	lr, pc
 	bx	r3
 	mov	r1, #50
-	mov	r2, #65
+	mov	r3, r4
 	mov	r0, r1
-	ldr	r3, .L4+40
+	ldr	r2, .L4+8
+	ldr	r5, .L4+12
+	mov	lr, pc
+	bx	r5
+	ldr	r3, .L4+16
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L4+44
+	ldr	r3, .L4+20
 	mov	lr, pc
 	bx	r3
-	mov	r3, #512
-	mov	r2, #117440512
-	mov	r0, #3
-	ldr	r1, .L4+48
-	mov	lr, pc
-	bx	r4
-	mov	r1, #67108864
-	mov	r0, #260
-	mov	r2, #0
-	ldr	r3, .L4+52
-	strh	r0, [r1]	@ movhi
-	pop	{r4, lr}
-	str	r2, [r3]
+	ldr	r3, .L4+24
+	str	r4, [r3]
+	pop	{r4, r5, r6, lr}
 	bx	lr
 .L5:
 	.align	2
 .L4:
-	.word	DMANow
-	.word	startimagePal
-	.word	startimageTiles
-	.word	100720640
-	.word	startimageMap
-	.word	83886592
-	.word	spritesheetPal
-	.word	100728832
-	.word	spritesheetTiles
-	.word	hideSprites
-	.word	drawChar
+	.word	1044
+	.word	fillScreen4
+	.word	.LC0
+	.word	drawString4
 	.word	waitForVBlank
-	.word	shadowOAM
+	.word	flipPage
 	.word	state
 	.size	goToStart, .-goToStart
 	.align	2
@@ -108,15 +78,10 @@ initialize:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	mov	r3, #67108864
-	mov	r0, #4352
-	mov	r1, #7296
 	mov	r2, #0
-	strh	r0, [r3]	@ movhi
-	strh	r1, [r3, #8]	@ movhi
-	ldr	r0, .L7
+	ldr	r3, .L7
 	ldr	r1, .L7+4
-	ldrh	r0, [r0, #48]
+	ldrh	r0, [r3, #48]
 	ldr	r3, .L7+8
 	strh	r0, [r1]	@ movhi
 	strh	r2, [r3]	@ movhi
@@ -224,17 +189,12 @@ main:
 	@ Volatile: function does not return.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	r3, #67108864
-	mov	r0, #4352
-	mov	r1, #7296
 	mov	r2, #0
-	push	{r7, lr}
 	ldr	r5, .L27
-	strh	r0, [r3]	@ movhi
-	strh	r1, [r3, #8]	@ movhi
 	ldr	r4, .L27+4
 	ldrh	r1, [r5, #48]
 	ldr	r6, .L27+8
+	push	{r7, lr}
 	ldr	r3, .L27+12
 	strh	r1, [r4]	@ movhi
 	strh	r2, [r6]	@ movhi

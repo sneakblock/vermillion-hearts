@@ -1461,6 +1461,7 @@ void drawNPCS();
 
 
 
+
 void glitchVisuals(int duration);
 
 

@@ -3,7 +3,6 @@
 #include "myLib.h"
 
 //Inclusions of Usenti images, for TESTS only right now.
-#include "startimage.h"
 #include "testgameimage.h"
 
 //Game.h stuff
@@ -95,37 +94,39 @@ int main()
 // Sets up GBA
 void initialize()
 {
-    REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
-    REG_BG0CNT = BG_SIZE_SMALL | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(28);
+    // REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
+    // REG_BG0CNT = BG_SIZE_SMALL | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(28);
 
-
+    //hideSprites();
+    //waitForVBlank();
+    //DMANow(3, shadowOAM, OAM, 512);
 
     buttons = BUTTONS;
     oldButtons = 0;
-
+    
     goToStart();
 }
 
 // Sets up the start state
 void goToStart() {
 
-    DMANow(3, startimagePal, PALETTE, startimagePalLen / 2);
-    DMANow(3, startimageTiles, &CHARBLOCK[0], startimageTilesLen / 2);
-	DMANow(3, startimageMap, &SCREENBLOCK[28], startimageMapLen / 2);
+    
+    REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
 
-    DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen / 2);
+    //load start screen palette
+    //draw the background image
 
-    //Why charblock 4?
-    DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen / 2);
+    PALETTE[0] = WHITE;
+    PALETTE[1] = BLACK;
 
+    fillScreen4(1);
     
 
-    hideSprites();
-    drawChar(50, 50, 'A');
+    char* string = "Death to Persia";
+    drawString4(50, 50, string, 0);
+
     waitForVBlank();
-    DMANow(3, shadowOAM, OAM, 512);
-
-    
+    flipPage();
     
 
     state = START;
