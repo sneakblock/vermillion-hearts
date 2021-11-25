@@ -1,27 +1,55 @@
 #include "myLib.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include "text.h"
+#include "font.h"
 
-void drawString(int x, int y, char* string) {
-    while (*string != '\0') {
-        drawChar(x, y, *string);
+// Draws the specified character at the specified location in Mode 3
+void drawChar3(int col, int row, char ch, unsigned short color) {
 
-        x += 8;
-
-        string++;
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 6; c++) {
+            if (fontdata_6x8[48*ch + OFFSET(c, r, 6)]) {
+                setPixel3(col+c, row+r, color);
+            }
+        }
     }
 }
 
-//currently does not support punctuation of any kind
-void drawChar(int x, int y, char ch) {
-    shadowOAM[0].attr0 = y | ATTR0_SQUARE | ATTR0_4BPP;
-    shadowOAM[0].attr1 = x | ATTR1_TINY;
-    shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
+// Draws the specified character at the specified location in Mode 4
+void drawChar4(int col, int row, char ch, unsigned char colorIndex) {
+
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 6; c++) {
+            if (fontdata_6x8[48*ch + OFFSET(c, r, 6)]) {
+                setPixel4(col+c, row+r, colorIndex);
+            }
+        }
+    }
 }
 
-void hideText() {
-    for (int i = ('a' - 65); i < 'z' + 1; i++) {
-        shadowOAM[i].attr0 |= ATTR0_HIDE;
+// Draws the specified string at the specified location in Mode 3
+void drawString3(int col, int row, char *str, unsigned short color) {
+
+    // Until the null character appears
+    while(*str != '\0') {
+
+        drawChar3(col, row, *str, color);
+        col += 6;
+
+        // Point to the next character
+        str++;
+    }
+}
+
+// Draws the specified string at the specified location in Mode 4
+void drawString4(int col, int row, char *str, unsigned char colorIndex) {
+
+    // Until the null character appears
+    while(*str != '\0') {
+
+        drawChar4(col, row, *str, colorIndex);
+        col += 6;
+
+        // Point to the next character
+        str++;
     }
 }
