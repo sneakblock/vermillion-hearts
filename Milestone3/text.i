@@ -1,7 +1,85 @@
-# 1 "main.c"
+# 1 "text.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "main.c"
+# 1 "text.c"
+# 1 "myLib.h" 1
+
+
+
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+# 64 "myLib.h"
+extern volatile unsigned short *videoBuffer;
+# 85 "myLib.h"
+typedef struct
+{
+    u16 tileimg[8192];
+} charblock;
+
+
+typedef struct
+{
+    u16 tilemap[1024];
+} screenblock;
+
+
+
+void setPixel3(int col, int row, unsigned short color);
+void drawRect3(int col, int row, int width, int height, volatile unsigned short color);
+void fillScreen3(volatile unsigned short color);
+void drawImage3(int col, int row, int width, int height, const unsigned short *image);
+void drawFullscreenImage3(const unsigned short *image);
+
+
+void setPixel4(int col, int row, unsigned char colorIndex);
+void drawRect4(int col, int row, int width, int height, volatile unsigned char colorIndex);
+void fillScreen4(volatile unsigned char colorIndex);
+void drawImage4(int col, int row, int width, int height, const unsigned short *image);
+void drawFullscreenImage4(const unsigned short *image);
+
+
+void waitForVBlank();
+void flipPage();
+
+
+
+
+typedef struct
+{
+    unsigned short attr0;
+    unsigned short attr1;
+    unsigned short attr2;
+    unsigned short fill;
+} OBJ_ATTR;
+
+
+
+extern OBJ_ATTR shadowOAM[];
+# 159 "myLib.h"
+void hideSprites();
+# 185 "myLib.h"
+extern unsigned short oldButtons;
+extern unsigned short buttons;
+# 195 "myLib.h"
+typedef volatile struct
+{
+    volatile const void *src;
+    volatile void *dst;
+    volatile unsigned int cnt;
+} DMA;
+
+
+extern DMA *dma;
+# 236 "myLib.h"
+void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
+
+
+
+
+int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
+# 2 "text.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -810,7 +888,7 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 2 "main.c" 2
+# 3 "text.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 36 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/9.1.0/include/stddef.h" 1 3 4
@@ -1221,488 +1299,34 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 3 "main.c" 2
-# 1 "myLib.h" 1
-
-
-
-
-
-# 5 "myLib.h"
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-# 64 "myLib.h"
-extern volatile unsigned short *videoBuffer;
-# 85 "myLib.h"
-typedef struct
-{
-    u16 tileimg[8192];
-} charblock;
-
-
-typedef struct
-{
-    u16 tilemap[1024];
-} screenblock;
-
-
-
-void setPixel3(int col, int row, unsigned short color);
-void drawRect3(int col, int row, int width, int height, volatile unsigned short color);
-void fillScreen3(volatile unsigned short color);
-void drawImage3(int col, int row, int width, int height, const unsigned short *image);
-void drawFullscreenImage3(const unsigned short *image);
-
-
-void setPixel4(int col, int row, unsigned char colorIndex);
-void drawRect4(int col, int row, int width, int height, volatile unsigned char colorIndex);
-void fillScreen4(volatile unsigned char colorIndex);
-void drawImage4(int col, int row, int width, int height, const unsigned short *image);
-void drawFullscreenImage4(const unsigned short *image);
-
-
-void waitForVBlank();
-void flipPage();
-
-
-
-
-typedef struct
-{
-    unsigned short attr0;
-    unsigned short attr1;
-    unsigned short attr2;
-    unsigned short fill;
-} OBJ_ATTR;
-
-
-
-extern OBJ_ATTR shadowOAM[];
-# 159 "myLib.h"
-void hideSprites();
-# 185 "myLib.h"
-extern unsigned short oldButtons;
-extern unsigned short buttons;
-# 195 "myLib.h"
-typedef volatile struct
-{
-    volatile const void *src;
-    volatile void *dst;
-    volatile unsigned int cnt;
-} DMA;
-
-
-extern DMA *dma;
-# 236 "myLib.h"
-void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-
-
-
-
-int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 4 "main.c" 2
-
-
-# 1 "startimage.h" 1
-# 22 "startimage.h"
-extern const unsigned short startimageTiles[1664];
-
-
-extern const unsigned short startimageMap[1024];
-
-
-extern const unsigned short startimagePal[256];
-# 7 "main.c" 2
-# 1 "testgameimage.h" 1
-# 22 "testgameimage.h"
-extern const unsigned short testgameimageTiles[3232];
-
-
-extern const unsigned short testgameimageMap[1024];
-
-
-extern const unsigned short testgameimagePal[256];
-# 8 "main.c" 2
-
-
-# 1 "game.h" 1
-
-enum {CLOUD, SEER, ECLECTIC, MAIDEN};
-# 28 "game.h"
-typedef struct {
-
-    int promptsChoice;
-
-    int choiceAIndex;
-    int choiceBIndex;
-
-    int endsConversation;
-
-    char* string;
-} DIALOGUE;
-
-typedef struct {
-    int worldCol;
-    int worldRow;
-} PATROLPOINT;
-
-
-typedef struct
-{
-
-
-    int screenRow;
-    int screenCol;
-    int worldRow;
-    int worldCol;
-    int rdel;
-    int cdel;
-    int width;
-    int height;
-    int hide;
-
-
-
-    int aniCounter;
-    int aniState;
-    int prevAniState;
-    int curFrame;
-    int numFrames;
-
-    int gameSpriteTileSize;
-
-
-    int gameSpriteTileIDx;
-    int gameSpriteTileIDy;
-
-
-
-
-    int canTalk;
-
-    int talkingHeadSpriteTileIDx;
-    int talkingHeadSpriteTileIDy;
-
-    DIALOGUE dialogues[10];
-
-    int dialoguesIndex;
-
-    char* name;
-
-
-
-
-    int patrols;
-
-    int patrolInterval;
-
-    int patrolIntervalCounter;
-
-    PATROLPOINT patrolPoints[3];
-
-    int patrolPointIndex;
-} NPC;
-
-typedef struct
-{
-    int currentEidolon;
-
-
-    int screenRow;
-    int screenCol;
-    int worldRow;
-    int worldCol;
-    int rdel;
-    int cdel;
-    int width;
-    int height;
-    int hide;
-
-
-
-    int aniCounter;
-    int aniState;
-    int prevAniState;
-    int curFrame;
-    int numFrames;
-
-    int gameSpriteTileSize;
-
-
-    int gameSpriteTileIDx;
-    int gameSpriteTileIDy;
-
-} PLAYER;
-
-
-
-
-
-typedef struct {
-
-    int playerSpawnCol;
-    int playerSpawnRow;
-
-    int tilesLen;
-    int mapLen;
-    unsigned short* bgTiles;
-    unsigned short* bgMap;
-
-    int numNPCS;
-    NPC npcs[5];
-
-} LEVEL;
-
-
-
-extern NPC* currentTarget;
-
-extern const unsigned short bgPalette1[];
-extern const unsigned short bgPalette2[];
-extern const unsigned short bgPalette3[];
-
-extern const unsigned short spritePalette1[];
-extern const unsigned short spritePalette2[];
-extern const unsigned short spritePalette3[];
-
-
-
-
-void loadLevel(LEVEL level);
-
-void updateGame();
-void updatePlayer();
-void updateNPCS();
-
-void updateBackgrounds();
-
-void drawGame();
-void drawPlayer();
-void drawNPCS();
-
-
-
-
-
-
-void glitchVisuals(int duration);
-
-
-void swapPalette();
-void swapSpritePalette();
-
-
-void consumeSprite();
-
-
-void changeSprite();
-
-
-void rotateCollisionMap();
-# 11 "main.c" 2
-
-
-# 1 "spritesheet.h" 1
-# 22 "spritesheet.h"
-extern const unsigned short spritesheetTiles[528];
-
-
-extern const unsigned short spritesheetMap[1024];
-
-
-extern const unsigned short spritesheetPal[256];
-# 14 "main.c" 2
-
-
+# 4 "text.c" 2
 # 1 "text.h" 1
+
+# 1 "text.h"
 void drawString(int x, int y, char* string);
 void drawChar(int x, int y, char ch);
 void hideText();
-# 17 "main.c" 2
+# 5 "text.c" 2
 
+void drawString(int x, int y, char* string) {
+    while (*string != '\0') {
+        drawChar(x, y, *string);
 
-void initialize();
+        x += 8;
 
-
-void goToStart();
-void start();
-void goToGame();
-void game();
-void goToDialogue();
-void dialogue();
-void goToPause();
-void pause();
-void goToWin();
-void win();
-void goToLose();
-void lose();
-void goToInstructions();
-void instructions();
-
-
-enum
-{
-    START,
-    GAME,
-    DIALOUGE,
-    PAUSE,
-    WIN,
-    INSTRUCTIONS,
-    LOSE
-};
-int state;
-
-
-unsigned short buttons;
-unsigned short oldButtons;
-
-
-OBJ_ATTR shadowOAM[128];
-
-int main()
-{
-    initialize();
-
-    while (1)
-    {
-
-        oldButtons = buttons;
-        buttons = (*(volatile unsigned short *)0x04000130);
-
-
-        switch (state)
-        {
-        case START:
-            start();
-            break;
-        case GAME:
-            game();
-            break;
-        case DIALOUGE:
-            dialogue();
-            break;
-        case PAUSE:
-            pause();
-            break;
-        case WIN:
-            win();
-            break;
-        case INSTRUCTIONS:
-            instructions();
-            break;
-        case LOSE:
-            lose();
-            break;
-        }
+        string++;
     }
 }
 
 
-void initialize()
-{
-    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
-    (*(volatile unsigned short *)0x4000008) = (0 << 14) | (1 << 7) | ((0) << 2) | ((28) << 8);
-
-
-
-    buttons = (*(volatile unsigned short *)0x04000130);
-    oldButtons = 0;
-
-    goToStart();
+void drawChar(int x, int y, char ch) {
+    shadowOAM[0].attr0 = y | (0 << 14) | (0 << 13);
+    shadowOAM[0].attr1 = x | (0 << 14);
+    shadowOAM[0].attr2 = ((0) << 12) | ((0)*32 + (0));
 }
 
-
-void goToStart() {
-
-    DMANow(3, startimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, startimageTiles, &((charblock *)0x6000000)[0], 3328 / 2);
- DMANow(3, startimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
-
-    DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512 / 2);
-
-
-    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 1056 / 2);
-
-
-
-    hideSprites();
-    drawChar(50, 50, 'A');
-    waitForVBlank();
-    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 8);
-
-
-
-
-    state = START;
-
-}
-
-
-void start() {
-
-
-
-
-    waitForVBlank();
-
-    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
-
-
-        goToGame();
-
+void hideText() {
+    for (int i = ('a' - 65); i < 'z' + 1; i++) {
+        shadowOAM[i].attr0 |= (2 << 8);
     }
-
-}
-
-
-void goToGame() {
-
-    DMANow(3, testgameimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, testgameimageTiles, &((charblock *)0x6000000)[0], 6464 / 2);
- DMANow(3, testgameimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
-
-    waitForVBlank();
-
-    state = GAME;
-
-}
-
-
-void game() {}
-
-void goToDialogue() {
-
-}
-
-void dialogue() {
-
-}
-
-
-void goToPause() {}
-
-
-void pause() {}
-
-
-void goToWin() {}
-
-
-void win() {}
-
-
-void goToLose() {}
-
-
-void lose() {}
-
-void goToInstructions() {
-
-}
-
-void instructions() {
-
 }

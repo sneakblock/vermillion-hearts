@@ -1,7 +1,7 @@
-# 1 "main.c"
+# 1 "game.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "main.c"
+# 1 "game.c"
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -810,7 +810,7 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 2 "main.c" 2
+# 2 "game.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 36 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/9.1.0/include/stddef.h" 1 3 4
@@ -1221,7 +1221,7 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 3 "main.c" 2
+# 3 "game.c" 2
 # 1 "myLib.h" 1
 
 
@@ -1301,31 +1301,7 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 4 "main.c" 2
-
-
-# 1 "startimage.h" 1
-# 22 "startimage.h"
-extern const unsigned short startimageTiles[1664];
-
-
-extern const unsigned short startimageMap[1024];
-
-
-extern const unsigned short startimagePal[256];
-# 7 "main.c" 2
-# 1 "testgameimage.h" 1
-# 22 "testgameimage.h"
-extern const unsigned short testgameimageTiles[3232];
-
-
-extern const unsigned short testgameimageMap[1024];
-
-
-extern const unsigned short testgameimagePal[256];
-# 8 "main.c" 2
-
-
+# 4 "game.c" 2
 # 1 "game.h" 1
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
@@ -1485,7 +1461,6 @@ void drawNPCS();
 
 
 
-
 void glitchVisuals(int duration);
 
 
@@ -1500,209 +1475,6 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 11 "main.c" 2
+# 5 "game.c" 2
 
-
-# 1 "spritesheet.h" 1
-# 22 "spritesheet.h"
-extern const unsigned short spritesheetTiles[528];
-
-
-extern const unsigned short spritesheetMap[1024];
-
-
-extern const unsigned short spritesheetPal[256];
-# 14 "main.c" 2
-
-
-# 1 "text.h" 1
-void drawString(int x, int y, char* string);
-void drawChar(int x, int y, char ch);
-void hideText();
-# 17 "main.c" 2
-
-
-void initialize();
-
-
-void goToStart();
-void start();
-void goToGame();
-void game();
-void goToDialogue();
-void dialogue();
-void goToPause();
-void pause();
-void goToWin();
-void win();
-void goToLose();
-void lose();
-void goToInstructions();
-void instructions();
-
-
-enum
-{
-    START,
-    GAME,
-    DIALOUGE,
-    PAUSE,
-    WIN,
-    INSTRUCTIONS,
-    LOSE
-};
-int state;
-
-
-unsigned short buttons;
-unsigned short oldButtons;
-
-
-OBJ_ATTR shadowOAM[128];
-
-int main()
-{
-    initialize();
-
-    while (1)
-    {
-
-        oldButtons = buttons;
-        buttons = (*(volatile unsigned short *)0x04000130);
-
-
-        switch (state)
-        {
-        case START:
-            start();
-            break;
-        case GAME:
-            game();
-            break;
-        case DIALOUGE:
-            dialogue();
-            break;
-        case PAUSE:
-            pause();
-            break;
-        case WIN:
-            win();
-            break;
-        case INSTRUCTIONS:
-            instructions();
-            break;
-        case LOSE:
-            lose();
-            break;
-        }
-    }
-}
-
-
-void initialize()
-{
-    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
-    (*(volatile unsigned short *)0x4000008) = (0 << 14) | (1 << 7) | ((0) << 2) | ((28) << 8);
-
-
-
-    buttons = (*(volatile unsigned short *)0x04000130);
-    oldButtons = 0;
-
-    goToStart();
-}
-
-
-void goToStart() {
-
-    DMANow(3, startimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, startimageTiles, &((charblock *)0x6000000)[0], 3328 / 2);
- DMANow(3, startimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
-
-    DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512 / 2);
-
-
-    DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 1056 / 2);
-
-
-
-    hideSprites();
-    drawChar(50, 50, 'A');
-    waitForVBlank();
-    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 8);
-
-
-
-
-    state = START;
-
-}
-
-
-void start() {
-
-
-
-
-    waitForVBlank();
-
-    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
-
-
-        goToGame();
-
-    }
-
-}
-
-
-void goToGame() {
-
-    DMANow(3, testgameimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, testgameimageTiles, &((charblock *)0x6000000)[0], 6464 / 2);
- DMANow(3, testgameimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
-
-    waitForVBlank();
-
-    state = GAME;
-
-}
-
-
-void game() {}
-
-void goToDialogue() {
-
-}
-
-void dialogue() {
-
-}
-
-
-void goToPause() {}
-
-
-void pause() {}
-
-
-void goToWin() {}
-
-
-void win() {}
-
-
-void goToLose() {}
-
-
-void lose() {}
-
-void goToInstructions() {
-
-}
-
-void instructions() {
-
-}
+NPC* currentTarget;

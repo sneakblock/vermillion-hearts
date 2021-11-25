@@ -1,55 +1,13 @@
 // ++++++++++++++++++++++++++ ENUMS +++++++++++++++++++++++++++++++++++
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-// @@@@@@@@@@@@@@@@@@@@@@@@@ EXTERN VARIABLES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-extern NPC* currentTarget;
-
-extern const unsigned short bgPalette1[];
-extern const unsigned short bgPalette2[];
-extern const unsigned short bgPalette3[];
-
-extern const unsigned short spritePalette1[];
-extern const unsigned short spritePalette2[];
-extern const unsigned short spritePalette3[];
 
 // &*&*&*&&*&*&*&*&&*&&*&*&*&*&*&*&*&* GLITCHING *&&&^^^^&^&^&&^**&*&*&*&*&*&*&*&*&*&*%%&
 #define NUM_PALETTES 3
 
 
-// +++++++++++++++++++++ METHOD HEADERS OR STUBS OR WHATEVER :) ++++++++++++++++++++++++++
 
-//Takes in an int of the level from the above enum, loads it's background and sprite positions.
-void loadLevel(LEVEL level);
-
-void updateGame();
-void updatePlayer();
-void updateNPCS();
-//I might use this for scrolling backgrounds or something, I'm not sure yet.
-void updateBackgrounds();
-
-void drawGame();
-void drawPlayer();
-void drawNPCS();
-
-//Some function that glitches the screen, possibly through charblock and charblock overlapping, or through 
-//some scrambling of the tilemap indices.
-//Should have some element of randomness.
-//If duration is 0, the duration is INFINITE.
-void glitchVisuals(int duration);
-
-//Swaps the palette to the next palette, and so on.
-void swapPalette();
-void swapSpritePalette();
-
-//Consumes the target sprite.
-void consumeSprite();
-
-//Swaps sprites through the array of currently consumed sprites.
-void changeSprite();
-
-//Rotates collision map
-void rotateCollisionMap();
 
 
 // =================== CHARACTER INFORMATION ===================
@@ -190,3 +148,50 @@ typedef struct {
     NPC npcs[MAX_NPCS_PER_LEVEL];
 
 } LEVEL;
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@ EXTERN VARIABLES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+extern NPC* currentTarget;
+
+extern const unsigned short bgPalette1[];
+extern const unsigned short bgPalette2[];
+extern const unsigned short bgPalette3[];
+
+extern const unsigned short spritePalette1[];
+extern const unsigned short spritePalette2[];
+extern const unsigned short spritePalette3[];
+
+// +++++++++++++++++++++ METHOD HEADERS OR STUBS OR WHATEVER :) ++++++++++++++++++++++++++
+
+//Takes in an int of the level from the above enum, loads it's background and sprite positions.
+void loadLevel(LEVEL level);
+
+void updateGame();
+void updatePlayer();
+void updateNPCS();
+//I might use this for scrolling backgrounds or something, I'm not sure yet.
+void updateBackgrounds();
+
+void drawGame();
+void drawPlayer();
+void drawNPCS();
+
+//Some function that glitches the screen, possibly through charblock and charblock overlapping, or through 
+//some scrambling of the tilemap indices.
+//Could also swap 0 index of sprite palette to allow for revealing that pink color.
+//Should have some element of randomness.
+//If duration is 0, the duration is INFINITE.
+void glitchVisuals(int duration);
+
+//Swaps the palette to the next palette, and so on.
+void swapPalette();
+void swapSpritePalette();
+
+//Consumes the target sprite.
+void consumeSprite();
+
+//Swaps sprites through the array of currently consumed sprites.
+void changeSprite();
+
+//Rotates collision map
+void rotateCollisionMap();

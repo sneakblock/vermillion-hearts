@@ -9,6 +9,12 @@
 //Game.h stuff
 #include "game.h"
 
+//Spritesheet
+#include "spritesheet.h"
+
+//Text stuff
+#include "text.h"
+
 // Prototypes
 void initialize();
 
@@ -25,6 +31,8 @@ void goToWin();
 void win();
 void goToLose();
 void lose();
+void goToInstructions();
+void instructions();
 
 // States
 enum
@@ -34,6 +42,7 @@ enum
     DIALOUGE,
     PAUSE,
     WIN,
+    INSTRUCTIONS,
     LOSE
 };
 int state;
@@ -73,6 +82,9 @@ int main()
         case WIN:
             win();
             break;
+        case INSTRUCTIONS:
+            instructions();
+            break;
         case LOSE:
             lose();
             break;
@@ -85,6 +97,8 @@ void initialize()
 {
     REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
     REG_BG0CNT = BG_SIZE_SMALL | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(28);
+
+
 
     buttons = BUTTONS;
     oldButtons = 0;
@@ -99,9 +113,20 @@ void goToStart() {
     DMANow(3, startimageTiles, &CHARBLOCK[0], startimageTilesLen / 2);
 	DMANow(3, startimageMap, &SCREENBLOCK[28], startimageMapLen / 2);
 
+    DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen / 2);
+
+    //Why charblock 4?
+    DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen / 2);
+
+    
+
     hideSprites();
+    drawChar(50, 50, 'A');
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 512);
+
+    
+    
 
     state = START;
 
@@ -109,6 +134,11 @@ void goToStart() {
 
 // Runs every frame of the start state
 void start() {
+
+    
+    
+
+    waitForVBlank();
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
@@ -160,3 +190,11 @@ void goToLose() {}
 
 // Runs every frame of the lose state
 void lose() {}
+
+void goToInstructions() {
+
+}
+
+void instructions() {
+
+}

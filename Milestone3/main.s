@@ -29,32 +29,53 @@ goToStart:
 	ldr	r1, .L4+4
 	mov	lr, pc
 	bx	r4
-	mov	r3, #1632
+	mov	r3, #1664
 	mov	r2, #100663296
 	mov	r0, #3
 	ldr	r1, .L4+8
 	mov	lr, pc
 	bx	r4
+	mov	r3, #1024
 	mov	r0, #3
 	ldr	r2, .L4+12
 	ldr	r1, .L4+16
-	mov	r3, #1024
 	mov	lr, pc
 	bx	r4
-	ldr	r3, .L4+20
+	mov	r3, #256
+	mov	r0, #3
+	ldr	r2, .L4+20
+	ldr	r1, .L4+24
+	mov	lr, pc
+	bx	r4
+	mov	r0, #3
+	ldr	r2, .L4+28
+	ldr	r1, .L4+32
+	mov	r3, #528
+	mov	lr, pc
+	bx	r4
+	ldr	r3, .L4+36
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L4+24
+	mov	r1, #50
+	mov	r2, #65
+	mov	r0, r1
+	ldr	r3, .L4+40
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L4+44
 	mov	lr, pc
 	bx	r3
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L4+28
+	ldr	r1, .L4+48
 	mov	lr, pc
 	bx	r4
+	mov	r1, #67108864
+	mov	r0, #260
 	mov	r2, #0
-	ldr	r3, .L4+32
+	ldr	r3, .L4+52
+	strh	r0, [r1]	@ movhi
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
@@ -66,7 +87,12 @@ goToStart:
 	.word	startimageTiles
 	.word	100720640
 	.word	startimageMap
+	.word	83886592
+	.word	spritesheetPal
+	.word	100728832
+	.word	spritesheetTiles
 	.word	hideSprites
+	.word	drawChar
 	.word	waitForVBlank
 	.word	shadowOAM
 	.word	state
@@ -161,19 +187,28 @@ start:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	ldr	r3, .L18
+	ldr	r3, .L20
+	push	{r4, lr}
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L20+4
 	ldrh	r3, [r3]
 	tst	r3, #8
-	bxeq	lr
-	ldr	r3, .L18+4
+	beq	.L13
+	ldr	r3, .L20+8
 	ldrh	r3, [r3]
 	tst	r3, #8
-	bxne	lr
-	b	goToGame
+	beq	.L19
+.L13:
+	pop	{r4, lr}
+	bx	lr
 .L19:
+	pop	{r4, lr}
+	b	goToGame
+.L21:
 	.align	2
-.L18:
+.L20:
+	.word	waitForVBlank
 	.word	oldButtons
 	.word	buttons
 	.size	start, .-start
@@ -194,46 +229,40 @@ main:
 	mov	r1, #7296
 	mov	r2, #0
 	push	{r7, lr}
-	ldr	r5, .L30
+	ldr	r5, .L27
 	strh	r0, [r3]	@ movhi
 	strh	r1, [r3, #8]	@ movhi
-	ldr	r4, .L30+4
+	ldr	r4, .L27+4
 	ldrh	r1, [r5, #48]
-	ldr	r8, .L30+8
-	ldr	r3, .L30+12
+	ldr	r6, .L27+8
+	ldr	r3, .L27+12
 	strh	r1, [r4]	@ movhi
-	strh	r2, [r8]	@ movhi
+	strh	r2, [r6]	@ movhi
 	mov	lr, pc
 	bx	r3
-	ldr	r7, .L30+16
-	ldr	r6, .L30+20
+	ldr	r8, .L27+16
+	ldr	r7, .L27+20
 .L24:
-	ldr	r0, [r7]
+	ldr	r2, [r8]
 	ldrh	r3, [r4]
-.L21:
-	strh	r3, [r8]	@ movhi
-	ldrh	r2, [r5, #48]
-	cmp	r0, #0
-	mov	r1, r3
-	strh	r2, [r4]	@ movhi
-	mov	r3, r2
-	bne	.L21
-	tst	r1, #8
-	beq	.L21
-	tst	r2, #8
-	bne	.L21
+.L23:
+	strh	r3, [r6]	@ movhi
+	ldrh	r3, [r5, #48]
+	cmp	r2, #0
+	strh	r3, [r4]	@ movhi
+	bne	.L23
 	mov	lr, pc
-	bx	r6
+	bx	r7
 	b	.L24
-.L31:
+.L28:
 	.align	2
-.L30:
+.L27:
 	.word	67109120
 	.word	buttons
 	.word	oldButtons
 	.word	goToStart
 	.word	state
-	.word	goToGame
+	.word	start
 	.size	main, .-main
 	.text
 	.align	2
@@ -249,6 +278,32 @@ game:
 	@ link register save eliminated.
 	bx	lr
 	.size	game, .-game
+	.align	2
+	.global	goToDialogue
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	goToDialogue, %function
+goToDialogue:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	bx	lr
+	.size	goToDialogue, .-goToDialogue
+	.align	2
+	.global	dialogue
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	dialogue, %function
+dialogue:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	bx	lr
+	.size	dialogue, .-dialogue
 	.align	2
 	.global	goToPause
 	.syntax unified
@@ -327,6 +382,32 @@ lose:
 	@ link register save eliminated.
 	bx	lr
 	.size	lose, .-lose
+	.align	2
+	.global	goToInstructions
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	goToInstructions, %function
+goToInstructions:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	bx	lr
+	.size	goToInstructions, .-goToInstructions
+	.align	2
+	.global	instructions
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	instructions, %function
+instructions:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	bx	lr
+	.size	instructions, .-instructions
 	.comm	shadowOAM,1024,4
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2

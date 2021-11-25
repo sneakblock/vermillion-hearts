@@ -4,5 +4,4 @@
 #include "game.h"
 
 NPC* currentTarget;
-int currentLevel = VILLAGE;
 
