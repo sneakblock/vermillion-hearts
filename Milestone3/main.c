@@ -7,7 +7,7 @@
 // This will be the first level of the game, and later areas will allow for more abilites and glitch mechanics.
 // To play, use the directional inputs and avoid enemies. Start goes to pause.
 // Take note of the red flickering upon death and the "channel tune" effect on the Mode 4 swap, leveraging page flipping.
-
+// Check out the glitch time freeze, still a work in progress, with A during the game.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,6 +40,8 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
+
+int seed;
 
 // States
 enum
@@ -102,6 +104,8 @@ int main()
 // Sets up GBA
 void initialize()
 {
+    seed = 0;
+
     buttons = BUTTONS;
     oldButtons = 0;
     
@@ -136,12 +140,15 @@ void start() {
     drawString4(20, 80, string, 0);
     drawString4(20, 100, string1, 0);
 
+    seed++;
+
     waitForVBlank();
     flipPage();
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
         //glitchVisuals();
+        srand(seed);
         goToGame();
 
     }
@@ -326,14 +333,16 @@ void goToInstructions() {
     fillScreen4(1);
 
     char* string = "DIRECTIONAL BUTTONS TO MOVE.";
+    char* string4 = "A TO GLITCH TIME.";
     char* string3 = "START TO PAUSE.";
     char* string1 = "AVOID ENTITIES. REACH END.";
     char* string2 = "PRESS START TO RETURN TO START.";
 
     drawString4(20, 80, string, 0);
-    drawString4(20, 90, string3, 0);
-    drawString4(20, 100, string1, 0);
-    drawString4(20, 110, string2, 0);
+    drawString4(20, 90, string4, 0);
+    drawString4(20, 100, string3, 0);
+    drawString4(20, 110, string1, 0);
+    drawString4(20, 120, string2, 0);
 
     waitForVBlank();
     flipPage();

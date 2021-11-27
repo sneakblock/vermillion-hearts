@@ -2,6 +2,7 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "main.c"
+# 12 "main.c"
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -810,7 +811,7 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 2 "main.c" 2
+# 13 "main.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 36 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/9.1.0/include/stddef.h" 1 3 4
@@ -1221,7 +1222,7 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 3 "main.c" 2
+# 14 "main.c" 2
 # 1 "myLib.h" 1
 
 
@@ -1301,7 +1302,7 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 4 "main.c" 2
+# 15 "main.c" 2
 
 
 # 1 "game.h" 1
@@ -1436,7 +1437,17 @@ typedef struct {
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
     const unsigned short* foregroundMap;
-# 167 "game.h"
+
+    int midgroundTilesLen;
+    int midgroundMapLen;
+    const unsigned short* midgroundTiles;
+    const unsigned short* midgroundMap;
+
+    int backgroundTilesLen;
+    int backgroundMapLen;
+    const unsigned short* backgroundTiles;
+    const unsigned short* backgroundMap;
+
     const unsigned short* defaultPalette;
 
     int numNPCS;
@@ -1494,7 +1505,7 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 7 "main.c" 2
+# 18 "main.c" 2
 
 
 # 1 "spritesheet.h" 1
@@ -1503,7 +1514,7 @@ extern const unsigned short SPRITESHEETTiles[16384];
 
 
 extern const unsigned short SPRITESHEETPal[256];
-# 10 "main.c" 2
+# 21 "main.c" 2
 
 
 # 1 "text.h" 1
@@ -1514,7 +1525,7 @@ void drawString3(int col, int row, char *str, unsigned short color);
 
 void drawChar4(int col, int row, char ch, unsigned char colorIndex);
 void drawString4(int col, int row, char *str, unsigned char colorIndex);
-# 13 "main.c" 2
+# 24 "main.c" 2
 
 
 void initialize();
@@ -1534,6 +1545,8 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
+
+int seed;
 
 
 enum
@@ -1596,6 +1609,8 @@ int main()
 
 void initialize()
 {
+    seed = 0;
+
     buttons = (*(volatile unsigned short *)0x04000130);
     oldButtons = 0;
 
@@ -1630,12 +1645,15 @@ void start() {
     drawString4(20, 80, string, 0);
     drawString4(20, 100, string1, 0);
 
+    seed++;
+
     waitForVBlank();
     flipPage();
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
 
+        srand(seed);
         goToGame();
 
     }
@@ -1737,6 +1755,8 @@ void pause() {
 
 void goToWin() {
 
+
+
     (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
     ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
@@ -1818,14 +1838,16 @@ void goToInstructions() {
     fillScreen4(1);
 
     char* string = "DIRECTIONAL BUTTONS TO MOVE.";
+    char* string4 = "A TO GLITCH TIME.";
     char* string3 = "START TO PAUSE.";
     char* string1 = "AVOID ENTITIES. REACH END.";
     char* string2 = "PRESS START TO RETURN TO START.";
 
     drawString4(20, 80, string, 0);
-    drawString4(20, 90, string3, 0);
-    drawString4(20, 100, string1, 0);
-    drawString4(20, 110, string2, 0);
+    drawString4(20, 90, string4, 0);
+    drawString4(20, 100, string3, 0);
+    drawString4(20, 110, string1, 0);
+    drawString4(20, 120, string2, 0);
 
     waitForVBlank();
     flipPage();

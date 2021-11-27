@@ -51,25 +51,28 @@ initialize:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	mov	r3, #0
 	mov	r1, #67108864
-	ldr	r0, .L8
+	ldr	r2, .L8
 	str	lr, [sp, #-4]!
-	ldr	r2, .L8+4
+	ldr	r0, .L8+4
+	str	r3, [r2]
+	ldr	r2, .L8+8
 	ldrh	lr, [r0, #48]
-	ldr	ip, .L8+8
-	strh	lr, [r2]	@ movhi
-	ldr	r0, .L8+12
-	ldr	r2, .L8+16
-	strh	r3, [ip]	@ movhi
-	ldr	lr, [sp], #4
+	ldr	ip, .L8+12
+	strh	r3, [r2]	@ movhi
+	ldr	r0, .L8+16
+	ldr	r2, .L8+20
+	strh	lr, [ip]	@ movhi
 	strh	r0, [r1]	@ movhi
+	ldr	lr, [sp], #4
 	str	r3, [r2]
 	bx	lr
 .L9:
 	.align	2
 .L8:
+	.word	seed
 	.word	67109120
-	.word	buttons
 	.word	oldButtons
+	.word	buttons
 	.word	1044
 	.word	state
 	.size	initialize, .-initialize
@@ -331,7 +334,7 @@ pause:
 	lsr	r0, r0, #16
 	lsr	r3, r3, #16
 	lsr	r2, r2, #16
-	ldr	r1, [r1, #44]
+	ldr	r1, [r1, #76]
 	strh	r0, [r5, #8]	@ movhi
 	strh	r3, [r5, #10]	@ movhi
 	mov	r0, #3
@@ -580,12 +583,15 @@ lose:
 	.ascii	"DIRECTIONAL BUTTONS TO MOVE.\000"
 	.align	2
 .LC6:
-	.ascii	"START TO PAUSE.\000"
+	.ascii	"A TO GLITCH TIME.\000"
 	.align	2
 .LC7:
-	.ascii	"AVOID ENTITIES. REACH END.\000"
+	.ascii	"START TO PAUSE.\000"
 	.align	2
 .LC8:
+	.ascii	"AVOID ENTITIES. REACH END.\000"
+	.align	2
+.LC9:
 	.ascii	"PRESS START TO RETURN TO START.\000"
 	.text
 	.align	2
@@ -622,20 +628,26 @@ goToInstructions:
 	ldr	r2, .L56+16
 	mov	lr, pc
 	bx	r4
-	ldr	r2, .L56+20
+	mov	r3, #0
 	mov	r1, #110
+	mov	r0, #20
+	ldr	r2, .L56+20
+	mov	lr, pc
+	bx	r4
+	ldr	r2, .L56+24
+	mov	r1, #120
 	mov	r0, #20
 	mov	r3, #0
 	mov	lr, pc
 	bx	r4
-	ldr	r3, .L56+24
-	mov	lr, pc
-	bx	r3
 	ldr	r3, .L56+28
 	mov	lr, pc
 	bx	r3
-	mov	r2, #5
 	ldr	r3, .L56+32
+	mov	lr, pc
+	bx	r3
+	mov	r2, #5
+	ldr	r3, .L56+36
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
@@ -648,16 +660,17 @@ goToInstructions:
 	.word	.LC6
 	.word	.LC7
 	.word	.LC8
+	.word	.LC9
 	.word	waitForVBlank
 	.word	flipPage
 	.word	state
 	.size	goToInstructions, .-goToInstructions
 	.section	.rodata.str1.4
 	.align	2
-.LC9:
+.LC10:
 	.ascii	"PRESS START TO BEGIN.\000"
 	.align	2
-.LC10:
+.LC11:
 	.ascii	"PRESS SELECT FOR INSTRUCTIONS.\000"
 	.text
 	.align	2
@@ -680,37 +693,41 @@ start:
 	ldr	r3, .L70
 	mov	lr, pc
 	bx	r3
-	ldr	r5, .L70+4
+	ldr	r6, .L70+4
 	mov	r3, r4
 	mov	r1, #80
 	mov	r0, #20
 	ldr	r2, .L70+8
+	ldr	r5, .L70+12
 	mov	lr, pc
-	bx	r5
+	bx	r6
 	mov	r3, r4
 	mov	r1, #100
 	mov	r0, #20
-	ldr	r2, .L70+12
+	ldr	r2, .L70+16
 	mov	lr, pc
-	bx	r5
-	ldr	r4, .L70+16
-	ldr	r3, .L70+20
+	bx	r6
+	ldr	r3, [r5]
+	ldr	r2, .L70+20
+	add	r3, r3, #1
+	ldr	r4, .L70+24
+	str	r3, [r5]
 	mov	lr, pc
-	bx	r3
-	ldr	r3, .L70+24
+	bx	r2
+	ldr	r3, .L70+28
 	mov	lr, pc
 	bx	r3
 	ldrh	r3, [r4]
 	tst	r3, #8
 	beq	.L59
-	ldr	r2, .L70+28
+	ldr	r2, .L70+32
 	ldrh	r2, [r2]
 	tst	r2, #8
 	beq	.L68
 .L59:
 	tst	r3, #4
 	beq	.L58
-	ldr	r3, .L70+28
+	ldr	r3, .L70+32
 	ldrh	r3, [r3]
 	tst	r3, #4
 	beq	.L69
@@ -721,6 +738,10 @@ start:
 	pop	{r4, r5, r6, lr}
 	b	goToInstructions
 .L68:
+	ldr	r3, .L70+36
+	ldr	r0, [r5]
+	mov	lr, pc
+	bx	r3
 	bl	goToGame
 	ldrh	r3, [r4]
 	b	.L59
@@ -729,12 +750,14 @@ start:
 .L70:
 	.word	fillScreen4
 	.word	drawString4
-	.word	.LC9
 	.word	.LC10
-	.word	oldButtons
+	.word	seed
+	.word	.LC11
 	.word	waitForVBlank
+	.word	oldButtons
 	.word	flipPage
 	.word	buttons
+	.word	srand
 	.size	start, .-start
 	.section	.text.startup,"ax",%progbits
 	.align	2
@@ -748,23 +771,25 @@ main:
 	@ Volatile: function does not return.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	r3, #67108864
 	mov	r2, #0
+	mov	r3, #67108864
 	push	{r4, r7, fp, lr}
 	ldr	r4, .L86
 	ldr	r7, .L86+4
 	ldrh	ip, [r4, #48]
 	ldr	r0, .L86+8
+	ldr	r1, .L86+12
 	strh	ip, [r7]	@ movhi
-	ldr	r6, .L86+12
+	str	r2, [r1]
+	ldr	r6, .L86+16
 	strh	r0, [r3]	@ movhi
-	ldr	r5, .L86+16
+	ldr	r5, .L86+20
 	ldrh	r0, [r7]
 	str	r2, [r6]
-	ldr	fp, .L86+20
-	ldr	r10, .L86+24
-	ldr	r9, .L86+28
-	ldr	r8, .L86+32
+	ldr	fp, .L86+24
+	ldr	r10, .L86+28
+	ldr	r9, .L86+32
+	ldr	r8, .L86+36
 .L74:
 	strh	r0, [r5]	@ movhi
 	ldrh	r3, [r4, #48]
@@ -781,7 +806,7 @@ main:
 	.word	.L77
 	.word	.L75
 .L75:
-	ldr	r3, .L86+36
+	ldr	r3, .L86+40
 	mov	lr, pc
 	bx	r3
 	ldr	r2, [r6]
@@ -790,14 +815,14 @@ main:
 .L77:
 	tst	r0, #8
 	beq	.L83
-	ldr	r3, .L86+40
+	ldr	r3, .L86+44
 	mov	lr, pc
 	bx	r3
 	ldr	r2, [r6]
 	ldrh	r0, [r7]
 	b	.L74
 .L78:
-	ldr	r3, .L86+44
+	ldr	r3, .L86+48
 	mov	lr, pc
 	bx	r3
 	ldr	r2, [r6]
@@ -832,6 +857,7 @@ main:
 	.word	67109120
 	.word	buttons
 	.word	1044
+	.word	seed
 	.word	state
 	.word	oldButtons
 	.word	start
@@ -868,4 +894,5 @@ instructions:
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2
 	.comm	state,4,4
+	.comm	seed,4,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

@@ -1434,7 +1434,17 @@ typedef struct {
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
     const unsigned short* foregroundMap;
-# 167 "game.h"
+
+    int midgroundTilesLen;
+    int midgroundMapLen;
+    const unsigned short* midgroundTiles;
+    const unsigned short* midgroundMap;
+
+    int backgroundTilesLen;
+    int backgroundMapLen;
+    const unsigned short* backgroundTiles;
+    const unsigned short* backgroundMap;
+
     const unsigned short* defaultPalette;
 
     int numNPCS;
@@ -1600,7 +1610,17 @@ void initLevels() {
     level1.foregroundMapLen = 4096;
     level1.foregroundTiles = level1foregroundTiles;
     level1.foregroundMap = level1foregroundMap;
-# 87 "game.c"
+
+    level1.midgroundTilesLen = 10368;
+    level1.midgroundMapLen = 4096;
+    level1.midgroundTiles = level1midgroundTiles;
+    level1.midgroundMap = level1midgroundMap;
+
+    level1.backgroundTilesLen = 34432;
+    level1.backgroundMapLen = 4096;
+    level1.backgroundTiles = level1backgroundTiles;
+    level1.backgroundMap = level1backgroundMap;
+
     level1.defaultPalette = level1foregroundPal;
 
 }
@@ -1771,6 +1791,10 @@ void updatePlayer() {
         goToWin();
     }
 
+    if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
+        glitchVisuals (40);
+    }
+
     animatePlayer();
 
 }
@@ -1829,7 +1853,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 332 "game.c"
+# 336 "game.c"
             player.aniCounter++;
 
 
@@ -1871,4 +1895,40 @@ void drawNPCS() {
 
     }
     }
+}
+
+void glitchVisuals(int duration) {
+
+    int counter = 0;
+
+    while (counter < duration) {
+        for (int i = 0; i < 5 - 1; i++) {
+            npcs[i].cdel = 0;
+            npcs[i].rdel = 0;
+        }
+
+        DMANow(3, currentLevel->midgroundTiles, &((charblock *)0x6000000)[1], currentLevel->midgroundTilesLen / 2);
+        DMANow(3, currentLevel->midgroundMap, &((screenblock *)0x6000000)[27], currentLevel->midgroundMapLen / 2);
+
+        DMANow(3, currentLevel->backgroundTiles, &((charblock *)0x6000000)[2], currentLevel->backgroundTilesLen / 2);
+        DMANow(3, currentLevel->backgroundMap, &((screenblock *)0x6000000)[24], currentLevel->backgroundMapLen / 2);
+        waitForVBlank();
+        counter++;
+
+    }
+
+    for (int i = 0; i < 5 - 1; i++) {
+            npcs[i].cdel = 1;
+            npcs[i].rdel = 1;
+        }
+
+    DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
+    DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
+    DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
+
+    DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
+    DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
+    hideSprites();
+    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+
 }

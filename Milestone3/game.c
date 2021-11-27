@@ -74,15 +74,15 @@ void initLevels() {
     level1.foregroundTiles = level1foregroundTiles;
     level1.foregroundMap = level1foregroundMap;
 
-    // level1.midgroundTilesLen = level1midgroundTilesLen;
-    // level1.midgroundMapLen = level1midgroundMapLen;
-    // level1.midgroundTiles = level1midgroundTiles;
-    // level1.midgroundMap = level1midgroundMap;
+    level1.midgroundTilesLen = level1midgroundTilesLen;
+    level1.midgroundMapLen = level1midgroundMapLen;
+    level1.midgroundTiles = level1midgroundTiles;
+    level1.midgroundMap = level1midgroundMap;
 
-    // level1.backgroundTilesLen = level1backgroundTilesLen;
-    // level1.backgroundMapLen = level1backgroundMapLen;
-    // level1.backgroundTiles = level1backgroundTiles;
-    // level1.backgroundMap = level1backgroundMap;
+    level1.backgroundTilesLen = level1backgroundTilesLen;
+    level1.backgroundMapLen = level1backgroundMapLen;
+    level1.backgroundTiles = level1backgroundTiles;
+    level1.backgroundMap = level1backgroundMap;
 
     level1.defaultPalette = level1foregroundPal;
 
@@ -254,6 +254,10 @@ void updatePlayer() {
         goToWin();
     }
 
+    if (BUTTON_PRESSED(BUTTON_A)) {
+        glitchVisuals (40);
+    }
+
     animatePlayer();
 
 }
@@ -370,6 +374,42 @@ void drawNPCS() {
         // shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
     }
     }
+}
+
+void glitchVisuals(int duration) {
+
+    int counter = 0;
+
+    while (counter < duration) {
+        for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+            npcs[i].cdel = 0;
+            npcs[i].rdel = 0;
+        }
+
+        DMANow(3, currentLevel->midgroundTiles, &CHARBLOCK[1], currentLevel->midgroundTilesLen / 2);
+        DMANow(3, currentLevel->midgroundMap, &SCREENBLOCK[27], currentLevel->midgroundMapLen / 2);
+
+        DMANow(3, currentLevel->backgroundTiles, &CHARBLOCK[2], currentLevel->backgroundTilesLen / 2);
+        DMANow(3, currentLevel->backgroundMap, &SCREENBLOCK[24], currentLevel->backgroundMapLen / 2);
+        waitForVBlank();
+        counter++;
+        
+    }
+
+    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+            npcs[i].cdel = 1;
+            npcs[i].rdel = 1;
+        }
+
+    DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
+    DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
+    DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
+
+    DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
+    DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
+    hideSprites();
+    DMANow(3, shadowOAM, OAM, 512);
+
 }
 
 

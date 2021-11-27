@@ -154,15 +154,15 @@ typedef struct {
     const unsigned short* foregroundTiles;
     const unsigned short* foregroundMap;
 
-    // int midgroundTilesLen;
-    // int midgroundMapLen;
-    // const unsigned short* midgroundTiles;
-    // const unsigned short* midgroundMap;
+    int midgroundTilesLen;
+    int midgroundMapLen;
+    const unsigned short* midgroundTiles;
+    const unsigned short* midgroundMap;
 
-    // int backgroundTilesLen;
-    // int backgroundMapLen;
-    // const unsigned short* backgroundTiles;
-    // const unsigned short* backgroundMap;
+    int backgroundTilesLen;
+    int backgroundMapLen;
+    const unsigned short* backgroundTiles;
+    const unsigned short* backgroundMap;
 
     const unsigned short* defaultPalette;
 
