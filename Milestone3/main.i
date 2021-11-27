@@ -1304,22 +1304,12 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 4 "main.c" 2
 
 
-# 1 "testgameimage.h" 1
-# 22 "testgameimage.h"
-extern const unsigned short testgameimageTiles[3232];
-
-
-extern const unsigned short testgameimageMap[1024];
-
-
-extern const unsigned short testgameimagePal[256];
-# 7 "main.c" 2
-
-
 # 1 "game.h" 1
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
-# 28 "game.h"
+
+enum {UP, DOWN, LEFT, RIGHT};
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1342,6 +1332,7 @@ typedef struct
 {
 
 
+    int active;
     int screenRow;
     int screenCol;
     int worldRow;
@@ -1359,8 +1350,6 @@ typedef struct
     int prevAniState;
     int curFrame;
     int numFrames;
-
-    int gameSpriteTileSize;
 
 
     int gameSpriteTileIDx;
@@ -1381,6 +1370,8 @@ typedef struct
     char* name;
 
 
+
+    int intendedDirection;
 
 
     int patrols;
@@ -1412,12 +1403,12 @@ typedef struct
 
 
     int aniCounter;
+    int framesToWait;
     int aniState;
+    int numStates;
     int prevAniState;
     int curFrame;
     int numFrames;
-
-    int gameSpriteTileSize;
 
 
     int gameSpriteTileIDx;
@@ -1431,13 +1422,22 @@ typedef struct
 
 typedef struct {
 
-    int playerSpawnCol;
-    int playerSpawnRow;
+    int levelSize;
 
-    int tilesLen;
-    int mapLen;
-    unsigned short* bgTiles;
-    unsigned short* bgMap;
+    int worldPixelWidth;
+    int worldPixelHeight;
+
+    int playerWorldSpawnCol;
+    int playerWorldSpawnRow;
+    int initHOff;
+    int initVOff;
+
+    int foregroundTilesLen;
+    int foregroundMapLen;
+    const unsigned short* foregroundTiles;
+    const unsigned short* foregroundMap;
+# 167 "game.h"
+    const unsigned short* defaultPalette;
 
     int numNPCS;
     NPC npcs[5];
@@ -1447,25 +1447,29 @@ typedef struct {
 
 
 extern NPC* currentTarget;
+extern LEVEL* currentLevel;
 
-extern const unsigned short bgPalette1[];
-extern const unsigned short bgPalette2[];
-extern const unsigned short bgPalette3[];
-
-extern const unsigned short spritePalette1[];
-extern const unsigned short spritePalette2[];
-extern const unsigned short spritePalette3[];
+extern LEVEL level1;
 
 
 
+void initGame();
 
-void loadLevel(LEVEL level);
+void initNPCS();
+void initLevels();
+void initPlayer();
+
+void loadLevel(LEVEL* level);
+void loadNPC(NPC* npc);
 
 void updateGame();
 void updatePlayer();
 void updateNPCS();
 
 void updateBackgrounds();
+
+void animatePlayer();
+void animateNPCS();
 
 void drawGame();
 void drawPlayer();
@@ -1490,19 +1494,16 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 10 "main.c" 2
+# 7 "main.c" 2
 
 
 # 1 "spritesheet.h" 1
-# 22 "spritesheet.h"
-extern const unsigned short spritesheetTiles[528];
+# 21 "spritesheet.h"
+extern const unsigned short SPRITESHEETTiles[16384];
 
 
-extern const unsigned short spritesheetMap[1024];
-
-
-extern const unsigned short spritesheetPal[256];
-# 13 "main.c" 2
+extern const unsigned short SPRITESHEETPal[256];
+# 10 "main.c" 2
 
 
 # 1 "text.h" 1
@@ -1513,7 +1514,7 @@ void drawString3(int col, int row, char *str, unsigned short color);
 
 void drawChar4(int col, int row, char ch, unsigned char colorIndex);
 void drawString4(int col, int row, char *str, unsigned char colorIndex);
-# 16 "main.c" 2
+# 13 "main.c" 2
 
 
 void initialize();
@@ -1595,13 +1596,6 @@ int main()
 
 void initialize()
 {
-
-
-
-
-
-
-
     buttons = (*(volatile unsigned short *)0x04000130);
     oldButtons = 0;
 
@@ -1611,23 +1605,11 @@ void initialize()
 
 void goToStart() {
 
-
     (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
 
 
 
-    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
-    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
-
-    fillScreen4(1);
-
-
-    char* string = "Death to Persia";
-    drawString4(50, 50, string, 0);
-
-    waitForVBlank();
-    flipPage();
 
 
     state = START;
@@ -1637,10 +1619,19 @@ void goToStart() {
 
 void start() {
 
+    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
+    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
 
+    fillScreen4(1);
 
+    char* string = "PRESS START TO BEGIN.";
+    char* string1 = "PRESS SELECT FOR INSTRUCTIONS.";
+
+    drawString4(20, 80, string, 0);
+    drawString4(20, 100, string1, 0);
 
     waitForVBlank();
+    flipPage();
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
@@ -1649,23 +1640,41 @@ void start() {
 
     }
 
+    if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
+
+
+        goToInstructions();
+
+    }
+
 }
 
 
 void goToGame() {
 
-    DMANow(3, testgameimagePal, ((unsigned short *)0x5000000), 512 / 2);
-    DMANow(3, testgameimageTiles, &((charblock *)0x6000000)[0], 6464 / 2);
- DMANow(3, testgameimageMap, &((screenblock *)0x6000000)[28], 2048 / 2);
-
     waitForVBlank();
+
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+
+    DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
+    DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
+    hideSprites();
+    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+
+    initGame();
+    loadLevel(&level1);
 
     state = GAME;
 
 }
 
 
-void game() {}
+void game() {
+
+    updateGame();
+    drawGame();
+
+}
 
 void goToDialogue() {
 
@@ -1676,27 +1685,161 @@ void dialogue() {
 }
 
 
-void goToPause() {}
+void goToPause() {
 
 
-void pause() {}
+
+    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
+
+    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
+    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
 
 
-void goToWin() {}
+    state = PAUSE;
+
+}
 
 
-void win() {}
+void pause() {
+
+    fillScreen4(1);
+
+    char* string = "PAUSED.";
+
+    drawString4(20, 60, string, 0);
+
+    waitForVBlank();
+    flipPage();
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+
+        waitForVBlank();
+
+        (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+
+        DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
+        DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
+        hideSprites();
+        DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+        (*(volatile unsigned short *)0x4000008) = currentLevel->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
+        (*(volatile unsigned short *)0x400000A) = currentLevel->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
+        (*(volatile unsigned short *)0x400000C) = currentLevel->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
+
+        DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
+        DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
+        DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
+
+        state = GAME;
+    }
+
+}
 
 
-void goToLose() {}
+void goToWin() {
+
+    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
+
+    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
+    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (31) << 10);
 
 
-void lose() {}
+    state = WIN;
+
+}
+
+
+void win() {
+
+    fillScreen4(1);
+
+    char* string = "YOU REACH AETHER.";
+    char* string1 = "PRESS START TO REPLAY.";
+
+    drawString4(20, 60, string, 0);
+    drawString4(20, 70, string1, 0);
+
+    waitForVBlank();
+    flipPage();
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+
+        goToStart();
+
+    }
+
+}
+
+
+void goToLose() {
+
+
+
+    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
+
+
+
+
+    ((unsigned short *)0x5000000)[0] = ((31) | (0) << 5 | (0) << 10);
+    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
+
+    fillScreen4(1);
+
+    waitForVBlank();
+    flipPage();
+
+    state = LOSE;
+
+}
+
+
+void lose() {
+
+
+
+    char* string = "YOU PERISH.";
+    char* string1 = "PRESS START TO BEGIN ANEW.";
+
+    drawString4(20, 80, string, 0);
+    drawString4(20, 100, string1, 0);
+
+    waitForVBlank();
+    flipPage();
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+
+        goToStart();
+
+    }
+
+}
 
 void goToInstructions() {
+
+    fillScreen4(1);
+
+    char* string = "DIRECTIONAL BUTTONS TO MOVE.";
+    char* string3 = "START TO PAUSE.";
+    char* string1 = "AVOID ENTITIES. REACH END.";
+    char* string2 = "PRESS START TO RETURN TO START.";
+
+    drawString4(20, 80, string, 0);
+    drawString4(20, 90, string3, 0);
+    drawString4(20, 100, string1, 0);
+    drawString4(20, 110, string2, 0);
+
+    waitForVBlank();
+    flipPage();
+
+    state = INSTRUCTIONS;
 
 }
 
 void instructions() {
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+
+        goToStart();
+
+    }
 
 }

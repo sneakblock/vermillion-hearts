@@ -1,6 +1,8 @@
 // ++++++++++++++++++++++++++ ENUMS +++++++++++++++++++++++++++++++++++
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
+enum {UP, DOWN, LEFT, RIGHT};
+
 
 
 // &*&*&*&&*&*&*&*&&*&&*&*&*&*&*&*&*&* GLITCHING *&&&^^^^&^&^&&^**&*&*&*&*&*&*&*&*&*&*%%&
@@ -47,6 +49,7 @@ typedef struct
 {
     // --------------- Standard attributes -----------------
 
+    int active;
     int screenRow;
     int screenCol;
     int worldRow;
@@ -64,8 +67,6 @@ typedef struct
     int prevAniState;
     int curFrame;
     int numFrames;
-    // the size, in tiles, of the sprite. Ensures proper origins of each frame of animation are chosen.
-    int gameSpriteTileSize;
     // e.g shadowOAM[x].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(gameSpriteTileIDx + char.aniState * gameSpriteTileSize, gameSpriteTileIDy + char.curFrame * gameSpriteTileSize);
     // aka, the local origin of that character's sub spritesheet
     int gameSpriteTileIDx;
@@ -86,6 +87,8 @@ typedef struct
     char* name;
 
     // -------------- Movement and Patrolling -----------------
+
+    int intendedDirection;
 
     // 0 if the NPC does not patrol, 1 if it does
     int patrols;
@@ -117,12 +120,12 @@ typedef struct
     // ---------- Game Sprite Information -------------------
 
     int aniCounter;
+    int framesToWait;
     int aniState;
+    int numStates;
     int prevAniState;
     int curFrame;
     int numFrames;
-    // the size, in tiles, of the sprite. Ensures proper origins of each frame of animation are chosen.
-    int gameSpriteTileSize;
     // e.g shadowOAM[x].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(gameSpriteTileIDx + char.aniState * gameSpriteTileSize, gameSpriteTileIDy + char.curFrame * gameSpriteTileSize);
     // aka, the local origin of that character's sub spritesheet
     int gameSpriteTileIDx;
@@ -136,13 +139,32 @@ typedef struct
 
 typedef struct {
 
-    int playerSpawnCol;
-    int playerSpawnRow;
+    int levelSize;
 
-    int tilesLen;
-    int mapLen;
-    unsigned short* bgTiles;
-    unsigned short* bgMap;
+    int worldPixelWidth;
+    int worldPixelHeight;
+
+    int playerWorldSpawnCol;
+    int playerWorldSpawnRow;
+    int initHOff;
+    int initVOff;
+
+    int foregroundTilesLen;
+    int foregroundMapLen;
+    const unsigned short* foregroundTiles;
+    const unsigned short* foregroundMap;
+
+    // int midgroundTilesLen;
+    // int midgroundMapLen;
+    // const unsigned short* midgroundTiles;
+    // const unsigned short* midgroundMap;
+
+    // int backgroundTilesLen;
+    // int backgroundMapLen;
+    // const unsigned short* backgroundTiles;
+    // const unsigned short* backgroundMap;
+
+    const unsigned short* defaultPalette;
 
     int numNPCS;
     NPC npcs[MAX_NPCS_PER_LEVEL];
@@ -152,25 +174,29 @@ typedef struct {
 // @@@@@@@@@@@@@@@@@@@@@@@@@ EXTERN VARIABLES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 extern NPC* currentTarget;
+extern LEVEL* currentLevel;
 
-extern const unsigned short bgPalette1[];
-extern const unsigned short bgPalette2[];
-extern const unsigned short bgPalette3[];
-
-extern const unsigned short spritePalette1[];
-extern const unsigned short spritePalette2[];
-extern const unsigned short spritePalette3[];
+extern LEVEL level1;
 
 // +++++++++++++++++++++ METHOD HEADERS OR STUBS OR WHATEVER :) ++++++++++++++++++++++++++
 
-//Takes in an int of the level from the above enum, loads it's background and sprite positions.
-void loadLevel(LEVEL level);
+void initGame();
+
+void initNPCS();
+void initLevels();
+void initPlayer();
+
+void loadLevel(LEVEL* level);
+void loadNPC(NPC* npc);
 
 void updateGame();
 void updatePlayer();
 void updateNPCS();
 //I might use this for scrolling backgrounds or something, I'm not sure yet.
 void updateBackgrounds();
+
+void animatePlayer();
+void animateNPCS();
 
 void drawGame();
 void drawPlayer();

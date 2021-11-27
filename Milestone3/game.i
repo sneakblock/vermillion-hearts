@@ -1305,7 +1305,9 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 1 "game.h" 1
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
-# 28 "game.h"
+
+enum {UP, DOWN, LEFT, RIGHT};
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1328,6 +1330,7 @@ typedef struct
 {
 
 
+    int active;
     int screenRow;
     int screenCol;
     int worldRow;
@@ -1345,8 +1348,6 @@ typedef struct
     int prevAniState;
     int curFrame;
     int numFrames;
-
-    int gameSpriteTileSize;
 
 
     int gameSpriteTileIDx;
@@ -1367,6 +1368,8 @@ typedef struct
     char* name;
 
 
+
+    int intendedDirection;
 
 
     int patrols;
@@ -1398,12 +1401,12 @@ typedef struct
 
 
     int aniCounter;
+    int framesToWait;
     int aniState;
+    int numStates;
     int prevAniState;
     int curFrame;
     int numFrames;
-
-    int gameSpriteTileSize;
 
 
     int gameSpriteTileIDx;
@@ -1417,13 +1420,22 @@ typedef struct
 
 typedef struct {
 
-    int playerSpawnCol;
-    int playerSpawnRow;
+    int levelSize;
 
-    int tilesLen;
-    int mapLen;
-    unsigned short* bgTiles;
-    unsigned short* bgMap;
+    int worldPixelWidth;
+    int worldPixelHeight;
+
+    int playerWorldSpawnCol;
+    int playerWorldSpawnRow;
+    int initHOff;
+    int initVOff;
+
+    int foregroundTilesLen;
+    int foregroundMapLen;
+    const unsigned short* foregroundTiles;
+    const unsigned short* foregroundMap;
+# 167 "game.h"
+    const unsigned short* defaultPalette;
 
     int numNPCS;
     NPC npcs[5];
@@ -1433,25 +1445,29 @@ typedef struct {
 
 
 extern NPC* currentTarget;
+extern LEVEL* currentLevel;
 
-extern const unsigned short bgPalette1[];
-extern const unsigned short bgPalette2[];
-extern const unsigned short bgPalette3[];
-
-extern const unsigned short spritePalette1[];
-extern const unsigned short spritePalette2[];
-extern const unsigned short spritePalette3[];
+extern LEVEL level1;
 
 
 
+void initGame();
 
-void loadLevel(LEVEL level);
+void initNPCS();
+void initLevels();
+void initPlayer();
+
+void loadLevel(LEVEL* level);
+void loadNPC(NPC* npc);
 
 void updateGame();
 void updatePlayer();
 void updateNPCS();
 
 void updateBackgrounds();
+
+void animatePlayer();
+void animateNPCS();
 
 void drawGame();
 void drawPlayer();
@@ -1478,4 +1494,381 @@ void changeSprite();
 void rotateCollisionMap();
 # 5 "game.c" 2
 
+# 1 "standardpalette.h" 1
+# 20 "standardpalette.h"
+extern const unsigned short standardpalettePal[256];
+# 7 "game.c" 2
+
+# 1 "level1foreground.h" 1
+# 22 "level1foreground.h"
+extern const unsigned short level1foregroundTiles[19328];
+
+
+extern const unsigned short level1foregroundMap[2048];
+
+
+extern const unsigned short level1foregroundPal[256];
+# 9 "game.c" 2
+# 1 "level1midground.h" 1
+# 21 "level1midground.h"
+extern const unsigned short level1midgroundTiles[5184];
+
+
+extern const unsigned short level1midgroundMap[2048];
+# 10 "game.c" 2
+# 1 "level1background.h" 1
+# 21 "level1background.h"
+extern const unsigned short level1backgroundTiles[17216];
+
+
+extern const unsigned short level1backgroundMap[2048];
+# 11 "game.c" 2
+# 1 "level1collisionmap.h" 1
+# 21 "level1collisionmap.h"
+extern const unsigned short level1collisionmapBitmap[65536];
+
+
+extern const unsigned short level1collisionmapPal[256];
+# 12 "game.c" 2
+
+# 1 "spritesheet.h" 1
+# 21 "spritesheet.h"
+extern const unsigned short SPRITESHEETTiles[16384];
+
+
+extern const unsigned short SPRITESHEETPal[256];
+# 14 "game.c" 2
+
+
 NPC* currentTarget;
+LEVEL* currentLevel;
+LEVEL level1;
+PLAYER player;
+
+
+NPC npcs[5];
+
+int hOff;
+int vOff;
+
+unsigned char* level1collisionmap = level1collisionmapBitmap;
+
+void initGame() {
+
+    initLevels();
+    initPlayer();
+    initNPCS();
+
+}
+
+void updateGame() {
+
+    updatePlayer();
+    updateNPCS();
+
+}
+
+void drawGame() {
+
+    drawPlayer();
+    drawNPCS();
+
+
+    waitForVBlank();
+
+    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 128 * 4);
+
+    (*(volatile unsigned short *)0x04000010) = hOff;
+    (*(volatile unsigned short *)0x04000012) = vOff;
+
+}
+
+
+
+void initLevels() {
+
+
+    level1.levelSize = (1 << 14);
+    level1.worldPixelWidth = 512;
+    level1.worldPixelHeight = 256;
+    level1.playerWorldSpawnCol = 450;
+    level1.playerWorldSpawnRow = 177;
+    level1.initHOff = 262;
+    level1.initVOff = 64;
+
+    level1.foregroundTilesLen = 38656;
+    level1.foregroundMapLen = 4096;
+    level1.foregroundTiles = level1foregroundTiles;
+    level1.foregroundMap = level1foregroundMap;
+# 87 "game.c"
+    level1.defaultPalette = level1foregroundPal;
+
+}
+
+void initPlayer() {
+
+    player.currentEidolon = CLOUD;
+    player.rdel = 1;
+    player.cdel = 1;
+    player.width = 8;
+    player.height = 16;
+
+    player.hide = 0;
+
+    player.aniCounter = 0;
+    player.framesToWait = 20;
+    player.aniState = 0;
+    player.numStates = 1;
+    player.prevAniState = 0;
+    player.curFrame = 0;
+    player.numFrames = 2;
+    player.gameSpriteTileIDx = 0;
+    player.gameSpriteTileIDy = 0;
+
+}
+
+void initNPCS() {
+
+    for (int i = 0; i < 5 - 1; i++) {
+        npcs[i].active = 1;
+        npcs[i].hide = 0;
+        npcs[i].rdel = 1;
+        npcs[i].cdel = 1;
+        npcs[i].width = 8;
+        npcs[i].height = 16;
+        npcs[i].aniState = DOWN;
+        npcs[i].curFrame = 0;
+        npcs[i].numFrames = 2;
+        npcs[i].gameSpriteTileIDx = 1;
+        npcs[i].gameSpriteTileIDy = 0;
+    }
+
+    npcs[0].worldCol = 303;
+    npcs[0].worldRow = 241;
+    npcs[0].intendedDirection = UP;
+
+    npcs[1].worldCol = 208;
+    npcs[1].worldRow = 178;
+    npcs[1].intendedDirection = LEFT;
+
+    npcs[2].worldCol = 177;
+    npcs[2].worldRow = 240;
+    npcs[2].intendedDirection = RIGHT;
+
+    npcs[3].worldCol = 172;
+    npcs[3].worldRow = 135;
+    npcs[3].intendedDirection = DOWN;
+
+}
+
+void loadLevel(LEVEL* level) {
+
+    (*(volatile unsigned short *)0x4000008) = level->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
+    (*(volatile unsigned short *)0x400000A) = level->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
+    (*(volatile unsigned short *)0x400000C) = level->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
+
+    DMANow(3, level->defaultPalette, ((unsigned short *)0x5000000), 256);
+    DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
+    DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
+
+    hOff = level->initHOff;
+    vOff = level->initVOff;
+
+
+
+
+
+
+
+    player.worldCol = level->playerWorldSpawnCol;
+    player.worldRow = level->playerWorldSpawnRow;
+
+
+
+
+
+
+
+    currentLevel = level;
+
+}
+
+void loadNPC(NPC* npc) {
+
+    npc->active = 1;
+
+}
+
+
+
+void updatePlayer() {
+
+    if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6)))) {
+        if (player.worldRow > 0 && level1collisionmap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
+            level1collisionmap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
+
+                player.worldRow = player.worldRow - player.rdel;
+
+            if (vOff > 0 && (player.worldRow - vOff) <= 160 / 2) {
+
+                vOff--;
+            }
+        }
+    }
+    if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 7)))) {
+        if (player.worldRow + player.height < currentLevel->worldPixelHeight && level1collisionmap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
+            level1collisionmap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
+                player.worldRow = player.worldRow + player.rdel;
+
+
+
+
+
+            if (vOff < currentLevel->worldPixelHeight - 160 && (player.worldRow - vOff) > 160 / 2) {
+
+                vOff++;
+            }
+        }
+    }
+    if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 5)))) {
+        if (player.worldCol > 0 && level1collisionmap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))] &&
+            level1collisionmap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))]) {
+                player.worldCol = player.worldCol - player.cdel;
+
+
+
+            if (hOff > 0 && (player.worldCol - hOff) <= 240 / 2) {
+                hOff--;
+            }
+        }
+    }
+    if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 4)))) {
+        if (player.worldCol + player.width < currentLevel->worldPixelWidth && level1collisionmap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))] &&
+            level1collisionmap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))]) {
+
+            player.worldCol = player.worldCol + player.cdel;
+
+            if (hOff < currentLevel->worldPixelWidth - 240 && (player.worldCol - hOff) > 240 / 2) {
+
+
+                hOff++;
+
+            }
+        }
+    }
+
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+        goToPause();
+    }
+
+    for (int i = 0; i < 5 - 1; i++) {
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height)) {
+            goToLose();
+        }
+    }
+
+    if (player.worldCol == 0) {
+        goToWin();
+    }
+
+    animatePlayer();
+
+}
+
+void updateNPCS() {
+
+    for (int i = 0; i < 5 - 1; i++) {
+
+        switch (npcs[i].intendedDirection) {
+            case UP:
+                if (npcs[i].worldRow > 0 && level1collisionmap[((npcs[i].worldRow - npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol))] &&
+                level1collisionmap[((npcs[i].worldRow - npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1))]) {
+                    npcs[i].worldRow -= npcs[i].rdel;
+                } else {
+                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+                }
+                break;
+            case DOWN:
+                if (npcs[i].worldRow < currentLevel->worldPixelHeight - npcs[i].height && level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol))] &&
+                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1))]) {
+                    npcs[i].worldRow += npcs[i].rdel;
+                } else {
+                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+                }
+                break;
+            case LEFT:
+                if (npcs[i].worldCol > 0 && level1collisionmap[((npcs[i].worldRow) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol - npcs[i].cdel))] &&
+                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol - npcs[i].cdel))]) {
+                npcs[i].worldCol -= npcs[i].cdel;
+                } else {
+                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+                }
+                break;
+            case RIGHT:
+                if (npcs[i].worldCol < currentLevel->worldPixelWidth - npcs[i].width && level1collisionmap[((npcs[i].worldRow) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel))] &&
+                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel))]) {
+                npcs[i].worldCol += npcs[i].cdel;
+                } else {
+                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+                }
+                break;
+        }
+    }
+
+    animateNPCS();
+
+}
+
+void animatePlayer() {
+
+
+
+
+
+        if(player.aniCounter % player.framesToWait == 0) {
+            player.curFrame = (player.curFrame + 1) % player.numFrames;
+            player.aniCounter = 0;
+        }
+# 332 "game.c"
+            player.aniCounter++;
+
+
+}
+
+void animateNPCS() {
+
+        for (int i = 0; i < 5 - 1; i++) {
+            npcs[i].aniState = npcs[i].intendedDirection;
+            if (npcs[i].aniCounter % 20 == 0) {
+            npcs[i].curFrame = (npcs[i].curFrame + 1) % npcs[i].numFrames;
+            npcs[i].aniCounter = 0;
+            }
+            npcs[i].aniCounter++;
+        }
+
+}
+
+void drawPlayer() {
+
+    if (player.hide) {
+        shadowOAM[0].attr0 |= (2 << 8);
+    } else {
+        shadowOAM[0].attr0 = (0xFF & (player.worldRow - vOff)) | (2 << 14) | (0 << 13);
+        shadowOAM[0].attr1 = (0x1FF & (player.worldCol - hOff)) | (0 << 14);
+        shadowOAM[0].attr2 = ((0) << 12) | (((player.gameSpriteTileIDy) + (player.curFrame * (player.height / 8)))*32 + ((player.gameSpriteTileIDx) + (player.aniState * (player.width / 8))));
+
+    }
+}
+
+void drawNPCS() {
+    for (int i = 0; i < 5 - 1; i++) {
+        if (npcs[i].hide) {
+        shadowOAM[i + 1].attr0 |= (2 << 8);
+        } else {
+        shadowOAM[i + 1].attr0 = (0xFF & (npcs[i].worldRow - vOff)) | (2 << 14) | (0 << 13);
+        shadowOAM[i + 1].attr1 = (0x1FF & (npcs[i].worldCol - hOff)) | (0 << 14);
+        shadowOAM[i + 1].attr2 = ((0) << 12) | (((npcs[i].gameSpriteTileIDy) + (npcs[i].curFrame * (npcs[i].height / 8)))*32 + ((npcs[i].gameSpriteTileIDx) + (npcs[i].aniState * (npcs[i].width / 8))));
+
+    }
+    }
+}
