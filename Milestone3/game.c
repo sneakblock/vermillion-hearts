@@ -12,6 +12,8 @@
 
 #include "spritesheet.h"
 
+#include "talkingheadtest.h"
+
 
 NPC* currentTarget;
 LEVEL* currentLevel;
@@ -85,6 +87,8 @@ void initLevels() {
     level1.backgroundMap = level1backgroundMap;
 
     level1.defaultPalette = level1foregroundPal;
+    
+    level1.numNPCS = 4;
 
 }
 
@@ -124,6 +128,9 @@ void initNPCS() {
         npcs[i].numFrames = 2;
         npcs[i].gameSpriteTileIDx = 1;
         npcs[i].gameSpriteTileIDy = 0;
+        npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
+        npcs[i].talkingHeadPalette = talkingheadtestPal;
+        npcs[i].talkingHeadPalLen = talkingheadtestPalLen;
     }
 
     npcs[0].worldCol = 303;
@@ -244,18 +251,26 @@ void updatePlayer() {
         goToPause();
     }
 
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height)) {
-            goToLose();
+    // for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+    //     if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height)) {
+    //         goToLose();
+    //     }
+    // }
+
+    // if (player.worldCol == 0) {
+    //     goToWin();
+    // }
+
+    // if (BUTTON_PRESSED(BUTTON_A)) {
+    //     glitchVisuals (40);
+    // }
+
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
+        //Temp solution
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && BUTTON_PRESSED(BUTTON_A)) {
+            currentTarget = &npcs[i];
+            goToDialogue();
         }
-    }
-
-    if (player.worldCol == 0) {
-        goToWin();
-    }
-
-    if (BUTTON_PRESSED(BUTTON_A)) {
-        glitchVisuals (40);
     }
 
     animatePlayer();
@@ -264,43 +279,43 @@ void updatePlayer() {
 
 void updateNPCS() {
 
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+    // for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
 
-        switch (npcs[i].intendedDirection) {
-            case UP:
-                if (npcs[i].worldRow > 0 && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)] && 
-                level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)]) {
-                    npcs[i].worldRow -= npcs[i].rdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case DOWN:
-                if (npcs[i].worldRow < currentLevel->worldPixelHeight - npcs[i].height && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)] && 
-                level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)]) {
-                    npcs[i].worldRow += npcs[i].rdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case LEFT:
-                if (npcs[i].worldCol > 0 && level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
-                level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
-                npcs[i].worldCol -= npcs[i].cdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case RIGHT:
-                if (npcs[i].worldCol < currentLevel->worldPixelWidth - npcs[i].width && level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
-                level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
-                npcs[i].worldCol += npcs[i].cdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-        }
-    }
+    //     switch (npcs[i].intendedDirection) {
+    //         case UP:
+    //             if (npcs[i].worldRow > 0 && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)] && 
+    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)]) {
+    //                 npcs[i].worldRow -= npcs[i].rdel;
+    //             } else {
+    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+    //             }
+    //             break;
+    //         case DOWN:
+    //             if (npcs[i].worldRow < currentLevel->worldPixelHeight - npcs[i].height && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)] && 
+    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)]) {
+    //                 npcs[i].worldRow += npcs[i].rdel;
+    //             } else {
+    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+    //             }
+    //             break;
+    //         case LEFT:
+    //             if (npcs[i].worldCol > 0 && level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
+    //             level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
+    //             npcs[i].worldCol -= npcs[i].cdel;
+    //             } else {
+    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+    //             }
+    //             break;
+    //         case RIGHT:
+    //             if (npcs[i].worldCol < currentLevel->worldPixelWidth - npcs[i].width && level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
+    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
+    //             npcs[i].worldCol += npcs[i].cdel;
+    //             } else {
+    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
+    //             }
+    //             break;
+    //     }
+    // }
 
     animateNPCS();
 

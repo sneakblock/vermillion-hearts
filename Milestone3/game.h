@@ -76,9 +76,10 @@ typedef struct
 
     // 0 if false, 1 if true
     int canTalk;
-    //Talking head sprite information
-    int talkingHeadSpriteTileIDx;
-    int talkingHeadSpriteTileIDy;
+    //Talking head image information
+    const unsigned short* talkingHeadBitmap;
+    const unsigned short* talkingHeadPalette;
+    int talkingHeadPalLen;
     // The array of all the character's dialogues.
     DIALOGUE dialogues[NUM_DIALOGUES];
     //The current index of the dialogues array.

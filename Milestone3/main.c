@@ -22,6 +22,8 @@
 //Text stuff
 #include "text.h"
 
+#include "talkingheadtest.h"
+
 // Prototypes
 void initialize();
 
@@ -48,7 +50,7 @@ enum
 {
     START,
     GAME,
-    DIALOUGE,
+    SPEAKING,
     PAUSE,
     WIN,
     INSTRUCTIONS,
@@ -82,7 +84,7 @@ int main()
         case GAME:
             game();
             break;
-        case DIALOUGE:
+        case SPEAKING:
             dialogue();
             break;
         case PAUSE:
@@ -150,6 +152,7 @@ void start() {
         //glitchVisuals();
         srand(seed);
         goToGame();
+        
 
     }
 
@@ -191,10 +194,32 @@ void game() {
 
 void goToDialogue() {
 
+    
+    //Turns off display controller
+    REG_DISPCTL = 0;
+
+    DMANow(3, currentTarget->talkingHeadPalette, PALETTE, currentTarget->talkingHeadPalLen / 2);
+
+    // Goes to Mode4
+    REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
+
+    PALETTE[0] = BLACK;
+    fillScreen4(0);
+
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 50, 50, currentTarget->talkingHeadBitmap);
+    }
+
+    waitForVBlank();
+    flipPage();
+
+    state = SPEAKING;
+    
+
 }
 
 void dialogue() {
-
+    
 }
 
 // Sets up the pause state

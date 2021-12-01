@@ -1361,8 +1361,9 @@ typedef struct
 
     int canTalk;
 
-    int talkingHeadSpriteTileIDx;
-    int talkingHeadSpriteTileIDy;
+    const unsigned short* talkingHeadBitmap;
+    const unsigned short* talkingHeadPalette;
+    int talkingHeadPalLen;
 
     DIALOGUE dialogues[10];
 
@@ -1527,6 +1528,14 @@ void drawChar4(int col, int row, char ch, unsigned char colorIndex);
 void drawString4(int col, int row, char *str, unsigned char colorIndex);
 # 24 "main.c" 2
 
+# 1 "talkingheadtest.h" 1
+# 21 "talkingheadtest.h"
+extern const unsigned short talkingheadtestBitmap[1300];
+
+
+extern const unsigned short talkingheadtestPal[256];
+# 26 "main.c" 2
+
 
 void initialize();
 
@@ -1553,7 +1562,7 @@ enum
 {
     START,
     GAME,
-    DIALOUGE,
+    SPEAKING,
     PAUSE,
     WIN,
     INSTRUCTIONS,
@@ -1587,7 +1596,7 @@ int main()
         case GAME:
             game();
             break;
-        case DIALOUGE:
+        case SPEAKING:
             dialogue();
             break;
         case PAUSE:
@@ -1656,6 +1665,7 @@ void start() {
         srand(seed);
         goToGame();
 
+
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
@@ -1695,6 +1705,28 @@ void game() {
 }
 
 void goToDialogue() {
+
+
+
+    (*(volatile unsigned short *)0x4000000) = 0;
+
+    DMANow(3, currentTarget->talkingHeadPalette, ((unsigned short *)0x5000000), currentTarget->talkingHeadPalLen / 2);
+
+
+    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
+
+    ((unsigned short *)0x5000000)[0] = ((0) | (0) << 5 | (0) << 10);
+    fillScreen4(0);
+
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 50, 50, currentTarget->talkingHeadBitmap);
+    }
+
+    waitForVBlank();
+    flipPage();
+
+    state = SPEAKING;
+
 
 }
 

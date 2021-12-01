@@ -1358,8 +1358,9 @@ typedef struct
 
     int canTalk;
 
-    int talkingHeadSpriteTileIDx;
-    int talkingHeadSpriteTileIDy;
+    const unsigned short* talkingHeadBitmap;
+    const unsigned short* talkingHeadPalette;
+    int talkingHeadPalLen;
 
     DIALOGUE dialogues[10];
 
@@ -1549,6 +1550,14 @@ extern const unsigned short SPRITESHEETTiles[16384];
 extern const unsigned short SPRITESHEETPal[256];
 # 14 "game.c" 2
 
+# 1 "talkingheadtest.h" 1
+# 21 "talkingheadtest.h"
+extern const unsigned short talkingheadtestBitmap[1300];
+
+
+extern const unsigned short talkingheadtestPal[256];
+# 16 "game.c" 2
+
 
 NPC* currentTarget;
 LEVEL* currentLevel;
@@ -1623,6 +1632,8 @@ void initLevels() {
 
     level1.defaultPalette = level1foregroundPal;
 
+    level1.numNPCS = 4;
+
 }
 
 void initPlayer() {
@@ -1661,6 +1672,9 @@ void initNPCS() {
         npcs[i].numFrames = 2;
         npcs[i].gameSpriteTileIDx = 1;
         npcs[i].gameSpriteTileIDy = 0;
+        npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
+        npcs[i].talkingHeadPalette = talkingheadtestPal;
+        npcs[i].talkingHeadPalLen = 512;
     }
 
     npcs[0].worldCol = 303;
@@ -1780,19 +1794,13 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
+# 268 "game.c"
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
 
-    for (int i = 0; i < 5 - 1; i++) {
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height)) {
-            goToLose();
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
+            currentTarget = &npcs[i];
+            goToDialogue();
         }
-    }
-
-    if (player.worldCol == 0) {
-        goToWin();
-    }
-
-    if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
-        glitchVisuals (40);
     }
 
     animatePlayer();
@@ -1800,45 +1808,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-
-    for (int i = 0; i < 5 - 1; i++) {
-
-        switch (npcs[i].intendedDirection) {
-            case UP:
-                if (npcs[i].worldRow > 0 && level1collisionmap[((npcs[i].worldRow - npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol))] &&
-                level1collisionmap[((npcs[i].worldRow - npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1))]) {
-                    npcs[i].worldRow -= npcs[i].rdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case DOWN:
-                if (npcs[i].worldRow < currentLevel->worldPixelHeight - npcs[i].height && level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol))] &&
-                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1))]) {
-                    npcs[i].worldRow += npcs[i].rdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case LEFT:
-                if (npcs[i].worldCol > 0 && level1collisionmap[((npcs[i].worldRow) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol - npcs[i].cdel))] &&
-                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol - npcs[i].cdel))]) {
-                npcs[i].worldCol -= npcs[i].cdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-            case RIGHT:
-                if (npcs[i].worldCol < currentLevel->worldPixelWidth - npcs[i].width && level1collisionmap[((npcs[i].worldRow) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel))] &&
-                level1collisionmap[((npcs[i].worldRow + npcs[i].height - 1) * (currentLevel->worldPixelWidth) + (npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel))]) {
-                npcs[i].worldCol += npcs[i].cdel;
-                } else {
-                    npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-                }
-                break;
-        }
-    }
-
+# 320 "game.c"
     animateNPCS();
 
 }
@@ -1853,7 +1823,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 336 "game.c"
+# 351 "game.c"
             player.aniCounter++;
 
 
