@@ -37,6 +37,10 @@ typedef struct {
     int endsConversation;
     // The actual sentence.
     char* string;
+
+    // The responses, as strings.
+    char* choiceA;
+    char* choiceB;
 } DIALOGUE;
 
 typedef struct {
@@ -84,6 +88,7 @@ typedef struct
     DIALOGUE dialogues[NUM_DIALOGUES];
     //The current index of the dialogues array.
     int dialoguesIndex;
+    int postConvoIndex;
     //npc's name
     char* name;
 

@@ -174,10 +174,26 @@ initPlayer:
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC0:
-	.ascii	"Plant Merchant\000"
+	.ascii	"Plant Merchant:\000"
 	.align	2
 .LC1:
-	.ascii	"I like plant :)\000"
+	.ascii	"I like plants. Wow I sure do. I love plants so much"
+	.ascii	" that I can't even handle it haha. Plants really ar"
+	.ascii	"e my favorite!\000"
+	.align	2
+.LC2:
+	.ascii	"I hate plants.\000"
+	.align	2
+.LC3:
+	.ascii	"I love plants, too.\000"
+	.align	2
+.LC4:
+	.ascii	"How could you say that? Plants bring us life, light"
+	.ascii	", and joy. :(\000"
+	.align	2
+.LC5:
+	.ascii	"I'm so happy to hear that! I'm glad that they bring"
+	.ascii	" you joy the same way they do for me!\000"
 	.text
 	.align	2
 	.global	initNPCS
@@ -190,38 +206,55 @@ initNPCS:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	ldr	r0, .L18
-	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	mov	r2, #1
 	mov	r3, r0
 	mov	r1, #0
-	mov	r10, #8
-	mov	r9, #16
+	mov	fp, #8
+	mov	r10, #16
 	mov	ip, #2
-	mov	r8, #512
-	ldr	r7, .L18+4
-	ldr	r6, .L18+8
-	ldr	r5, .L18+12
-	ldr	r4, .L18+16
-	add	lr, r0, #1344
+	mov	r9, #512
+	ldr	r8, .L18+4
+	ldr	r7, .L18+8
+	ldr	r6, .L18+12
+	ldr	r5, .L18+16
+	ldr	r4, .L18+20
 .L15:
+	ldr	lr, .L18+24
+	str	lr, [r3, #104]
+	ldr	lr, .L18+28
+	str	lr, [r3, #108]
+	ldr	lr, .L18+32
+	str	lr, [r3, #128]
+	ldr	lr, .L18+36
 	str	r2, [r3]
 	str	r1, [r3, #36]
 	str	r2, [r3, #20]
 	str	r2, [r3, #24]
-	str	r10, [r3, #28]
-	str	r9, [r3, #32]
+	str	fp, [r3, #28]
+	str	r10, [r3, #32]
 	str	r2, [r3, #44]
 	str	r1, [r3, #52]
 	str	ip, [r3, #56]
 	str	r2, [r3, #60]
 	str	r1, [r3, #64]
-	str	r7, [r3, #72]
-	str	r6, [r3, #76]
-	str	r8, [r3, #80]
-	str	r5, [r3, #288]
-	str	r4, [r3, #100]
-	str	r1, [r3, #284]
-	add	r3, r3, #336
+	str	r8, [r3, #72]
+	str	r7, [r3, #76]
+	str	r9, [r3, #80]
+	str	r6, [r3, #372]
+	str	r2, [r3, #84]
+	str	r2, [r3, #88]
+	str	ip, [r3, #92]
+	str	r1, [r3, #96]
+	str	r5, [r3, #100]
+	str	r1, [r3, #112]
+	str	r2, [r3, #124]
+	str	r1, [r3, #140]
+	str	r2, [r3, #152]
+	str	r4, [r3, #156]
+	str	r1, [r3, #364]
+	str	r1, [r3, #368]
+	add	r3, r3, #420
 	cmp	r3, lr
 	bne	.L15
 	mov	r3, #177
@@ -232,20 +265,20 @@ initNPCS:
 	mov	r5, #3
 	mov	r4, #172
 	mov	lr, #135
-	str	r3, [r0, #688]
+	str	r3, [r0, #856]
 	add	r3, r3, #126
 	str	r9, [r0, #12]
-	str	r8, [r0, #352]
-	str	r7, [r0, #348]
-	str	r6, [r0, #684]
-	str	r5, [r0, #964]
-	str	r4, [r0, #1024]
-	str	lr, [r0, #1020]
-	str	r1, [r0, #292]
-	str	ip, [r0, #628]
-	str	r2, [r0, #1300]
+	str	r8, [r0, #436]
+	str	r7, [r0, #432]
+	str	r6, [r0, #852]
+	str	r5, [r0, #1216]
+	str	r4, [r0, #1276]
+	str	lr, [r0, #1272]
+	str	r1, [r0, #376]
+	str	ip, [r0, #796]
+	str	r2, [r0, #1636]
 	str	r3, [r0, #16]
-	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
 .L19:
 	.align	2
@@ -255,6 +288,11 @@ initNPCS:
 	.word	talkingheadtestPal
 	.word	.LC0
 	.word	.LC1
+	.word	.LC5
+	.word	.LC2
+	.word	.LC3
+	.word	.LC4
+	.word	npcs+1680
 	.size	initNPCS, .-initNPCS
 	.align	2
 	.global	initGame
@@ -514,7 +552,7 @@ updatePlayer:
 	ldr	r3, [r7]
 	ldr	r3, [r3, #80]
 	cmp	r3, r6
-	add	r5, r5, #336
+	add	r5, r5, #420
 	bgt	.L47
 .L48:
 	ldr	r5, [r4, #40]
@@ -718,14 +756,14 @@ animateNPCS:
 	ldr	r4, .L107
 	ldr	r7, .L107+4
 	ldr	r5, .L107+8
-	add	r6, r4, #1344
+	add	r6, r4, #1680
 .L104:
 	ldr	r2, [r4, #40]
 	smull	r3, r1, r7, r2
 	asr	r3, r2, #31
 	rsb	r3, r3, r1, asr #3
 	add	r3, r3, r3, lsl #2
-	ldr	r1, [r4, #292]
+	ldr	r1, [r4, #376]
 	cmp	r2, r3, lsl #2
 	str	r1, [r4, #44]
 	addne	r2, r2, #1
@@ -739,7 +777,7 @@ animateNPCS:
 	str	r1, [r4, #52]
 .L103:
 	str	r2, [r4, #40]
-	add	r4, r4, #336
+	add	r4, r4, #420
 	cmp	r4, r6
 	bne	.L104
 	pop	{r4, r5, r6, r7, r8, lr}
@@ -826,7 +864,7 @@ drawNPCS:
 	ldrh	r5, [r1]
 	ldr	r2, .L124+16
 	ldr	lr, .L124+20
-	add	r0, r3, #1344
+	add	r0, r3, #1680
 .L121:
 	ldr	r1, [r3, #36]
 	cmp	r1, #0
@@ -835,7 +873,7 @@ drawNPCS:
 	orr	r1, r1, #512
 	strh	r1, [r2, #8]	@ movhi
 .L120:
-	add	r3, r3, #336
+	add	r3, r3, #420
 	cmp	r3, r0
 	add	r2, r2, #8
 	bne	.L121
@@ -964,12 +1002,12 @@ glitchVisuals:
 	asr	r3, r3, #1
 	str	ip, [r4, #24]
 	str	ip, [r4, #20]
-	str	ip, [r4, #360]
-	str	ip, [r4, #356]
-	str	ip, [r4, #696]
-	str	ip, [r4, #692]
-	str	ip, [r4, #1032]
-	str	ip, [r4, #1028]
+	str	ip, [r4, #444]
+	str	ip, [r4, #440]
+	str	ip, [r4, #864]
+	str	ip, [r4, #860]
+	str	ip, [r4, #1284]
+	str	ip, [r4, #1280]
 	mov	lr, pc
 	bx	r5
 	ldr	r2, [r6]
@@ -1010,12 +1048,12 @@ glitchVisuals:
 	str	r0, [r4, #24]
 	ldr	r1, [r2, #76]
 	str	r0, [r4, #20]
-	str	r0, [r4, #360]
-	str	r0, [r4, #356]
-	str	r0, [r4, #696]
-	str	r0, [r4, #692]
-	str	r0, [r4, #1032]
-	str	r0, [r4, #1028]
+	str	r0, [r4, #444]
+	str	r0, [r4, #440]
+	str	r0, [r4, #864]
+	str	r0, [r4, #860]
+	str	r0, [r4, #1284]
+	str	r0, [r4, #1280]
 	mov	r3, #256
 	mov	r2, #83886080
 	mov	r0, #3
@@ -1089,9 +1127,9 @@ glitchVisuals:
 	.global	level1collisionmap
 	.comm	vOff,4,4
 	.comm	hOff,4,4
-	.comm	npcs,1680,4
+	.comm	npcs,2100,4
 	.comm	player,76,4
-	.comm	level1,1764,4
+	.comm	level1,2184,4
 	.comm	currentLevel,4,4
 	.comm	currentTarget,4,4
 	.data

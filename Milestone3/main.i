@@ -1321,6 +1321,10 @@ typedef struct {
     int endsConversation;
 
     char* string;
+
+
+    char* choiceA;
+    char* choiceB;
 } DIALOGUE;
 
 typedef struct {
@@ -1368,6 +1372,7 @@ typedef struct
     DIALOGUE dialogues[10];
 
     int dialoguesIndex;
+    int postConvoIndex;
 
     char* name;
 
@@ -1537,6 +1542,16 @@ extern const unsigned short talkingheadtestPal[256];
 # 26 "main.c" 2
 
 # 1 "dialogue.h" 1
+# 25 "dialogue.h"
+enum{CHOICE_A, CHOICE_B};
+
+extern int selectedChoice;
+
+void drawDialogueUI();
+void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char colorIndex);
+void drawChoices();
+void drawSelector();
+void selectChoice();
 # 28 "main.c" 2
 
 
@@ -1644,16 +1659,6 @@ void goToStart() {
 
 
 
-
-
-
-    state = START;
-
-}
-
-
-void start() {
-
     ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
     ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
 
@@ -1665,10 +1670,19 @@ void start() {
     drawString4(20, 80, string, 0);
     drawString4(20, 100, string1, 0);
 
-    seed++;
 
     waitForVBlank();
     flipPage();
+
+
+    state = START;
+
+}
+
+
+void start() {
+
+    seed++;
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
@@ -1729,39 +1743,63 @@ void goToDialogue() {
     ((unsigned short *)0x5000000)[255] = ((0) | (0) << 5 | (0) << 10);
     ((unsigned short *)0x5000000)[254] = ((31) | (31) << 5 | (31) << 10);
 
-    source = currentTarget->dialogues[currentTarget->dialoguesIndex].string;
+    drawDialogueUI();
+    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
 
-    index = 0;
+    selectedChoice = CHOICE_A;
+
+    waitForVBlank();
+    flipPage();
 
     state = SPEAKING;
-
 
 }
 
 void dialogue() {
 
-
-
-    fillScreen4(254);
-
-
-
-
-
-    if (currentTarget->talkingHeadBitmap) {
-        drawImage4(4, 4, 116, 152, currentTarget->talkingHeadBitmap);
+    if ((!(~(oldButtons) & ((1 << 6))) && (~buttons & ((1 << 6)))) || (!(~(oldButtons) & ((1 << 7))) && (~buttons & ((1 << 7))))) {
+        if (selectedChoice == CHOICE_A) {
+            selectedChoice = CHOICE_B;
+        } else {
+            selectedChoice = CHOICE_A;
+        }
     }
 
-    if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 255);
+    if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
+        if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        selectChoice();
+        }
+        else if (!currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice && !currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
+            currentTarget->dialoguesIndex++;
+        }
+        else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
+            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
+
+            waitForVBlank();
+
+            (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+
+            DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
+            DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
+            hideSprites();
+            DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+            (*(volatile unsigned short *)0x4000008) = currentLevel->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
+            (*(volatile unsigned short *)0x400000A) = currentLevel->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
+            (*(volatile unsigned short *)0x400000C) = currentLevel->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
+
+            DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
+            DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
+            DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
+
+            state = GAME;
+        }
+
     }
 
-    if (currentTarget->dialogues) {
-        drawString4(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 255);
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        drawChoices();
+        drawSelector();
     }
-
-
-
 
     waitForVBlank();
     flipPage();

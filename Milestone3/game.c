@@ -13,6 +13,7 @@
 #include "spritesheet.h"
 
 #include "talkingheadtest.h"
+#include "talkingheadtest2.h"
 
 
 NPC* currentTarget;
@@ -133,10 +134,31 @@ void initNPCS() {
         npcs[i].talkingHeadPalette = talkingheadtestPal;
         npcs[i].talkingHeadPalLen = talkingheadtestPalLen;
         npcs[i].name = "Plant Merchant:";
-        DIALOGUE npcDialogue;
-        npcDialogue.string = "I like plant :)";
-        npcs[i].dialogues[0] = npcDialogue;
+
+        DIALOGUE greeting;
+        greeting.string = "I like plants. Wow I sure do. I love plants so much that I can't even handle it haha. Plants really are my favorite!";
+        greeting.choiceA = "I hate plants.";
+        greeting.choiceB = "I love plants, too.";
+        greeting.choiceAIndex = 1;
+        greeting.choiceBIndex = 2;
+        greeting.promptsChoice = 1;
+        greeting.endsConversation = 0;
+
+        DIALOGUE hatePlants;
+        hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
+        hatePlants.endsConversation = 1;
+        hatePlants.promptsChoice = 0;
+
+        DIALOGUE lovePlants;
+        lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
+        lovePlants.endsConversation = 1;
+        lovePlants.promptsChoice = 0;
+
+        npcs[i].dialogues[0] = greeting;
+        npcs[i].dialogues[1] = hatePlants;
+        npcs[i].dialogues[2] = lovePlants;
         npcs[i].dialoguesIndex = 0;
+        npcs[i].postConvoIndex = 0;
         
     }
 

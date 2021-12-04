@@ -1318,6 +1318,10 @@ typedef struct {
     int endsConversation;
 
     char* string;
+
+
+    char* choiceA;
+    char* choiceB;
 } DIALOGUE;
 
 typedef struct {
@@ -1365,6 +1369,7 @@ typedef struct
     DIALOGUE dialogues[10];
 
     int dialoguesIndex;
+    int postConvoIndex;
 
     char* name;
 
@@ -1557,6 +1562,13 @@ extern const unsigned short talkingheadtestBitmap[8816];
 
 extern const unsigned short talkingheadtestPal[256];
 # 16 "game.c" 2
+# 1 "talkingheadtest2.h" 1
+# 21 "talkingheadtest2.h"
+extern const unsigned short talkingheadtest2Bitmap[8816];
+
+
+extern const unsigned short talkingheadtest2Pal[256];
+# 17 "game.c" 2
 
 
 NPC* currentTarget;
@@ -1676,11 +1688,32 @@ void initNPCS() {
         npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
         npcs[i].talkingHeadPalette = talkingheadtestPal;
         npcs[i].talkingHeadPalLen = 512;
-        npcs[i].name = "Plant Merchant";
-        DIALOGUE npcDialogue;
-        npcDialogue.string = "I like plant :)";
-        npcs[i].dialogues[0] = npcDialogue;
+        npcs[i].name = "Plant Merchant:";
+
+        DIALOGUE greeting;
+        greeting.string = "I like plants. Wow I sure do. I love plants so much that I can't even handle it haha. Plants really are my favorite!";
+        greeting.choiceA = "I hate plants.";
+        greeting.choiceB = "I love plants, too.";
+        greeting.choiceAIndex = 1;
+        greeting.choiceBIndex = 2;
+        greeting.promptsChoice = 1;
+        greeting.endsConversation = 0;
+
+        DIALOGUE hatePlants;
+        hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
+        hatePlants.endsConversation = 1;
+        hatePlants.promptsChoice = 0;
+
+        DIALOGUE lovePlants;
+        lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
+        lovePlants.endsConversation = 1;
+        lovePlants.promptsChoice = 0;
+
+        npcs[i].dialogues[0] = greeting;
+        npcs[i].dialogues[1] = hatePlants;
+        npcs[i].dialogues[2] = lovePlants;
         npcs[i].dialoguesIndex = 0;
+        npcs[i].postConvoIndex = 0;
 
     }
 
@@ -1801,7 +1834,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 275 "game.c"
+# 297 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1815,7 +1848,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 327 "game.c"
+# 349 "game.c"
     animateNPCS();
 
 }
@@ -1830,7 +1863,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 358 "game.c"
+# 380 "game.c"
             player.aniCounter++;
 
 

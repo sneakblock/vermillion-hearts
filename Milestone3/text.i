@@ -144,4 +144,5 @@ void drawString4(int col, int row, char *str, unsigned char colorIndex) {
 
         str++;
     }
+
 }

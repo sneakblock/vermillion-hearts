@@ -131,16 +131,6 @@ void goToStart() {
 
     //load start screen palette
     //draw the background image
-
-    
-    
-    state = START;
-
-}
-
-// Runs every frame of the start state
-void start() {
-
     PALETTE[0] = WHITE;
     PALETTE[1] = BLACK;
 
@@ -152,10 +142,19 @@ void start() {
     drawString4(20, 80, string, 0);
     drawString4(20, 100, string1, 0);
 
-    seed++;
 
     waitForVBlank();
     flipPage();
+    
+    
+    state = START;
+
+}
+
+// Runs every frame of the start state
+void start() {
+
+    seed++;
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
@@ -215,41 +214,65 @@ void goToDialogue() {
 
     PALETTE[255] = BLACK;
     PALETTE[254] = WHITE;
+    
+    drawDialogueUI();
+    typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
 
-    source = currentTarget->dialogues[currentTarget->dialoguesIndex].string;
+    selectedChoice = CHOICE_A;
 
-    index = 0;
+    waitForVBlank();
+    flipPage();
 
     state = SPEAKING;
     
-
 }
 
 void dialogue() {
 
-    
-
-    fillScreen4(254);
-    
-    
-    // THESE are intended dimensions.
-    // Use some kind of rand to set these dimensions slightly wrongly in order to 
-    // Create artifacts on sides and edges.
-    if (currentTarget->talkingHeadBitmap) {
-        drawImage4(4, 4, 116, 152, currentTarget->talkingHeadBitmap);
+    if (BUTTON_PRESSED(BUTTON_UP) || BUTTON_PRESSED(BUTTON_DOWN)) {
+        if (selectedChoice == CHOICE_A) {
+            selectedChoice = CHOICE_B;
+        } else {
+            selectedChoice = CHOICE_A;
+        }
     }
 
-    if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 255);
-    }
+    if (BUTTON_PRESSED(BUTTON_A)) {
+        if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        selectChoice();
+        }
+        else if (!currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice && !currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
+            currentTarget->dialoguesIndex++;
+        }
+        else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
+            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
 
-    if (currentTarget->dialogues) {
-        drawString4(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 255);
-    }
+            waitForVBlank();
+
+            REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
+
+            DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
+            DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
+            hideSprites();
+            DMANow(3, shadowOAM, OAM, 512);
+            REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+            REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+            REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+
+            DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
+            DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
+            DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
+
+            state = GAME;
+        }
         
+    }
 
-
-
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        drawChoices();
+        drawSelector();
+    }
+    
     waitForVBlank();
     flipPage();
 

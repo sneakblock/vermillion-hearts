@@ -18,6 +18,10 @@ typedef struct {
     int endsConversation;
 
     char* string;
+
+
+    char* choiceA;
+    char* choiceB;
 } DIALOGUE;
 
 typedef struct {
@@ -65,6 +69,7 @@ typedef struct
     DIALOGUE dialogues[10];
 
     int dialoguesIndex;
+    int postConvoIndex;
 
     char* name;
 
@@ -291,3 +296,127 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "dialogue.c" 2
+# 1 "dialogue.h" 1
+# 25 "dialogue.h"
+enum{CHOICE_A, CHOICE_B};
+
+extern int selectedChoice;
+
+void drawDialogueUI();
+void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char colorIndex);
+void drawChoices();
+void drawSelector();
+void selectChoice();
+# 5 "dialogue.c" 2
+# 1 "selector.h" 1
+# 20 "selector.h"
+extern const unsigned short selectorBitmap[16];
+# 6 "dialogue.c" 2
+
+int selectedChoice;
+
+void drawDialogueUI() {
+
+    videoBuffer = ((unsigned short *)0x600A000);
+    fillScreen4(255);
+
+
+
+
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
+    }
+    if (currentTarget->name) {
+        drawString4(124, 4, currentTarget->name, 254);
+    }
+
+    videoBuffer = ((unsigned short *)0x6000000);
+    fillScreen4(255);
+
+
+
+
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
+    }
+    if (currentTarget->name) {
+        drawString4(124, 4, currentTarget->name, 254);
+    }
+}
+
+void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char colorIndex) {
+
+    int col = textboxCol;
+    int row = textboxRow;
+
+    while (*string != '\0') {
+
+        int lengthChecker = 0;
+
+        while ((*(string + lengthChecker) != ' ') && (*(string + lengthChecker) != '\0')) {
+            lengthChecker++;
+        }
+
+        if ((col + ((lengthChecker + 1)) * 6) < 124 + 100) {
+            col += 6;
+        } else {
+            col = 124;
+            row += 10;
+        }
+
+        videoBuffer = ((unsigned short *)0x600A000);
+        drawChar4(col, row, *string, colorIndex);
+
+        videoBuffer = ((unsigned short *)0x6000000);
+        drawChar4(col, row, *string, colorIndex);
+
+
+        string++;
+
+        waitForVBlank();
+        flipPage();
+
+    }
+
+}
+
+void drawChoices() {
+
+    drawString4(12, 112, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceA, 254);
+    drawString4(12, 136, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceB, 254);
+
+}
+
+void drawSelector() {
+
+    switch (selectedChoice) {
+        case CHOICE_A:
+        drawImage4(4, 112, 4, 8, selectorBitmap);
+        drawRect4(4, 136, 4, 8, 255);
+        break;
+
+        case CHOICE_B:
+        drawImage4(4, 136, 4, 8, selectorBitmap);
+        drawRect4(4, 112, 4, 8, 255);
+        break;
+    }
+
+}
+
+void selectChoice() {
+
+    drawDialogueUI();
+
+    switch (selectedChoice) {
+        case CHOICE_A:
+        currentTarget->dialoguesIndex = currentTarget->dialogues[currentTarget->dialoguesIndex].choiceAIndex;
+        break;
+
+        case CHOICE_B:
+        currentTarget->dialoguesIndex = currentTarget->dialogues[currentTarget->dialoguesIndex].choiceBIndex;
+        break;
+    }
+
+    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
+
+}
