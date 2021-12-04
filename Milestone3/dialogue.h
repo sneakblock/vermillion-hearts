@@ -1,0 +1,3 @@
+#define TEXT_SPEED_FAST 1
+#define TEXT_SPEED_STANDARD 3
+#define TEXT_SPEED_SLOW 5

@@ -128,9 +128,16 @@ void initNPCS() {
         npcs[i].numFrames = 2;
         npcs[i].gameSpriteTileIDx = 1;
         npcs[i].gameSpriteTileIDy = 0;
+
         npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
         npcs[i].talkingHeadPalette = talkingheadtestPal;
         npcs[i].talkingHeadPalLen = talkingheadtestPalLen;
+        npcs[i].name = "Plant Merchant:";
+        DIALOGUE npcDialogue;
+        npcDialogue.string = "I like plant :)";
+        npcs[i].dialogues[0] = npcDialogue;
+        npcs[i].dialoguesIndex = 0;
+        
     }
 
     npcs[0].worldCol = 303;

@@ -171,6 +171,14 @@ initPlayer:
 .L12:
 	.word	player
 	.size	initPlayer, .-initPlayer
+	.section	.rodata.str1.4,"aMS",%progbits,1
+	.align	2
+.LC0:
+	.ascii	"Plant Merchant\000"
+	.align	2
+.LC1:
+	.ascii	"I like plant :)\000"
+	.text
 	.align	2
 	.global	initNPCS
 	.syntax unified
@@ -181,33 +189,38 @@ initNPCS:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r1, .L18
-	push	{r4, r5, r6, r7, r8, r9, lr}
+	ldr	r0, .L18
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
 	mov	r2, #1
-	mov	r3, r1
-	mov	r0, #0
-	mov	r8, #8
-	mov	r7, #16
+	mov	r3, r0
+	mov	r1, #0
+	mov	r10, #8
+	mov	r9, #16
 	mov	ip, #2
-	mov	r6, #512
-	ldr	r5, .L18+4
-	ldr	r4, .L18+8
-	add	lr, r1, #1344
+	mov	r8, #512
+	ldr	r7, .L18+4
+	ldr	r6, .L18+8
+	ldr	r5, .L18+12
+	ldr	r4, .L18+16
+	add	lr, r0, #1344
 .L15:
 	str	r2, [r3]
-	str	r0, [r3, #36]
+	str	r1, [r3, #36]
 	str	r2, [r3, #20]
 	str	r2, [r3, #24]
-	str	r8, [r3, #28]
-	str	r7, [r3, #32]
+	str	r10, [r3, #28]
+	str	r9, [r3, #32]
 	str	r2, [r3, #44]
-	str	r0, [r3, #52]
+	str	r1, [r3, #52]
 	str	ip, [r3, #56]
 	str	r2, [r3, #60]
-	str	r0, [r3, #64]
-	str	r5, [r3, #72]
-	str	r4, [r3, #76]
-	str	r6, [r3, #80]
+	str	r1, [r3, #64]
+	str	r7, [r3, #72]
+	str	r6, [r3, #76]
+	str	r8, [r3, #80]
+	str	r5, [r3, #288]
+	str	r4, [r3, #100]
+	str	r1, [r3, #284]
 	add	r3, r3, #336
 	cmp	r3, lr
 	bne	.L15
@@ -219,20 +232,20 @@ initNPCS:
 	mov	r5, #3
 	mov	r4, #172
 	mov	lr, #135
-	str	r3, [r1, #688]
+	str	r3, [r0, #688]
 	add	r3, r3, #126
-	str	r9, [r1, #12]
-	str	r8, [r1, #352]
-	str	r7, [r1, #348]
-	str	r6, [r1, #684]
-	str	r5, [r1, #964]
-	str	r4, [r1, #1024]
-	str	lr, [r1, #1020]
-	str	r0, [r1, #292]
-	str	ip, [r1, #628]
-	str	r2, [r1, #1300]
-	str	r3, [r1, #16]
-	pop	{r4, r5, r6, r7, r8, r9, lr}
+	str	r9, [r0, #12]
+	str	r8, [r0, #352]
+	str	r7, [r0, #348]
+	str	r6, [r0, #684]
+	str	r5, [r0, #964]
+	str	r4, [r0, #1024]
+	str	lr, [r0, #1020]
+	str	r1, [r0, #292]
+	str	ip, [r0, #628]
+	str	r2, [r0, #1300]
+	str	r3, [r0, #16]
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
 	bx	lr
 .L19:
 	.align	2
@@ -240,6 +253,8 @@ initNPCS:
 	.word	npcs
 	.word	talkingheadtestBitmap
 	.word	talkingheadtestPal
+	.word	.LC0
+	.word	.LC1
 	.size	initNPCS, .-initNPCS
 	.align	2
 	.global	initGame

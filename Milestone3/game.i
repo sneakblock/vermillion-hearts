@@ -1552,7 +1552,7 @@ extern const unsigned short SPRITESHEETPal[256];
 
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
-extern const unsigned short talkingheadtestBitmap[1300];
+extern const unsigned short talkingheadtestBitmap[8816];
 
 
 extern const unsigned short talkingheadtestPal[256];
@@ -1672,9 +1672,16 @@ void initNPCS() {
         npcs[i].numFrames = 2;
         npcs[i].gameSpriteTileIDx = 1;
         npcs[i].gameSpriteTileIDy = 0;
+
         npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
         npcs[i].talkingHeadPalette = talkingheadtestPal;
         npcs[i].talkingHeadPalLen = 512;
+        npcs[i].name = "Plant Merchant";
+        DIALOGUE npcDialogue;
+        npcDialogue.string = "I like plant :)";
+        npcs[i].dialogues[0] = npcDialogue;
+        npcs[i].dialoguesIndex = 0;
+
     }
 
     npcs[0].worldCol = 303;
@@ -1794,7 +1801,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 268 "game.c"
+# 275 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1808,7 +1815,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 320 "game.c"
+# 327 "game.c"
     animateNPCS();
 
 }
@@ -1823,7 +1830,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 351 "game.c"
+# 358 "game.c"
             player.aniCounter++;
 
 

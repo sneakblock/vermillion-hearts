@@ -24,6 +24,8 @@
 
 #include "talkingheadtest.h"
 
+#include "dialogue.h"
+
 // Prototypes
 void initialize();
 
@@ -64,6 +66,14 @@ unsigned short oldButtons;
 
 // Shadow OAM
 OBJ_ATTR shadowOAM[128];
+
+//Dialogue stuff
+int dialogueTypeCol = 124;
+int dialogueTypeRow = 12;
+
+char* source;
+char* clone;
+int index;
 
 int main()
 {
@@ -203,15 +213,12 @@ void goToDialogue() {
     // Goes to Mode4
     REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
 
-    PALETTE[0] = BLACK;
-    fillScreen4(0);
+    PALETTE[255] = BLACK;
+    PALETTE[254] = WHITE;
 
-    if (currentTarget->talkingHeadBitmap) {
-        drawImage4(4, 4, 50, 50, currentTarget->talkingHeadBitmap);
-    }
+    source = currentTarget->dialogues[currentTarget->dialoguesIndex].string;
 
-    waitForVBlank();
-    flipPage();
+    index = 0;
 
     state = SPEAKING;
     
@@ -219,7 +226,33 @@ void goToDialogue() {
 }
 
 void dialogue() {
+
     
+
+    fillScreen4(254);
+    
+    
+    // THESE are intended dimensions.
+    // Use some kind of rand to set these dimensions slightly wrongly in order to 
+    // Create artifacts on sides and edges.
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 116, 152, currentTarget->talkingHeadBitmap);
+    }
+
+    if (currentTarget->name) {
+        drawString4(124, 4, currentTarget->name, 255);
+    }
+
+    if (currentTarget->dialogues) {
+        drawString4(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 255);
+    }
+        
+
+
+
+    waitForVBlank();
+    flipPage();
+
 }
 
 // Sets up the pause state

@@ -1530,11 +1530,14 @@ void drawString4(int col, int row, char *str, unsigned char colorIndex);
 
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
-extern const unsigned short talkingheadtestBitmap[1300];
+extern const unsigned short talkingheadtestBitmap[8816];
 
 
 extern const unsigned short talkingheadtestPal[256];
 # 26 "main.c" 2
+
+# 1 "dialogue.h" 1
+# 28 "main.c" 2
 
 
 void initialize();
@@ -1576,6 +1579,14 @@ unsigned short oldButtons;
 
 
 OBJ_ATTR shadowOAM[128];
+
+
+int dialogueTypeCol = 124;
+int dialogueTypeRow = 12;
+
+char* source;
+char* clone;
+int index;
 
 int main()
 {
@@ -1715,15 +1726,12 @@ void goToDialogue() {
 
     (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
-    ((unsigned short *)0x5000000)[0] = ((0) | (0) << 5 | (0) << 10);
-    fillScreen4(0);
+    ((unsigned short *)0x5000000)[255] = ((0) | (0) << 5 | (0) << 10);
+    ((unsigned short *)0x5000000)[254] = ((31) | (31) << 5 | (31) << 10);
 
-    if (currentTarget->talkingHeadBitmap) {
-        drawImage4(4, 4, 50, 50, currentTarget->talkingHeadBitmap);
-    }
+    source = currentTarget->dialogues[currentTarget->dialoguesIndex].string;
 
-    waitForVBlank();
-    flipPage();
+    index = 0;
 
     state = SPEAKING;
 
@@ -1731,6 +1739,32 @@ void goToDialogue() {
 }
 
 void dialogue() {
+
+
+
+    fillScreen4(254);
+
+
+
+
+
+    if (currentTarget->talkingHeadBitmap) {
+        drawImage4(4, 4, 116, 152, currentTarget->talkingHeadBitmap);
+    }
+
+    if (currentTarget->name) {
+        drawString4(124, 4, currentTarget->name, 255);
+    }
+
+    if (currentTarget->dialogues) {
+        drawString4(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 255);
+    }
+
+
+
+
+    waitForVBlank();
+    flipPage();
 
 }
 
