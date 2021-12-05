@@ -141,16 +141,39 @@ void start() {
     animateStart();
 
     if (BUTTON_PRESSED(BUTTON_START)) {
-        //glitchVisuals();
         srand(seed);
+
+        for (int i = 0; i < 1000; i++) {
+
+            waitForVBlank();
+
+            if (!soundB.isPlaying) {
+            playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+            // Interesting glitch pulverizes all colors.
+            // PALETTE[rand() % 16] = PALETTE[rand() % 16];
+
+            int a = rand() % 16;
+            int b = rand() % 16;
+
+            unsigned short temp = PALETTE[a];
+
+            PALETTE[a] = PALETTE[b];
+
+            PALETTE[b] = temp;
+
+            }
+
+        }
+
         initGame();
-        loadLevel(&level1, 1);
+        loadLevel(currentLevel, 1);
         stopSound();
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
     }
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
+        srand(seed);
         goToInstructions();
     }
 
@@ -171,7 +194,33 @@ void goToGame() {
     hideSprites();
     DMANow(3, shadowOAM, OAM, 512);
 
-    loadLevel(&level1, 0);
+    loadLevel(currentLevel, 0);
+
+    for (int i = 0; i < 200; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        // Interesting glitch pulverizes all colors.
+        // PALETTE[rand() % 16] = PALETTE[rand() % 16];
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = PALETTE[a];
+
+        PALETTE[a] = PALETTE[b];
+
+        PALETTE[b] = temp;
+
+        }
+
+    }
+
+    if (rand() % 2 == 1) {
+        loadLevel(currentLevel, 0);
+    }
 
     state = GAME;
 
@@ -411,8 +460,23 @@ void goToInstructions() {
 
 void instructions() {
 
+    waitForVBlank();
+
+    //MAKE THIS A FUNCTION!
     if (!soundB.isPlaying) {
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        // Interesting glitch pulverizes all colors.
+        // PALETTE[rand() % 16] = PALETTE[rand() % 16];
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = PALETTE[a];
+
+        PALETTE[a] = PALETTE[b];
+
+        PALETTE[b] = temp;
+
     }
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {

@@ -30,6 +30,7 @@ unsigned char* level1collisionmap = level1collisionmapBitmap;
 void initGame() {
 
     initLevels();
+    currentLevel = &level1;
     initPlayer();
     initNPCS();
 
@@ -199,7 +200,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     //     }
     // }
 
-    currentLevel = level;
+    // currentLevel = level;
 
 }
 

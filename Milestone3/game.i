@@ -1628,6 +1628,7 @@ unsigned char* level1collisionmap = level1collisionmapBitmap;
 void initGame() {
 
     initLevels();
+    currentLevel = &level1;
     initPlayer();
     initNPCS();
 
@@ -1790,15 +1791,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-
-
-
-
-
-
-
-    currentLevel = level;
-
+# 205 "game.c"
 }
 
 void loadNPC(NPC* npc) {
@@ -1871,7 +1864,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 291 "game.c"
+# 292 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1885,7 +1878,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 343 "game.c"
+# 344 "game.c"
     animateNPCS();
 
 }
@@ -1900,7 +1893,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 374 "game.c"
+# 375 "game.c"
             player.aniCounter++;
 
 

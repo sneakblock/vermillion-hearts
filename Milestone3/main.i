@@ -1743,16 +1743,39 @@ void start() {
     animateStart();
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
-
         srand(seed);
+
+        for (int i = 0; i < 1000; i++) {
+
+            waitForVBlank();
+
+            if (!soundB.isPlaying) {
+            playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+
+
+            int a = rand() % 16;
+            int b = rand() % 16;
+
+            unsigned short temp = ((unsigned short *)0x5000000)[a];
+
+            ((unsigned short *)0x5000000)[a] = ((unsigned short *)0x5000000)[b];
+
+            ((unsigned short *)0x5000000)[b] = temp;
+
+            }
+
+        }
+
         initGame();
-        loadLevel(&level1, 1);
+        loadLevel(currentLevel, 1);
         stopSound();
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
+        srand(seed);
         goToInstructions();
     }
 
@@ -1773,7 +1796,33 @@ void goToGame() {
     hideSprites();
     DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
 
-    loadLevel(&level1, 0);
+    loadLevel(currentLevel, 0);
+
+    for (int i = 0; i < 200; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = ((unsigned short *)0x5000000)[a];
+
+        ((unsigned short *)0x5000000)[a] = ((unsigned short *)0x5000000)[b];
+
+        ((unsigned short *)0x5000000)[b] = temp;
+
+        }
+
+    }
+
+    if (rand() % 2 == 1) {
+        loadLevel(currentLevel, 0);
+    }
 
     state = GAME;
 
@@ -1834,7 +1883,7 @@ void dialogue() {
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
-# 252 "main.c"
+# 301 "main.c"
         }
 
     }
@@ -1879,7 +1928,7 @@ void pause() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
         goToGame();
-# 314 "main.c"
+# 363 "main.c"
     }
 
 }
@@ -1980,8 +2029,23 @@ void goToInstructions() {
 
 void instructions() {
 
+    waitForVBlank();
+
+
     if (!soundB.isPlaying) {
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = ((unsigned short *)0x5000000)[a];
+
+        ((unsigned short *)0x5000000)[a] = ((unsigned short *)0x5000000)[b];
+
+        ((unsigned short *)0x5000000)[b] = temp;
+
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {

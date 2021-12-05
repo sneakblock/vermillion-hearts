@@ -267,16 +267,13 @@ initGame:
 	ldr	r3, .L22
 	mov	lr, pc
 	bx	r3
-	mov	r4, #8
-	mov	lr, #16
 	mov	r2, #0
+	mov	r0, #16
+	mov	r4, #8
+	mov	lr, #20
 	mov	r1, #1
-	mov	ip, #20
-	mov	r0, #2
+	mov	ip, #2
 	ldr	r3, .L22+4
-	str	r4, [r3, #28]
-	str	lr, [r3, #32]
-	pop	{r4, lr}
 	str	r2, [r3]
 	str	r2, [r3, #36]
 	str	r2, [r3, #40]
@@ -285,17 +282,25 @@ initGame:
 	str	r2, [r3, #60]
 	str	r2, [r3, #68]
 	str	r2, [r3, #72]
-	str	ip, [r3, #44]
-	str	r0, [r3, #64]
+	str	r0, [r3, #32]
+	ldr	r2, .L22+8
+	ldr	r0, .L22+12
+	str	r4, [r3, #28]
+	str	lr, [r3, #44]
+	pop	{r4, lr}
+	str	ip, [r3, #64]
 	str	r1, [r3, #20]
 	str	r1, [r3, #24]
 	str	r1, [r3, #52]
+	str	r0, [r2]
 	b	initNPCS
 .L23:
 	.align	2
 .L22:
 	.word	initLevel1
 	.word	player
+	.word	currentLevel
+	.word	level1
 	.size	initGame, .-initGame
 	.align	2
 	.global	loadLevel
@@ -413,21 +418,19 @@ loadLevel:
 	bx	r5
 .L26:
 	cmp	r6, #0
-	beq	.L27
+	beq	.L24
 	add	r2, r4, #12
-	ldm	r2, {r2, ip}
+	ldm	r2, {r2, lr}
 	ldr	r3, .L38+24
-	ldr	r1, .L38+28
+	ldr	r0, .L38+28
+	ldr	ip, [r4, #20]
+	ldr	r1, [r4, #24]
 	str	r2, [r3, #16]
-	ldr	r0, [r4, #20]
 	ldr	r2, .L38+32
-	str	ip, [r3, #12]
-	ldr	r3, [r4, #24]
-	str	r0, [r1]
-	str	r3, [r2]
-.L27:
-	ldr	r3, .L38+36
-	str	r4, [r3]
+	str	lr, [r3, #12]
+	str	ip, [r0]
+	str	r1, [r2]
+.L24:
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
 .L39:
@@ -442,7 +445,6 @@ loadLevel:
 	.word	player
 	.word	hOff
 	.word	vOff
-	.word	currentLevel
 	.size	loadLevel, .-loadLevel
 	.align	2
 	.global	loadNPC
