@@ -1820,7 +1820,7 @@ void goToGame() {
 
     }
 
-    if (rand() % 2 == 1) {
+    if (rand() % 5 > 1) {
         loadLevel(currentLevel, 0);
     }
 
@@ -2023,16 +2023,11 @@ void goToInstructions() {
 
     stopSound();
 
-    state = INSTRUCTIONS;
-
-}
-
-void instructions() {
-
-    waitForVBlank();
+    for (int i = 0; i < 500; i++) {
+        waitForVBlank();
 
 
-    if (!soundB.isPlaying) {
+        if (!soundB.isPlaying) {
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
 
 
@@ -2046,7 +2041,16 @@ void instructions() {
 
         ((unsigned short *)0x5000000)[b] = temp;
 
+        }
     }
+
+    state = INSTRUCTIONS;
+
+}
+
+void instructions() {
+
+
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
 

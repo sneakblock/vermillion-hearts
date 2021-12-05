@@ -218,7 +218,7 @@ void goToGame() {
 
     }
 
-    if (rand() % 2 == 1) {
+    if (rand() % 5 > 1) {
         loadLevel(currentLevel, 0);
     }
 
@@ -453,17 +453,12 @@ void goToInstructions() {
     loadLevel(&instructionsLevel, 0);
 
     stopSound();
-    
-    state = INSTRUCTIONS;
 
-}
+    for (int i = 0; i < 500; i++) {
+        waitForVBlank();
 
-void instructions() {
-
-    waitForVBlank();
-
-    //MAKE THIS A FUNCTION!
-    if (!soundB.isPlaying) {
+        //MAKE THIS A FUNCTION!
+        if (!soundB.isPlaying) {
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
         // Interesting glitch pulverizes all colors.
         // PALETTE[rand() % 16] = PALETTE[rand() % 16];
@@ -477,7 +472,16 @@ void instructions() {
 
         PALETTE[b] = temp;
 
+        }
     }
+    
+    state = INSTRUCTIONS;
+
+}
+
+void instructions() {
+
+    
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
 
