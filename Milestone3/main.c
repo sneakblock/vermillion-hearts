@@ -28,6 +28,7 @@
 
 #include "sound.h"
 #include "trackA.h"
+#include "trackB.h"
 
 #include "levels.h"
 
@@ -125,6 +126,8 @@ void goToStart() {
 
     initStart();
     loadLevel(&startLevel, 0);
+
+    playSoundA(trackB_data, trackB_length, 1);
     
     state = START;
 
@@ -142,12 +145,12 @@ void start() {
         srand(seed);
         initGame();
         loadLevel(&level1, 1);
+        stopSound();
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
     }
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
-        //glitchVisuals();
         goToInstructions();
     }
 
@@ -395,22 +398,12 @@ void lose() {
 
 void goToInstructions() {
 
-    fillScreen4(1);
+    REG_DISPCTL = MODE0 | BG0_ENABLE;
 
-    char* string = "DIRECTIONAL BUTTONS TO MOVE.";
-    char* string4 = "A TO GLITCH TIME.";
-    char* string3 = "START TO PAUSE.";
-    char* string1 = "AVOID ENTITIES. REACH END.";
-    char* string2 = "PRESS START TO RETURN TO START.";
+    initInstructions();
+    loadLevel(&instructionsLevel, 0);
 
-    drawString4(20, 80, string, 0);
-    drawString4(20, 90, string4, 0);
-    drawString4(20, 100, string3, 0);
-    drawString4(20, 110, string1, 0);
-    drawString4(20, 120, string2, 0);
-
-    waitForVBlank();
-    flipPage();
+    stopSound();
     
     state = INSTRUCTIONS;
 
@@ -418,7 +411,11 @@ void goToInstructions() {
 
 void instructions() {
 
-    if (BUTTON_PRESSED(BUTTON_START)) {
+    if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+    }
+
+    if (BUTTON_PRESSED(BUTTON_SELECT)) {
 
         goToStart();
 

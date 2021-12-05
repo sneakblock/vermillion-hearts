@@ -60,13 +60,25 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
             row += 10;
         }
 
-        videoBuffer = ((unsigned short *)0x600A000);
-        drawChar4(col, row, *string, colorIndex);
+        if (rand() % 100 == 1) {
+            videoBuffer = ((unsigned short *)0x600A000);
+            drawChar4(col, row, *string + rand(), colorIndex);
         
-        videoBuffer = ((unsigned short *)0x6000000);
-        drawChar4(col, row, *string, colorIndex);
+            videoBuffer = ((unsigned short *)0x6000000);
+            drawChar4(col, row, *string + rand(), colorIndex);
+        } else {
+            videoBuffer = ((unsigned short *)0x600A000);
+            drawChar4(col, row, *string, colorIndex);
+        
+            videoBuffer = ((unsigned short *)0x6000000);
+            drawChar4(col, row, *string, colorIndex);
+        }
 
-        playSoundB(&talksounds_data[rand() % talksounds_length], 1, 0);
+        
+
+        if (!soundB.isPlaying) {
+            playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, rand() % SOUND_FREQ);
+        }
 
         // prev = *string;
         string++;

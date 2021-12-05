@@ -1600,9 +1600,13 @@ extern const unsigned short talkingheadtest2Pal[256];
 # 13 "game.c" 2
 # 1 "levels.h" 1
 extern LEVEL startLevel;
-
+extern LEVEL instructionsLevel;
 
 void initStart();
+void animateStart();
+
+void initInstructions();
+
 void initLevel1();
 # 14 "game.c" 2
 
@@ -1762,23 +1766,23 @@ void initNPCS() {
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     (*(volatile unsigned short *)0x4000008) = level->levelSize | (0 << 7) | ((0) << 2) | ((30) << 8);
-    (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
-    (*(volatile unsigned short *)0x400000C) = level->levelSize | (0 << 7) | ((2) << 2) | ((26) << 8);
-
-    DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
-
-    DMANow(3, level->midgroundPal, &((unsigned short *)0x5000000)[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
-
-    DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
-
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
+    DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
 
-    DMANow(3, level->midgroundTiles, &((charblock *)0x6000000)[1], level->midgroundTilesLen / 2);
-    DMANow(3, level->midgroundMap, &((screenblock *)0x6000000)[28], level->midgroundMapLen / 2);
+    if (level->midgroundTiles) {
+        (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
+        DMANow(3, level->midgroundTiles, &((charblock *)0x6000000)[1], level->midgroundTilesLen / 2);
+        DMANow(3, level->midgroundMap, &((screenblock *)0x6000000)[28], level->midgroundMapLen / 2);
+        DMANow(3, level->midgroundPal, &((unsigned short *)0x5000000)[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+    }
 
-    DMANow(3, level->backgroundTiles, &((charblock *)0x6000000)[2], level->backgroundTilesLen / 2);
-    DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
+    if (level->backgroundTiles) {
+        (*(volatile unsigned short *)0x400000C) = level->levelSize | (0 << 7) | ((2) << 2) | ((26) << 8);
+        DMANow(3, level->backgroundTiles, &((charblock *)0x6000000)[2], level->backgroundTilesLen / 2);
+        DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
+        DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+    }
 
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;

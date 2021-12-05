@@ -1600,9 +1600,12 @@ extern const unsigned short talkingheadtest2Pal[256];
 # 13 "levels.c" 2
 # 1 "levels.h" 1
 extern LEVEL startLevel;
+extern LEVEL instructionsLevel;
 
 void initStart();
 void animateStart();
+
+void initInstructions();
 
 void initLevel1();
 # 14 "levels.c" 2
@@ -1638,7 +1641,19 @@ extern const unsigned short startbackgroundMap[1024];
 extern const unsigned short startbackgroundPal[2];
 # 18 "levels.c" 2
 
+# 1 "instructionsforeground.h" 1
+# 22 "instructionsforeground.h"
+extern const unsigned short instructionsforegroundTiles[9968];
+
+
+extern const unsigned short instructionsforegroundMap[1024];
+
+
+extern const unsigned short instructionsforegroundPal[16];
+# 20 "levels.c" 2
+
 LEVEL startLevel;
+LEVEL instructionsLevel;
 
 int vOffBG0;
 int vOffBG1;
@@ -1683,6 +1698,8 @@ void initStart() {
     startLevel.backgroundPal = startbackgroundPal;
     startLevel.backgroundPalLen = 4;
 
+
+
     movingUp = 1;
 
 }
@@ -1723,6 +1740,23 @@ void animateStart() {
 
 }
 
+void initInstructions() {
+
+
+
+    instructionsLevel.foregroundTiles = instructionsforegroundTiles;
+    instructionsLevel.foregroundMap = instructionsforegroundMap;
+    instructionsLevel.foregroundTilesLen = 19936;
+    instructionsLevel.foregroundMapLen = 2048;
+
+    instructionsLevel.foregroundPal = instructionsforegroundPal;
+    instructionsLevel.foregroundPalLen = 32;
+
+    (*(volatile unsigned short *)0x04000012) = 0;
+    (*(volatile unsigned short *)0x04000010) = 0;
+
+}
+
 
 void initLevel1() {
 
@@ -1755,6 +1789,6 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 154 "levels.c"
+# 176 "levels.c"
     level1.numNPCS = 4;
 }

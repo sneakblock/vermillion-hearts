@@ -1584,7 +1584,7 @@ void selectChoice();
 # 1 "sound.h" 1
 void setupSounds();
 void playSoundA(const signed char* sound, int length, int loops);
-void playSoundB(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops, int freq);
 
 void setupInterrupts();
 void interruptHandler();
@@ -1614,15 +1614,25 @@ extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
 # 31 "main.c" 2
+# 1 "trackB.h" 1
+
+
+extern const unsigned int trackB_sampleRate;
+extern const unsigned int trackB_length;
+extern const signed char trackB_data[];
+# 32 "main.c" 2
 
 # 1 "levels.h" 1
 extern LEVEL startLevel;
+extern LEVEL instructionsLevel;
 
 void initStart();
 void animateStart();
 
+void initInstructions();
+
 void initLevel1();
-# 33 "main.c" 2
+# 34 "main.c" 2
 
 
 void initialize();
@@ -1719,6 +1729,8 @@ void goToStart() {
     initStart();
     loadLevel(&startLevel, 0);
 
+    playSoundA(trackB_data, trackB_length, 1);
+
     state = START;
 
 }
@@ -1735,12 +1747,12 @@ void start() {
         srand(seed);
         initGame();
         loadLevel(&level1, 1);
+        stopSound();
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
-
         goToInstructions();
     }
 
@@ -1822,7 +1834,7 @@ void dialogue() {
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
-# 249 "main.c"
+# 252 "main.c"
         }
 
     }
@@ -1867,7 +1879,7 @@ void pause() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
         goToGame();
-# 311 "main.c"
+# 314 "main.c"
     }
 
 }
@@ -1955,22 +1967,12 @@ void lose() {
 
 void goToInstructions() {
 
-    fillScreen4(1);
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
-    char* string = "DIRECTIONAL BUTTONS TO MOVE.";
-    char* string4 = "A TO GLITCH TIME.";
-    char* string3 = "START TO PAUSE.";
-    char* string1 = "AVOID ENTITIES. REACH END.";
-    char* string2 = "PRESS START TO RETURN TO START.";
+    initInstructions();
+    loadLevel(&instructionsLevel, 0);
 
-    drawString4(20, 80, string, 0);
-    drawString4(20, 90, string4, 0);
-    drawString4(20, 100, string3, 0);
-    drawString4(20, 110, string1, 0);
-    drawString4(20, 120, string2, 0);
-
-    waitForVBlank();
-    flipPage();
+    stopSound();
 
     state = INSTRUCTIONS;
 
@@ -1978,7 +1980,11 @@ void goToInstructions() {
 
 void instructions() {
 
-    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+    if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+    }
+
+    if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
 
         goToStart();
 

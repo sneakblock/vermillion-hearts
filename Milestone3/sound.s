@@ -113,6 +113,7 @@ playSoundA:
 	.word	1086687360
 	.word	__aeabi_d2iz
 	.size	playSoundA, .-playSoundA
+	.global	__aeabi_idiv
 	.align	2
 	.global	playSoundB
 	.syntax unified
@@ -123,53 +124,69 @@ playSoundB:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, lr}
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
 	mov	r7, #0
+	mov	r4, r3
 	ldr	r3, .L11+8
 	ldr	r3, [r3]
+	ldr	r9, .L11+12
 	mov	r5, r1
 	mov	r6, r0
 	mov	r8, r2
 	mov	r1, r0
 	str	r7, [r3, #32]
-	mov	r0, #2
+	ldr	r2, .L11+16
 	mov	r3, #910163968
-	ldr	r2, .L11+12
-	ldr	r4, .L11+16
+	mov	r0, #2
+	ldr	r10, .L11+20
 	mov	lr, pc
-	bx	r4
-	mov	r2, #1
-	mvn	r0, #1520
-	mov	r1, #128
-	ldr	r4, .L11+20
+	bx	r10
+	mov	r1, r4
+	strh	r7, [r9, #6]	@ movhi
 	ldr	r3, .L11+24
-	strh	r7, [r3, #6]	@ movhi
-	strh	r0, [r3, #4]	@ movhi
-	strh	r1, [r3, #6]	@ movhi
-	mov	r0, r5
-	str	r5, [r4, #4]
-	str	r2, [r4, #12]
-	ldr	r3, .L11+28
-	str	r6, [r4]
-	str	r8, [r4, #16]
+	mov	r0, #16777216
 	mov	lr, pc
 	bx	r3
-	ldr	r5, .L11+32
+	mov	r2, #128
+	mov	r3, #1
+	rsb	ip, r0, #0
+	ldr	r10, .L11+28
+	lsl	ip, ip, #16
+	lsr	ip, ip, #16
+	strh	ip, [r9, #4]	@ movhi
+	mov	r0, r5
+	strh	r2, [r9, #6]	@ movhi
+	ldr	r9, .L11+32
+	str	r6, [r10]
+	str	r5, [r10, #4]
+	str	r3, [r10, #12]
+	str	r8, [r10, #16]
+	mov	lr, pc
+	bx	r9
+	ldr	r5, .L11+36
 	adr	r3, .L11
 	ldmia	r3, {r2-r3}
 	mov	lr, pc
 	bx	r5
-	mov	r2, #0
-	ldr	r5, .L11+36
-	ldr	r3, .L11+40
+	mov	r2, r0
+	mov	r0, r4
+	mov	r5, r1
+	mov	r4, r2
 	mov	lr, pc
-	bx	r5
+	bx	r9
+	ldr	r6, .L11+40
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r4
+	mov	r1, r5
+	mov	lr, pc
+	bx	r6
 	ldr	r3, .L11+44
 	mov	lr, pc
 	bx	r3
-	str	r7, [r4, #28]
-	str	r0, [r4, #20]
-	pop	{r4, r5, r6, r7, r8, lr}
+	str	r7, [r10, #28]
+	str	r0, [r10, #20]
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
 	bx	lr
 .L12:
 	.align	3
@@ -177,14 +194,14 @@ playSoundB:
 	.word	1443109011
 	.word	1078844686
 	.word	dma
+	.word	67109120
 	.word	67109028
 	.word	DMANow
+	.word	__aeabi_idiv
 	.word	soundB
-	.word	67109120
 	.word	__aeabi_i2d
 	.word	__aeabi_dmul
 	.word	__aeabi_ddiv
-	.word	1086687360
 	.word	__aeabi_d2iz
 	.size	playSoundB, .-playSoundB
 	.align	2
@@ -224,25 +241,25 @@ interruptHandler:
 	str	r2, [r0, #20]
 	strh	r2, [r1, #2]	@ movhi
 .L16:
-	ldr	r3, .L32+16
-	ldr	r2, [r3, #12]
-	cmp	r2, #0
+	ldr	r0, .L32+16
+	ldr	r3, [r0, #12]
+	cmp	r3, #0
 	beq	.L20
-	ldr	r2, [r3, #28]
-	ldr	r1, [r3, #20]
-	add	r2, r2, #1
-	cmp	r2, r1
-	str	r2, [r3, #28]
+	ldr	r3, [r0, #28]
+	ldr	r2, [r0, #20]
+	add	r3, r3, #1
+	cmp	r3, r2
+	str	r3, [r0, #28]
 	ble	.L20
-	ldr	r2, [r3, #16]
+	ldr	r2, [r0, #16]
 	cmp	r2, #0
 	bne	.L31
-	ldr	r0, .L32+8
-	ldr	r1, .L32+12
-	ldr	r0, [r0]
-	str	r2, [r3, #12]
-	str	r2, [r0, #32]
-	strh	r2, [r1, #6]	@ movhi
+	ldr	r1, .L32+8
+	ldr	r3, .L32+12
+	ldr	r1, [r1]
+	str	r2, [r0, #12]
+	str	r2, [r1, #32]
+	strh	r2, [r3, #6]	@ movhi
 .L20:
 	mov	r2, #1
 	ldr	r3, .L32
@@ -262,7 +279,8 @@ interruptHandler:
 	bl	playSoundA
 	b	.L16
 .L31:
-	ldm	r3, {r0, r1}
+	ldr	r3, .L32+20
+	ldm	r0, {r0, r1}
 	bl	playSoundB
 	b	.L20
 .L33:
@@ -273,6 +291,7 @@ interruptHandler:
 	.word	dma
 	.word	67109120
 	.word	soundB
+	.word	11025
 	.size	interruptHandler, .-interruptHandler
 	.align	2
 	.global	setupInterrupts

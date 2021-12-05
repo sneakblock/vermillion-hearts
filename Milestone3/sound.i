@@ -103,7 +103,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 # 1 "sound.h" 1
 void setupSounds();
 void playSoundA(const signed char* sound, int length, int loops);
-void playSoundB(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops, int freq);
 
 void setupInterrupts();
 void interruptHandler();
@@ -165,11 +165,11 @@ void playSoundA( const signed char* sound, int length, int loops) {
 }
 
 
-void playSoundB( const signed char* sound, int length, int loops) {
+void playSoundB(const signed char* sound, int length, int loops, int freq) {
 
     dma[2].cnt = 0;
 
-    int ticks = (16777216) / 11025;
+    int ticks = (16777216) / freq;
 
     DMANow(2, sound, (u16*)0x040000A4, (2 << 21) | (3 << 28) | (1 << 25) | (1 << 26));
 
@@ -182,7 +182,7 @@ void playSoundB( const signed char* sound, int length, int loops) {
     soundB.length = length;
     soundB.loops = loops;
     soundB.isPlaying = 1;
-    soundB.duration = ((59.727) * length) / 11025;
+    soundB.duration = ((59.727) * length) / freq;
     soundB.vBlankCount = 0;
 }
 
@@ -221,7 +221,7 @@ void interruptHandler() {
             soundB.vBlankCount = soundB.vBlankCount + 1;
             if (soundB.vBlankCount > soundB.duration) {
                 if (soundB.loops) {
-                    playSoundB(soundB.data, soundB.length, soundB.loops);
+                    playSoundB(soundB.data, soundB.length, soundB.loops, 11025);
                 } else {
                     soundB.isPlaying = 0;
                     dma[2].cnt = 0;

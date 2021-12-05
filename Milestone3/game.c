@@ -168,23 +168,23 @@ void initNPCS() {
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     REG_BG0CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-    REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-    REG_BG2CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
-
-    DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
-
-    DMANow(3, level->midgroundPal, &PALETTE[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
-
-    DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
-
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
+    DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
 
-    DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
-    DMANow(3, level->midgroundMap, &SCREENBLOCK[28], level->midgroundMapLen / 2);
+    if (level->midgroundTiles) {
+        REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+        DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
+        DMANow(3, level->midgroundMap, &SCREENBLOCK[28], level->midgroundMapLen / 2);
+        DMANow(3, level->midgroundPal, &PALETTE[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+    }
 
-    DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
-    DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
+    if (level->backgroundTiles) {
+        REG_BG2CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+        DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
+        DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
+        DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+    }
 
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;

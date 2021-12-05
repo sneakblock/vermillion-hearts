@@ -7,7 +7,7 @@
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 30 "game.h"
+# 28 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -342,7 +342,7 @@ extern const unsigned short selectorBitmap[16];
 # 1 "sound.h" 1
 void setupSounds();
 void playSoundA(const signed char* sound, int length, int loops);
-void playSoundB(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops, int freq);
 
 void setupInterrupts();
 void interruptHandler();
@@ -1655,13 +1655,25 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
             row += 10;
         }
 
-        videoBuffer = ((unsigned short *)0x600A000);
-        drawChar4(col, row, *string, colorIndex);
+        if (rand() % 100 == 1) {
+            videoBuffer = ((unsigned short *)0x600A000);
+            drawChar4(col, row, *string + rand(), colorIndex);
 
-        videoBuffer = ((unsigned short *)0x6000000);
-        drawChar4(col, row, *string, colorIndex);
+            videoBuffer = ((unsigned short *)0x6000000);
+            drawChar4(col, row, *string + rand(), colorIndex);
+        } else {
+            videoBuffer = ((unsigned short *)0x600A000);
+            drawChar4(col, row, *string, colorIndex);
 
-        playSoundB(&talksounds_data[rand() % talksounds_length], 1, 0);
+            videoBuffer = ((unsigned short *)0x6000000);
+            drawChar4(col, row, *string, colorIndex);
+        }
+
+
+
+        if (!soundB.isPlaying) {
+            playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, rand() % 11025);
+        }
 
 
         string++;

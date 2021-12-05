@@ -107,75 +107,77 @@ drawDialogueUI:
 	.type	typeDialogue, %function
 typeDialogue:
 	@ Function supports interworking.
-	@ args = 0, pretend = 0, frame = 0
+	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	mov	r4, r2
 	ldrb	r2, [r2]	@ zero_extendqisi2
 	cmp	r2, #0
+	sub	sp, sp, #12
 	beq	.L22
 	mov	r5, r0
-	mov	r10, r3
 	mov	r6, r1
-	ldr	r1, .L38
-	ldr	r9, .L38+4
-	ldr	fp, [r1]
-	ldr	r8, .L38+8
+	mov	r9, r3
+	ldr	r8, .L43
+	ldr	fp, .L43+4
+	ldr	r10, .L43+8
 	rsb	r7, r4, #0
 .L24:
 	tst	r2, #223
-	moveq	r3, #6
-	beq	.L29
-	mov	r2, r4
+	moveq	r2, #6
+	beq	.L32
+	mov	r3, r4
 	add	r0, r7, #1
 .L25:
-	add	r3, r0, r2
-	ldrb	r1, [r2, #1]!	@ zero_extendqisi2
+	add	r2, r0, r3
+	ldrb	r1, [r3, #1]!	@ zero_extendqisi2
 	tst	r1, #223
 	bne	.L25
-	add	r3, r3, #1
-	add	r3, r3, r3, lsl #1
-	lsl	r3, r3, #1
-.L29:
-	add	r3, r5, r3
-	cmp	r3, #223
+	add	r2, r2, #1
+	add	r2, r2, r2, lsl #1
+	lsl	r2, r2, #1
+.L32:
+	add	r2, r5, r2
+	cmp	r2, #223
 	movgt	r5, #124
-	ldr	r3, .L38+12
-	str	r3, [r9]
 	addle	r5, r5, #6
 	addgt	r6, r6, #10
-	ldrb	r2, [r4]	@ zero_extendqisi2
-	mov	r3, r10
-	mov	r1, r6
-	mov	r0, r5
 	mov	lr, pc
 	bx	r8
+	ldr	r2, .L43+12
+	smull	r3, r2, r0, r2
+	asr	r3, r0, #31
+	rsb	r3, r3, r2, asr #5
+	add	r3, r3, r3, lsl #2
+	add	r3, r3, r3, lsl #2
+	sub	r3, r0, r3, lsl #2
+	cmp	r3, #1
+	ldr	r3, .L43+16
+	str	r3, [fp]
+	beq	.L41
+	mov	r3, r9
+	mov	r1, r6
+	mov	r0, r5
+	ldrb	r2, [r4]	@ zero_extendqisi2
+	mov	lr, pc
+	bx	r10
 	mov	r3, #100663296
-	str	r3, [r9]
+	str	r3, [fp]
 	mov	r1, r6
+	mov	r3, r9
 	ldrb	r2, [r4]	@ zero_extendqisi2
-	mov	r3, r10
 	mov	r0, r5
 	mov	lr, pc
-	bx	r8
-	ldr	r3, .L38+16
+	bx	r10
+	ldr	r3, .L43+20
+	ldr	r2, [r3, #12]
+	cmp	r2, #0
+	beq	.L42
+.L30:
+	ldr	r3, .L43+24
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L38+20
-	mov	r1, fp
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L38+24
-	mov	r2, #0
-	add	r0, r3, r1
-	mov	r1, #1
-	ldr	r3, .L38+28
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L38+32
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L38+36
+	ldr	r3, .L43+28
 	mov	lr, pc
 	bx	r3
 	ldrb	r2, [r4, #1]!	@ zero_extendqisi2
@@ -183,21 +185,89 @@ typeDialogue:
 	sub	r7, r7, #1
 	bne	.L24
 .L22:
-	pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	add	sp, sp, #12
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L39:
+.L41:
+	ldrb	r2, [r4]	@ zero_extendqisi2
+	str	r2, [sp]
+	mov	lr, pc
+	bx	r8
+	ldr	r2, [sp]
+	add	r2, r2, r0
+	mov	r1, r6
+	mov	r3, r9
+	mov	r0, r5
+	and	r2, r2, #255
+	mov	lr, pc
+	bx	r10
+	mov	r3, #100663296
+	str	r3, [fp]
+	ldrb	r2, [r4]	@ zero_extendqisi2
+	str	r2, [sp]
+	mov	lr, pc
+	bx	r8
+	ldr	r2, [sp]
+	add	r2, r2, r0
+	mov	r3, r9
+	and	r2, r2, #255
+	mov	r1, r6
+	mov	r0, r5
+	mov	lr, pc
+	bx	r10
+	ldr	r3, .L43+20
+	ldr	r2, [r3, #12]
+	cmp	r2, #0
+	bne	.L30
+.L42:
+	str	r2, [sp, #4]
+	mov	lr, pc
+	bx	r8
+	ldr	r3, .L43+32
+	ldr	r1, [r3]
+	ldr	r3, .L43+36
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L43+40
+	add	r1, r3, r1
+	str	r1, [sp]
+	mov	lr, pc
+	bx	r8
+	mov	lr, r0
+	ldr	r3, .L43+44
+	smull	r2, r3, r0, r3
+	asr	ip, r0, #31
+	rsb	ip, ip, r3, asr #11
+	add	ip, ip, ip, lsl #2
+	add	ip, ip, ip, lsl #2
+	ldr	r1, [sp]
+	rsb	ip, ip, ip, lsl #3
+	rsb	ip, ip, ip, lsl #6
+	mov	r0, r1
+	sub	r3, lr, ip
+	mov	r1, #250
+	ldr	r2, [sp, #4]
+	ldr	ip, .L43+48
+	mov	lr, pc
+	bx	ip
+	b	.L30
+.L44:
 	.align	2
-.L38:
-	.word	talksounds_length
+.L43:
+	.word	rand
 	.word	videoBuffer
 	.word	drawChar4
+	.word	1374389535
 	.word	100704256
-	.word	rand
-	.word	__aeabi_uidivmod
-	.word	talksounds_data
-	.word	playSoundB
+	.word	soundB
 	.word	waitForVBlank
 	.word	flipPage
+	.word	talksounds_length
+	.word	__aeabi_uidivmod
+	.word	talksounds_data
+	.word	797831567
+	.word	playSoundB
 	.size	typeDialogue, .-typeDialogue
 	.align	2
 	.global	drawChoices
@@ -210,12 +280,12 @@ drawChoices:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
-	ldr	r5, .L42
+	ldr	r5, .L47
 	ldr	r3, [r5]
 	ldr	r2, [r3, #404]
 	add	r3, r3, r2, lsl #5
 	ldr	r2, [r3, #108]
-	ldr	r4, .L42+4
+	ldr	r4, .L47+4
 	mov	r3, #254
 	mov	r1, #112
 	mov	r0, #12
@@ -232,9 +302,9 @@ drawChoices:
 	bx	r4
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L43:
+.L48:
 	.align	2
-.L42:
+.L47:
 	.word	currentTarget
 	.word	drawString4
 	.size	drawChoices, .-drawChoices
@@ -249,19 +319,19 @@ drawSelector:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L49
+	ldr	r3, .L54
 	ldr	r3, [r3]
 	cmp	r3, #0
 	sub	sp, sp, #8
-	beq	.L45
+	beq	.L50
 	cmp	r3, #1
-	bne	.L44
+	bne	.L49
 	mov	r2, #4
-	ldr	r3, .L49+4
+	ldr	r3, .L54+4
 	mov	r0, r2
 	mov	r1, #136
 	str	r3, [sp]
-	ldr	r4, .L49+8
+	ldr	r4, .L54+8
 	mov	r3, #8
 	mov	lr, pc
 	bx	r4
@@ -271,40 +341,40 @@ drawSelector:
 	mov	r0, r2
 	mov	r3, #8
 	mov	r1, #112
-	ldr	r4, .L49+12
+	ldr	r4, .L54+12
 	mov	lr, pc
 	bx	r4
-.L44:
-	add	sp, sp, #8
-	@ sp needed
-	pop	{r4, lr}
-	bx	lr
-.L45:
-	mov	r2, #4
-	ldr	r3, .L49+4
-	mov	r0, r2
-	str	r3, [sp]
-	mov	r1, #112
-	mov	r3, #8
-	ldr	r4, .L49+8
-	mov	lr, pc
-	bx	r4
-	mov	r2, #4
-	mov	r3, #255
-	mov	r0, r2
-	str	r3, [sp]
-	mov	r1, #136
-	mov	r3, #8
-	ldr	r4, .L49+12
-	mov	lr, pc
-	bx	r4
+.L49:
 	add	sp, sp, #8
 	@ sp needed
 	pop	{r4, lr}
 	bx	lr
 .L50:
+	mov	r2, #4
+	ldr	r3, .L54+4
+	mov	r0, r2
+	str	r3, [sp]
+	mov	r1, #112
+	mov	r3, #8
+	ldr	r4, .L54+8
+	mov	lr, pc
+	bx	r4
+	mov	r2, #4
+	mov	r3, #255
+	mov	r0, r2
+	str	r3, [sp]
+	mov	r1, #136
+	mov	r3, #8
+	ldr	r4, .L54+12
+	mov	lr, pc
+	bx	r4
+	add	sp, sp, #8
+	@ sp needed
+	pop	{r4, lr}
+	bx	lr
+.L55:
 	.align	2
-.L49:
+.L54:
 	.word	selectedChoice
 	.word	selectorBitmap
 	.word	drawImage4
@@ -322,18 +392,18 @@ selectChoice:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
 	bl	drawDialogueUI
-	ldr	r3, .L60
+	ldr	r3, .L65
 	ldr	r3, [r3]
 	cmp	r3, #0
-	beq	.L52
+	beq	.L57
 	cmp	r3, #1
-	ldr	r3, .L60+4
+	ldr	r3, .L65+4
 	ldr	r2, [r3]
 	ldr	r3, [r2, #404]
 	addeq	r3, r2, r3, lsl #5
 	ldreq	r3, [r3, #92]
 	streq	r3, [r2, #404]
-.L54:
+.L59:
 	add	r3, r2, r3, lsl #5
 	ldr	r1, [r3, #100]
 	cmp	r1, #0
@@ -345,17 +415,17 @@ selectChoice:
 	mov	r3, #254
 	pop	{r4, lr}
 	b	typeDialogue
-.L52:
-	ldr	r3, .L60+4
+.L57:
+	ldr	r3, .L65+4
 	ldr	r2, [r3]
 	ldr	r3, [r2, #404]
 	add	r3, r2, r3, lsl #5
 	ldr	r3, [r3, #88]
 	str	r3, [r2, #404]
-	b	.L54
-.L61:
+	b	.L59
+.L66:
 	.align	2
-.L60:
+.L65:
 	.word	selectedChoice
 	.word	currentTarget
 	.size	selectChoice, .-selectChoice

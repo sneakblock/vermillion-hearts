@@ -16,7 +16,10 @@
 #include "startmidground.h"
 #include "startbackground.h"
 
+#include "instructionsforeground.h"
+
 LEVEL startLevel;
+LEVEL instructionsLevel;
 
 int vOffBG0;
 int vOffBG1;
@@ -61,6 +64,8 @@ void initStart() {
     startLevel.backgroundPal = startbackgroundPal;
     startLevel.backgroundPalLen = startbackgroundPalLen;
 
+    // ========== MISC =========
+
     movingUp = 1;
 
 }
@@ -98,6 +103,23 @@ void animateStart() {
     REG_BG0HOFF = 5;
     REG_BG1VOFF = 10;
     REG_BG2VOFF = vOffBG2;
+
+}
+
+void initInstructions() {
+
+    // =========== FOREGROUND ============
+
+    instructionsLevel.foregroundTiles = instructionsforegroundTiles;
+    instructionsLevel.foregroundMap = instructionsforegroundMap;
+    instructionsLevel.foregroundTilesLen = instructionsforegroundTilesLen;
+    instructionsLevel.foregroundMapLen = instructionsforegroundMapLen;
+
+    instructionsLevel.foregroundPal = instructionsforegroundPal;
+    instructionsLevel.foregroundPalLen = instructionsforegroundPalLen;
+
+    REG_BG0VOFF = 0;
+    REG_BG0HOFF = 0;
 
 }
 

@@ -1,6 +1,6 @@
 void setupSounds();
 void playSoundA(const signed char* sound, int length, int loops);
-void playSoundB(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops, int freq);
 
 void setupInterrupts();
 void interruptHandler();

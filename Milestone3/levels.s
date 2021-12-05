@@ -167,6 +167,45 @@ animateStart:
 	.word	movingUp
 	.size	animateStart, .-animateStart
 	.align	2
+	.global	initInstructions
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initInstructions, %function
+initInstructions:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r2, #67108864
+	mov	r1, #0
+	mov	ip, #2048
+	mov	r0, #32
+	ldr	r3, .L19
+	str	lr, [sp, #-4]!
+	strh	r1, [r2, #18]	@ movhi
+	ldr	lr, .L19+4
+	str	ip, [r3, #32]
+	strh	r1, [r2, #16]	@ movhi
+	ldr	ip, .L19+8
+	ldr	r1, .L19+12
+	ldr	r2, .L19+16
+	str	lr, [r3, #36]
+	str	ip, [r3, #40]
+	str	r1, [r3, #28]
+	str	r2, [r3, #76]
+	str	r0, [r3, #80]
+	ldr	lr, [sp], #4
+	bx	lr
+.L20:
+	.align	2
+.L19:
+	.word	instructionsLevel
+	.word	instructionsforegroundTiles
+	.word	instructionsforegroundMap
+	.word	19936
+	.word	instructionsforegroundPal
+	.size	initInstructions, .-initInstructions
+	.align	2
 	.global	initLevel1
 	.syntax unified
 	.arm
@@ -187,31 +226,31 @@ initLevel1:
 	mov	r5, #64
 	mov	r1, #4
 	mov	ip, #2
-	ldr	r3, .L19
+	ldr	r3, .L23
 	str	r0, [r3, #28]
-	ldr	r0, .L19+4
+	ldr	r0, .L23+4
 	str	lr, [r3, #80]
 	str	r0, [r3, #36]
-	ldr	lr, .L19+8
-	ldr	r0, .L19+12
+	ldr	lr, .L23+8
+	ldr	r0, .L23+12
 	str	lr, [r3, #40]
 	str	r0, [r3, #44]
-	ldr	lr, .L19+16
-	ldr	r0, .L19+20
+	ldr	lr, .L23+16
+	ldr	r0, .L23+20
 	str	lr, [r3, #52]
 	str	r0, [r3, #56]
-	ldr	lr, .L19+24
-	ldr	r0, .L19+28
+	ldr	lr, .L23+24
+	ldr	r0, .L23+28
 	str	lr, [r3, #60]
 	str	r0, [r3, #68]
-	ldr	lr, .L19+32
-	ldr	r0, .L19+36
+	ldr	lr, .L23+32
+	ldr	r0, .L23+36
 	str	r4, [r3, #8]
 	str	lr, [r3, #72]
 	str	r0, [r3, #76]
-	ldr	lr, .L19+40
+	ldr	lr, .L23+40
 	add	r4, r4, #194
-	ldr	r0, .L19+44
+	ldr	r0, .L23+44
 	str	r4, [r3, #12]
 	sub	r4, r4, #188
 	str	r8, [r3]
@@ -229,9 +268,9 @@ initLevel1:
 	str	r1, [r3, #100]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L20:
+.L24:
 	.align	2
-.L19:
+.L23:
 	.word	level1
 	.word	level1foregroundTiles
 	.word	level1foregroundMap
@@ -251,5 +290,6 @@ initLevel1:
 	.comm	vOffBG2,4,4
 	.comm	vOffBG1,4,4
 	.comm	vOffBG0,4,4
+	.comm	instructionsLevel,2424,4
 	.comm	startLevel,2424,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"
