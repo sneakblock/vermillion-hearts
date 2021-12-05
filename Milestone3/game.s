@@ -80,11 +80,15 @@ initLevels:
 	ldr	r3, .L8
 	mov	lr, pc
 	bx	r3
+	ldr	r3, .L8+4
+	mov	lr, pc
+	bx	r3
 	pop	{r4, lr}
 	bx	lr
 .L9:
 	.align	2
 .L8:
+	.word	initPause
 	.word	initLevel1
 	.size	initLevels, .-initLevels
 	.align	2
@@ -267,13 +271,16 @@ initGame:
 	ldr	r3, .L22
 	mov	lr, pc
 	bx	r3
+	ldr	r3, .L22+4
+	mov	lr, pc
+	bx	r3
 	mov	r2, #0
 	mov	r0, #16
 	mov	r4, #8
 	mov	lr, #20
 	mov	r1, #1
 	mov	ip, #2
-	ldr	r3, .L22+4
+	ldr	r3, .L22+8
 	str	r2, [r3]
 	str	r2, [r3, #36]
 	str	r2, [r3, #40]
@@ -283,8 +290,8 @@ initGame:
 	str	r2, [r3, #68]
 	str	r2, [r3, #72]
 	str	r0, [r3, #32]
-	ldr	r2, .L22+8
-	ldr	r0, .L22+12
+	ldr	r2, .L22+12
+	ldr	r0, .L22+16
 	str	r4, [r3, #28]
 	str	lr, [r3, #44]
 	pop	{r4, lr}
@@ -297,6 +304,7 @@ initGame:
 .L23:
 	.align	2
 .L22:
+	.word	initPause
 	.word	initLevel1
 	.word	player
 	.word	currentLevel

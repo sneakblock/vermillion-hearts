@@ -1601,11 +1601,14 @@ extern const unsigned short talkingheadtest2Pal[256];
 # 1 "levels.h" 1
 extern LEVEL startLevel;
 extern LEVEL instructionsLevel;
+extern LEVEL pauseLevel;
 
 void initStart();
 void animateStart();
 
 void initInstructions();
+
+void initPause();
 
 void initLevel1();
 # 14 "game.c" 2
@@ -1670,6 +1673,7 @@ void drawGame() {
 
 void initLevels() {
 
+    initPause();
     initLevel1();
 
 }
@@ -1791,7 +1795,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-# 205 "game.c"
+# 206 "game.c"
 }
 
 void loadNPC(NPC* npc) {
@@ -1864,7 +1868,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 292 "game.c"
+# 293 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1878,7 +1882,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 344 "game.c"
+# 345 "game.c"
     animateNPCS();
 
 }
@@ -1893,7 +1897,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 375 "game.c"
+# 376 "game.c"
             player.aniCounter++;
 
 

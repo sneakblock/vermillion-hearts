@@ -21,46 +21,48 @@ initStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, lr}
+	mov	lr, #0
+	mov	r1, #1888
 	mov	r2, #2048
-	mov	ip, #16
-	push	{r4, lr}
-	mov	r0, #4
-	mov	r4, #10
-	mov	lr, #1888
-	mov	r1, #1
+	mov	r5, #10
+	mov	r4, #16
+	mov	ip, #4
+	mov	r0, #1
 	ldr	r3, .L4
+	str	lr, [r3]
+	ldr	lr, .L4+4
+	str	lr, [r3, #36]
+	ldr	lr, .L4+8
+	str	r1, [r3, #60]
+	str	lr, [r3, #40]
+	ldr	r1, .L4+12
+	ldr	lr, .L4+16
+	str	r1, [r3, #76]
+	str	lr, [r3, #28]
+	ldr	r1, .L4+20
+	ldr	lr, .L4+24
+	str	r1, [r3, #56]
+	str	lr, [r3, #52]
+	ldr	r1, .L4+28
+	ldr	lr, .L4+32
+	str	r1, [r3, #84]
+	str	lr, [r3, #44]
+	ldr	r1, .L4+36
+	ldr	lr, .L4+40
+	str	r1, [r3, #72]
+	str	lr, [r3, #68]
+	ldr	r1, .L4+44
+	ldr	lr, .L4+48
+	str	r5, [r3, #80]
+	str	r4, [r3, #88]
+	str	lr, [r3, #92]
+	str	ip, [r3, #96]
 	str	r2, [r3, #32]
 	str	r2, [r3, #48]
 	str	r2, [r3, #64]
-	ldr	r2, .L4+4
-	str	r2, [r3, #36]
-	ldr	r2, .L4+8
-	str	ip, [r3, #88]
-	str	r2, [r3, #40]
-	ldr	ip, .L4+12
-	ldr	r2, .L4+16
-	str	ip, [r3, #28]
-	str	r2, [r3, #76]
-	ldr	ip, .L4+20
-	ldr	r2, .L4+24
-	str	ip, [r3, #52]
-	str	r2, [r3, #56]
-	ldr	ip, .L4+28
-	ldr	r2, .L4+32
-	str	ip, [r3, #44]
-	str	r2, [r3, #84]
-	ldr	ip, .L4+36
-	ldr	r2, .L4+40
-	str	ip, [r3, #68]
-	str	r2, [r3, #72]
-	ldr	ip, .L4+44
-	ldr	r2, .L4+48
-	str	r4, [r3, #80]
-	str	lr, [r3, #60]
-	str	ip, [r3, #92]
-	str	r0, [r3, #96]
-	str	r1, [r2]
-	pop	{r4, lr}
+	str	r0, [r1]
+	pop	{r4, r5, lr}
 	bx	lr
 .L5:
 	.align	2
@@ -68,16 +70,16 @@ initStart:
 	.word	startLevel
 	.word	startforegroundTiles
 	.word	startforegroundMap
-	.word	5728
 	.word	startforegroundPal
-	.word	startmidgroundTiles
+	.word	5728
 	.word	startmidgroundMap
-	.word	7968
+	.word	startmidgroundTiles
 	.word	startmidgroundPal
-	.word	startbackgroundTiles
+	.word	7968
 	.word	startbackgroundMap
-	.word	startbackgroundPal
+	.word	startbackgroundTiles
 	.word	movingUp
+	.word	startbackgroundPal
 	.size	initStart, .-initStart
 	.align	2
 	.global	animateStart
@@ -176,25 +178,26 @@ initInstructions:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	r2, #67108864
-	mov	r1, #0
-	mov	ip, #2048
+	str	lr, [sp, #-4]!
+	mov	lr, #2048
+	mov	r2, #0
+	mov	r1, #67108864
 	mov	r0, #32
 	ldr	r3, .L19
-	str	lr, [sp, #-4]!
-	strh	r1, [r2, #18]	@ movhi
-	ldr	lr, .L19+4
-	str	ip, [r3, #32]
-	strh	r1, [r2, #16]	@ movhi
+	ldr	ip, .L19+4
+	str	ip, [r3, #36]
 	ldr	ip, .L19+8
-	ldr	r1, .L19+12
-	ldr	r2, .L19+16
-	str	lr, [r3, #36]
+	str	lr, [r3, #32]
 	str	ip, [r3, #40]
-	str	r1, [r3, #28]
-	str	r2, [r3, #76]
+	ldr	lr, .L19+12
+	ldr	ip, .L19+16
+	str	lr, [r3, #28]
+	str	r2, [r3]
+	str	ip, [r3, #76]
 	str	r0, [r3, #80]
 	ldr	lr, [sp], #4
+	strh	r2, [r1, #18]	@ movhi
+	strh	r2, [r1, #16]	@ movhi
 	bx	lr
 .L20:
 	.align	2
@@ -205,6 +208,45 @@ initInstructions:
 	.word	19936
 	.word	instructionsforegroundPal
 	.size	initInstructions, .-initInstructions
+	.align	2
+	.global	initPause
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initPause, %function
+initPause:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	mov	r2, #0
+	mov	r4, #10816
+	mov	lr, #2048
+	mov	r1, #67108864
+	mov	r0, #32
+	ldr	r3, .L23
+	ldr	ip, .L23+4
+	str	ip, [r3, #36]
+	ldr	ip, .L23+8
+	str	ip, [r3, #40]
+	ldr	ip, .L23+12
+	str	r4, [r3, #28]
+	str	lr, [r3, #32]
+	str	r2, [r3]
+	str	ip, [r3, #76]
+	str	r0, [r3, #80]
+	pop	{r4, lr}
+	strh	r2, [r1, #18]	@ movhi
+	strh	r2, [r1, #16]	@ movhi
+	bx	lr
+.L24:
+	.align	2
+.L23:
+	.word	pauseLevel
+	.word	pauseTiles
+	.word	pauseMap
+	.word	pausePal
+	.size	initPause, .-initPause
 	.align	2
 	.global	initLevel1
 	.syntax unified
@@ -226,31 +268,31 @@ initLevel1:
 	mov	r5, #64
 	mov	r1, #4
 	mov	ip, #2
-	ldr	r3, .L23
+	ldr	r3, .L27
 	str	r0, [r3, #28]
-	ldr	r0, .L23+4
+	ldr	r0, .L27+4
 	str	lr, [r3, #80]
 	str	r0, [r3, #36]
-	ldr	lr, .L23+8
-	ldr	r0, .L23+12
+	ldr	lr, .L27+8
+	ldr	r0, .L27+12
 	str	lr, [r3, #40]
 	str	r0, [r3, #44]
-	ldr	lr, .L23+16
-	ldr	r0, .L23+20
+	ldr	lr, .L27+16
+	ldr	r0, .L27+20
 	str	lr, [r3, #52]
 	str	r0, [r3, #56]
-	ldr	lr, .L23+24
-	ldr	r0, .L23+28
+	ldr	lr, .L27+24
+	ldr	r0, .L27+28
 	str	lr, [r3, #60]
 	str	r0, [r3, #68]
-	ldr	lr, .L23+32
-	ldr	r0, .L23+36
+	ldr	lr, .L27+32
+	ldr	r0, .L27+36
 	str	r4, [r3, #8]
 	str	lr, [r3, #72]
 	str	r0, [r3, #76]
-	ldr	lr, .L23+40
+	ldr	lr, .L27+40
 	add	r4, r4, #194
-	ldr	r0, .L23+44
+	ldr	r0, .L27+44
 	str	r4, [r3, #12]
 	sub	r4, r4, #188
 	str	r8, [r3]
@@ -268,9 +310,9 @@ initLevel1:
 	str	r1, [r3, #100]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L24:
+.L28:
 	.align	2
-.L23:
+.L27:
 	.word	level1
 	.word	level1foregroundTiles
 	.word	level1foregroundMap
@@ -290,6 +332,7 @@ initLevel1:
 	.comm	vOffBG2,4,4
 	.comm	vOffBG1,4,4
 	.comm	vOffBG0,4,4
+	.comm	pauseLevel,2424,4
 	.comm	instructionsLevel,2424,4
 	.comm	startLevel,2424,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

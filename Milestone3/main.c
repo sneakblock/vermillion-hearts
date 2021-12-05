@@ -35,8 +35,6 @@
 // Prototypes
 void initialize();
 
-
-
 int seed;
 
 // States
@@ -48,7 +46,6 @@ enum
     PAUSE,
     WIN,
     INSTRUCTIONS,
-    LOSE
 };
 int state;
 
@@ -97,9 +94,6 @@ int main()
             break;
         case INSTRUCTIONS:
             instructions();
-            break;
-        case LOSE:
-            lose();
             break;
         }
     }
@@ -281,23 +275,6 @@ void dialogue() {
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
-            // waitForVBlank();
-
-            // REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
-
-            // DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-            // DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-            // hideSprites();
-            // DMANow(3, shadowOAM, OAM, 512);
-            // REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-            // REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-            // REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
-
-            // DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-            // DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-            // DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
-
-            // state = GAME;
         }
         
     }
@@ -317,11 +294,14 @@ void goToPause() {
 
     //REALLY nice glitching for a quick moment here, a frame or two.
 
-    REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
+    // REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
 
-    PALETTE[0] = WHITE;
-    PALETTE[1] = BLACK;
+    // PALETTE[0] = WHITE;
+    // PALETTE[1] = BLACK;
 
+    REG_DISPCTL = MODE0 | BG0_ENABLE;
+
+    loadLevel(&pauseLevel, 0);
 
     state = PAUSE;
 
@@ -330,36 +310,13 @@ void goToPause() {
 // Runs every frame of the pause state
 void pause() {
 
-    fillScreen4(1);
-
-    char* string = "PAUSED.";
-
-    drawString4(20, 60, string, 0);
-
-    waitForVBlank();
-    flipPage();
+    REG_BG0HOFF = 0;
+    REG_BG0VOFF = 0;
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
         goToGame();
 
-        // waitForVBlank();
-
-        // REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
-
-        // DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-        // DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-        // hideSprites();
-        // DMANow(3, shadowOAM, OAM, 512);
-        // REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-        // REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-        // REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
-
-        // DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-        // DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-        // DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
-
-        // state = GAME;
     }
 
 }
@@ -401,50 +358,6 @@ void win() {
 
 }
 
-// Sets up the lose state
-void goToLose() {
-
-    //NICE GLITCHING HERE!
-
-    REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
-
-    //load start screen palette
-    //draw the background image
-
-    PALETTE[0] = RED;
-    PALETTE[1] = BLACK;
-
-    fillScreen4(1);
-
-    waitForVBlank();
-    flipPage();
-    
-    state = LOSE;
-
-}
-
-// Runs every frame of the lose state
-void lose() {
-
-    //NICE GLITCHING HERE!
-
-    char* string = "YOU PERISH.";
-    char* string1 = "PRESS START TO BEGIN ANEW.";
-
-    drawString4(20, 80, string, 0);
-    drawString4(20, 100, string1, 0);
-
-    waitForVBlank();
-    flipPage();
-
-    if (BUTTON_PRESSED(BUTTON_START)) {
-
-        goToStart();
-
-    }
-
-}
-
 void goToInstructions() {
 
     REG_DISPCTL = MODE0 | BG0_ENABLE;
@@ -454,7 +367,7 @@ void goToInstructions() {
 
     stopSound();
 
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 100; i++) {
         waitForVBlank();
 
         //MAKE THIS A FUNCTION!
@@ -474,14 +387,14 @@ void goToInstructions() {
 
         }
     }
+
+    loadLevel(&instructionsLevel, 0);
     
     state = INSTRUCTIONS;
 
 }
 
 void instructions() {
-
-    
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
 

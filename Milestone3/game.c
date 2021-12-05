@@ -72,6 +72,7 @@ void drawGame() {
 
 void initLevels() {
 
+    initPause();
     initLevel1();
 
 }

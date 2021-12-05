@@ -18,8 +18,11 @@
 
 #include "instructionsforeground.h"
 
+#include "pause.h"
+
 LEVEL startLevel;
 LEVEL instructionsLevel;
+LEVEL pauseLevel;
 
 int vOffBG0;
 int vOffBG1;
@@ -33,6 +36,9 @@ int movingUp;
 
 
 void initStart() {
+
+    // ============= SIZE ===============
+    startLevel.levelSize = BG_SIZE_SMALL;
 
     // =========== FOREGROUND ============
 
@@ -108,6 +114,8 @@ void animateStart() {
 
 void initInstructions() {
 
+    instructionsLevel.levelSize = BG_SIZE_SMALL;
+
     // =========== FOREGROUND ============
 
     instructionsLevel.foregroundTiles = instructionsforegroundTiles;
@@ -117,6 +125,25 @@ void initInstructions() {
 
     instructionsLevel.foregroundPal = instructionsforegroundPal;
     instructionsLevel.foregroundPalLen = instructionsforegroundPalLen;
+
+    REG_BG0VOFF = 0;
+    REG_BG0HOFF = 0;
+
+}
+
+void initPause() {
+
+    pauseLevel.levelSize = BG_SIZE_SMALL;
+
+    // =========== FOREGROUND ============
+
+    pauseLevel.foregroundTiles = pauseTiles;
+    pauseLevel.foregroundMap = pauseMap;
+    pauseLevel.foregroundTilesLen = pauseTilesLen;
+    pauseLevel.foregroundMapLen = pauseMapLen;
+
+    pauseLevel.foregroundPal = pausePal;
+    pauseLevel.foregroundPalLen = pausePalLen;
 
     REG_BG0VOFF = 0;
     REG_BG0HOFF = 0;

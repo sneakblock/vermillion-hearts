@@ -1625,19 +1625,20 @@ extern const signed char trackB_data[];
 # 1 "levels.h" 1
 extern LEVEL startLevel;
 extern LEVEL instructionsLevel;
+extern LEVEL pauseLevel;
 
 void initStart();
 void animateStart();
 
 void initInstructions();
 
+void initPause();
+
 void initLevel1();
 # 34 "main.c" 2
 
 
 void initialize();
-
-
 
 int seed;
 
@@ -1650,7 +1651,6 @@ enum
     PAUSE,
     WIN,
     INSTRUCTIONS,
-    LOSE
 };
 int state;
 
@@ -1699,9 +1699,6 @@ int main()
             break;
         case INSTRUCTIONS:
             instructions();
-            break;
-        case LOSE:
-            lose();
             break;
         }
     }
@@ -1883,7 +1880,6 @@ void dialogue() {
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
-# 301 "main.c"
         }
 
     }
@@ -1900,14 +1896,10 @@ void dialogue() {
 
 
 void goToPause() {
+# 302 "main.c"
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
-
-
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
-
-    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
-    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
-
+    loadLevel(&pauseLevel, 0);
 
     state = PAUSE;
 
@@ -1916,19 +1908,13 @@ void goToPause() {
 
 void pause() {
 
-    fillScreen4(1);
-
-    char* string = "PAUSED.";
-
-    drawString4(20, 60, string, 0);
-
-    waitForVBlank();
-    flipPage();
+    (*(volatile unsigned short *)0x04000010) = 0;
+    (*(volatile unsigned short *)0x04000012) = 0;
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
         goToGame();
-# 363 "main.c"
+
     }
 
 }
@@ -1970,50 +1956,6 @@ void win() {
 
 }
 
-
-void goToLose() {
-
-
-
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
-
-
-
-
-    ((unsigned short *)0x5000000)[0] = ((31) | (0) << 5 | (0) << 10);
-    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
-
-    fillScreen4(1);
-
-    waitForVBlank();
-    flipPage();
-
-    state = LOSE;
-
-}
-
-
-void lose() {
-
-
-
-    char* string = "YOU PERISH.";
-    char* string1 = "PRESS START TO BEGIN ANEW.";
-
-    drawString4(20, 80, string, 0);
-    drawString4(20, 100, string1, 0);
-
-    waitForVBlank();
-    flipPage();
-
-    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
-
-        goToStart();
-
-    }
-
-}
-
 void goToInstructions() {
 
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
@@ -2023,7 +1965,7 @@ void goToInstructions() {
 
     stopSound();
 
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 100; i++) {
         waitForVBlank();
 
 
@@ -2044,13 +1986,13 @@ void goToInstructions() {
         }
     }
 
+    loadLevel(&instructionsLevel, 0);
+
     state = INSTRUCTIONS;
 
 }
 
 void instructions() {
-
-
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
 
