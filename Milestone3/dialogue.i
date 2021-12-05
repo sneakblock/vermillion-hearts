@@ -16,6 +16,7 @@ typedef struct {
     int choiceBIndex;
 
     int endsConversation;
+    int satisfiesBool;
 
     char* string;
 
@@ -70,6 +71,7 @@ typedef struct
 
     int dialoguesIndex;
     int postConvoIndex;
+    int convoBoolSatisfied;
 
     char* name;
 
@@ -415,6 +417,10 @@ void selectChoice() {
         case CHOICE_B:
         currentTarget->dialoguesIndex = currentTarget->dialogues[currentTarget->dialoguesIndex].choiceBIndex;
         break;
+    }
+
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].satisfiesBool) {
+        currentTarget->convoBoolSatisfied = 1;
     }
 
     typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);

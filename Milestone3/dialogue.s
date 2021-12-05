@@ -45,7 +45,7 @@ drawDialogueUI:
 	bx	r7
 	ldr	r3, [r4]
 .L2:
-	ldr	r2, [r3, #372]
+	ldr	r2, [r3, #416]
 	cmp	r2, #0
 	beq	.L3
 	mov	r3, #254
@@ -74,7 +74,7 @@ drawDialogueUI:
 	bx	r5
 	ldr	r3, [r4]
 .L4:
-	ldr	r2, [r3, #372]
+	ldr	r2, [r3, #416]
 	cmp	r2, #0
 	beq	.L1
 	mov	r3, #254
@@ -190,10 +190,9 @@ drawChoices:
 	push	{r4, r5, r6, lr}
 	ldr	r5, .L42
 	ldr	r3, [r5]
-	ldr	r2, [r3, #364]
-	rsb	r2, r2, r2, lsl #3
-	add	r3, r3, r2, lsl #2
-	ldr	r2, [r3, #104]
+	ldr	r2, [r3, #404]
+	add	r3, r3, r2, lsl #5
+	ldr	r2, [r3, #108]
 	ldr	r4, .L42+4
 	mov	r3, #254
 	mov	r1, #112
@@ -201,10 +200,9 @@ drawChoices:
 	mov	lr, pc
 	bx	r4
 	ldr	r3, [r5]
-	ldr	r2, [r3, #364]
-	rsb	r2, r2, r2, lsl #3
-	add	r3, r3, r2, lsl #2
-	ldr	r2, [r3, #108]
+	ldr	r2, [r3, #404]
+	add	r3, r3, r2, lsl #5
+	ldr	r2, [r3, #112]
 	mov	r1, #136
 	mov	r3, #254
 	mov	r0, #12
@@ -302,39 +300,40 @@ selectChoice:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
 	bl	drawDialogueUI
-	ldr	r3, .L56
+	ldr	r3, .L60
 	ldr	r3, [r3]
 	cmp	r3, #0
 	beq	.L52
 	cmp	r3, #1
-	ldr	r3, .L56+4
-	ldr	r3, [r3]
-	ldr	r2, [r3, #364]
-	rsbeq	r2, r2, r2, lsl #3
-	addeq	r2, r3, r2, lsl #2
-	ldreq	r2, [r2, #92]
-	streq	r2, [r3, #364]
+	ldr	r3, .L60+4
+	ldr	r2, [r3]
+	ldr	r3, [r2, #404]
+	addeq	r3, r2, r3, lsl #5
+	ldreq	r3, [r3, #92]
+	streq	r3, [r2, #404]
 .L54:
-	rsb	r2, r2, r2, lsl #3
-	add	r3, r3, r2, lsl #2
-	ldr	r2, [r3, #100]
+	add	r3, r2, r3, lsl #5
+	ldr	r1, [r3, #100]
+	cmp	r1, #0
+	movne	r1, #1
+	strne	r1, [r2, #412]
+	mov	r0, #124
+	ldr	r2, [r3, #104]
 	mov	r1, #16
 	mov	r3, #254
-	mov	r0, #124
 	pop	{r4, lr}
 	b	typeDialogue
 .L52:
-	ldr	r3, .L56+4
-	ldr	r3, [r3]
-	ldr	r2, [r3, #364]
-	rsb	r2, r2, r2, lsl #3
-	add	r2, r3, r2, lsl #2
-	ldr	r2, [r2, #88]
-	str	r2, [r3, #364]
+	ldr	r3, .L60+4
+	ldr	r2, [r3]
+	ldr	r3, [r2, #404]
+	add	r3, r2, r3, lsl #5
+	ldr	r3, [r3, #88]
+	str	r3, [r2, #404]
 	b	.L54
-.L57:
+.L61:
 	.align	2
-.L56:
+.L60:
 	.word	selectedChoice
 	.word	currentTarget
 	.size	selectChoice, .-selectChoice

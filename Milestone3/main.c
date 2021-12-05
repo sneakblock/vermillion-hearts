@@ -26,24 +26,13 @@
 
 #include "dialogue.h"
 
+#include "sound.h"
+#include "trackA.h"
+
 // Prototypes
 void initialize();
 
-// State Prototypes
-void goToStart();
-void start();
-void goToGame();
-void game();
-void goToDialogue();
-void dialogue();
-void goToPause();
-void pause();
-void goToWin();
-void win();
-void goToLose();
-void lose();
-void goToInstructions();
-void instructions();
+
 
 int seed;
 
@@ -120,6 +109,9 @@ void initialize()
 
     buttons = BUTTONS;
     oldButtons = 0;
+
+    setupInterrupts();
+    setupSounds();
     
     goToStart();
 }
@@ -160,6 +152,9 @@ void start() {
 
         //glitchVisuals();
         srand(seed);
+        initGame();
+        loadLevel(&level1, 1);
+        playSoundA(trackA_data, trackA_length, 1);
         goToGame();
         
 
@@ -177,6 +172,9 @@ void start() {
 // Sets up the game state
 void goToGame() {
 
+    //Turn it off!!!
+    REG_DISPCTL = 0;
+
     waitForVBlank();
 
     REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
@@ -186,8 +184,7 @@ void goToGame() {
     hideSprites();
     DMANow(3, shadowOAM, OAM, 512);
 
-    initGame();
-    loadLevel(&level1);
+    loadLevel(&level1, 0);
 
     state = GAME;
 
@@ -246,24 +243,24 @@ void dialogue() {
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
+            goToGame();
+            // waitForVBlank();
 
-            waitForVBlank();
+            // REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
 
-            REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
+            // DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
+            // DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
+            // hideSprites();
+            // DMANow(3, shadowOAM, OAM, 512);
+            // REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+            // REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+            // REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
 
-            DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-            DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-            hideSprites();
-            DMANow(3, shadowOAM, OAM, 512);
-            REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-            REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-            REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+            // DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
+            // DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
+            // DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
 
-            DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-            DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-            DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
-
-            state = GAME;
+            // state = GAME;
         }
         
     }
@@ -307,23 +304,25 @@ void pause() {
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
-        waitForVBlank();
+        goToGame();
 
-        REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
+        // waitForVBlank();
 
-        DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-        DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-        hideSprites();
-        DMANow(3, shadowOAM, OAM, 512);
-        REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-        REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-        REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+        // REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
 
-        DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-        DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-        DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
+        // DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
+        // DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
+        // hideSprites();
+        // DMANow(3, shadowOAM, OAM, 512);
+        // REG_BG0CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+        // REG_BG1CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+        // REG_BG2CNT = currentLevel->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
 
-        state = GAME;
+        // DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
+        // DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
+        // DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
+
+        // state = GAME;
     }
 
 }

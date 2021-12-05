@@ -1233,9 +1233,28 @@ _putchar_unlocked(int _c)
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-# 64 "myLib.h"
+
+
+
+
+
+void goToStart();
+void start();
+void goToGame();
+void game();
+void goToDialogue();
+void dialogue();
+void goToPause();
+void pause();
+void goToWin();
+void win();
+void goToLose();
+void lose();
+void goToInstructions();
+void instructions();
+# 80 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 85 "myLib.h"
+# 101 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1280,12 +1299,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 159 "myLib.h"
+# 175 "myLib.h"
 void hideSprites();
-# 185 "myLib.h"
+# 201 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 195 "myLib.h"
+# 211 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1295,12 +1314,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 236 "myLib.h"
+# 252 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-
-
-
-
+# 288 "myLib.h"
+typedef void (*ihp)(void);
+# 308 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 15 "main.c" 2
 
@@ -1319,6 +1337,7 @@ typedef struct {
     int choiceBIndex;
 
     int endsConversation;
+    int satisfiesBool;
 
     char* string;
 
@@ -1373,6 +1392,7 @@ typedef struct
 
     int dialoguesIndex;
     int postConvoIndex;
+    int convoBoolSatisfied;
 
     char* name;
 
@@ -1476,7 +1496,7 @@ void initNPCS();
 void initLevels();
 void initPlayer();
 
-void loadLevel(LEVEL* level);
+void loadLevel(LEVEL* level, int resetsPlayerPos);
 void loadNPC(NPC* npc);
 
 void updateGame();
@@ -1554,24 +1574,44 @@ void drawSelector();
 void selectChoice();
 # 28 "main.c" 2
 
+# 1 "sound.h" 1
+void setupSounds();
+void playSoundA(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops);
+
+void setupInterrupts();
+void interruptHandler();
+
+void pauseSound();
+void unpauseSound();
+void stopSound();
+# 49 "sound.h"
+typedef struct{
+    const signed char* data;
+    int length;
+    int frequency;
+    int isPlaying;
+    int loops;
+    int duration;
+    int priority;
+    int vBlankCount;
+} SOUND;
+
+SOUND soundA;
+SOUND soundB;
+# 30 "main.c" 2
+# 1 "trackA.h" 1
+
+
+extern const unsigned int trackA_sampleRate;
+extern const unsigned int trackA_length;
+extern const signed char trackA_data[];
+# 31 "main.c" 2
+
 
 void initialize();
 
 
-void goToStart();
-void start();
-void goToGame();
-void game();
-void goToDialogue();
-void dialogue();
-void goToPause();
-void pause();
-void goToWin();
-void win();
-void goToLose();
-void lose();
-void goToInstructions();
-void instructions();
 
 int seed;
 
@@ -1649,6 +1689,9 @@ void initialize()
     buttons = (*(volatile unsigned short *)0x04000130);
     oldButtons = 0;
 
+    setupInterrupts();
+    setupSounds();
+
     goToStart();
 }
 
@@ -1688,6 +1731,9 @@ void start() {
 
 
         srand(seed);
+        initGame();
+        loadLevel(&level1, 1);
+        playSoundA(trackA_data, trackA_length, 1);
         goToGame();
 
 
@@ -1705,6 +1751,9 @@ void start() {
 
 void goToGame() {
 
+
+    (*(volatile unsigned short *)0x4000000) = 0;
+
     waitForVBlank();
 
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
@@ -1714,8 +1763,7 @@ void goToGame() {
     hideSprites();
     DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
 
-    initGame();
-    loadLevel(&level1);
+    loadLevel(&level1, 0);
 
     state = GAME;
 
@@ -1774,24 +1822,8 @@ void dialogue() {
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
-
-            waitForVBlank();
-
-            (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
-
-            DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
-            DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
-            hideSprites();
-            DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-            (*(volatile unsigned short *)0x4000008) = currentLevel->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
-            (*(volatile unsigned short *)0x400000A) = currentLevel->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
-            (*(volatile unsigned short *)0x400000C) = currentLevel->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
-
-            DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
-            DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
-            DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
-
-            state = GAME;
+            goToGame();
+# 264 "main.c"
         }
 
     }
@@ -1835,23 +1867,8 @@ void pause() {
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
-        waitForVBlank();
-
-        (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
-
-        DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
-        DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
-        hideSprites();
-        DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-        (*(volatile unsigned short *)0x4000008) = currentLevel->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
-        (*(volatile unsigned short *)0x400000A) = currentLevel->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
-        (*(volatile unsigned short *)0x400000C) = currentLevel->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
-
-        DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
-        DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
-        DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
-
-        state = GAME;
+        goToGame();
+# 326 "main.c"
     }
 
 }

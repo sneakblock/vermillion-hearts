@@ -1232,9 +1232,28 @@ _putchar_unlocked(int _c)
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-# 64 "myLib.h"
+
+
+
+
+
+void goToStart();
+void start();
+void goToGame();
+void game();
+void goToDialogue();
+void dialogue();
+void goToPause();
+void pause();
+void goToWin();
+void win();
+void goToLose();
+void lose();
+void goToInstructions();
+void instructions();
+# 80 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 85 "myLib.h"
+# 101 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1279,12 +1298,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 159 "myLib.h"
+# 175 "myLib.h"
 void hideSprites();
-# 185 "myLib.h"
+# 201 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 195 "myLib.h"
+# 211 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1294,12 +1313,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 236 "myLib.h"
+# 252 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-
-
-
-
+# 288 "myLib.h"
+typedef void (*ihp)(void);
+# 308 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "game.c" 2
 # 1 "game.h" 1
@@ -1316,6 +1334,7 @@ typedef struct {
     int choiceBIndex;
 
     int endsConversation;
+    int satisfiesBool;
 
     char* string;
 
@@ -1370,6 +1389,7 @@ typedef struct
 
     int dialoguesIndex;
     int postConvoIndex;
+    int convoBoolSatisfied;
 
     char* name;
 
@@ -1473,7 +1493,7 @@ void initNPCS();
 void initLevels();
 void initPlayer();
 
-void loadLevel(LEVEL* level);
+void loadLevel(LEVEL* level, int resetsPlayerPos);
 void loadNPC(NPC* npc);
 
 void updateGame();
@@ -1698,16 +1718,19 @@ void initNPCS() {
         greeting.choiceBIndex = 2;
         greeting.promptsChoice = 1;
         greeting.endsConversation = 0;
+        greeting.satisfiesBool = 0;
 
         DIALOGUE hatePlants;
         hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
         hatePlants.endsConversation = 1;
         hatePlants.promptsChoice = 0;
+        hatePlants.satisfiesBool = 0;
 
         DIALOGUE lovePlants;
         lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
         lovePlants.endsConversation = 1;
         lovePlants.promptsChoice = 0;
+        lovePlants.satisfiesBool = 0;
 
         npcs[i].dialogues[0] = greeting;
         npcs[i].dialogues[1] = hatePlants;
@@ -1735,7 +1758,7 @@ void initNPCS() {
 
 }
 
-void loadLevel(LEVEL* level) {
+void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     (*(volatile unsigned short *)0x4000008) = level->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
     (*(volatile unsigned short *)0x400000A) = level->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
@@ -1745,17 +1768,18 @@ void loadLevel(LEVEL* level) {
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
 
-    hOff = level->initHOff;
-    vOff = level->initVOff;
 
 
 
 
 
 
-
-    player.worldCol = level->playerWorldSpawnCol;
-    player.worldRow = level->playerWorldSpawnRow;
+    if (resetsPlayerPos) {
+        player.worldCol = level->playerWorldSpawnCol;
+        player.worldRow = level->playerWorldSpawnRow;
+        hOff = level->initHOff;
+        vOff = level->initVOff;
+    }
 
 
 
@@ -1834,7 +1858,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 297 "game.c"
+# 301 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1848,7 +1872,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 349 "game.c"
+# 353 "game.c"
     animateNPCS();
 
 }
@@ -1863,7 +1887,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 380 "game.c"
+# 384 "game.c"
             player.aniCounter++;
 
 

@@ -108,9 +108,14 @@ void selectChoice() {
         break;
     }
 
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].satisfiesBool) {
+        currentTarget->convoBoolSatisfied = 1;
+    }
+
     typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
 
 }
+
 
 
 // VERY GOOD GLITCH.

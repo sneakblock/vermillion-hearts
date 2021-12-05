@@ -143,16 +143,19 @@ void initNPCS() {
         greeting.choiceBIndex = 2;
         greeting.promptsChoice = 1;
         greeting.endsConversation = 0;
+        greeting.satisfiesBool = 0;
 
         DIALOGUE hatePlants;
         hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
         hatePlants.endsConversation = 1;
         hatePlants.promptsChoice = 0;
+        hatePlants.satisfiesBool = 0;
 
         DIALOGUE lovePlants;
         lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
         lovePlants.endsConversation = 1;
         lovePlants.promptsChoice = 0;
+        lovePlants.satisfiesBool = 0;
 
         npcs[i].dialogues[0] = greeting;
         npcs[i].dialogues[1] = hatePlants;
@@ -180,7 +183,7 @@ void initNPCS() {
     
 }
 
-void loadLevel(LEVEL* level) {
+void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     REG_BG0CNT = level->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
     REG_BG1CNT = level->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
@@ -190,17 +193,18 @@ void loadLevel(LEVEL* level) {
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
 
-    hOff = level->initHOff;
-    vOff = level->initVOff;
-
     // DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
     // DMANow(3, level->midgroundMap, &SCREENBLOCK[27], level->midgroundMapLen / 2);
 
     // DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
     // DMANow(3, level->backgroundMap, &SCREENBLOCK[24], level->backgroundMapLen / 2);
 
-    player.worldCol = level->playerWorldSpawnCol;
-    player.worldRow = level->playerWorldSpawnRow;
+    if (resetsPlayerPos) {
+        player.worldCol = level->playerWorldSpawnCol;
+        player.worldRow = level->playerWorldSpawnRow;
+        hOff = level->initHOff;
+        vOff = level->initVOff;
+    }
 
     // for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
     //     if (&level->npcs[i] != NULL) {

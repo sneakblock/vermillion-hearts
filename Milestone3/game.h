@@ -35,6 +35,7 @@ typedef struct {
     int choiceBIndex;
     // 1 if this dialogue ends the conversation, 0 if it does not.
     int endsConversation;
+    int satisfiesBool;
     // The actual sentence.
     char* string;
 
@@ -89,6 +90,7 @@ typedef struct
     //The current index of the dialogues array.
     int dialoguesIndex;
     int postConvoIndex;
+    int convoBoolSatisfied;
     //npc's name
     char* name;
 
@@ -192,7 +194,7 @@ void initNPCS();
 void initLevels();
 void initPlayer();
 
-void loadLevel(LEVEL* level);
+void loadLevel(LEVEL* level, int resetsPlayerPos);
 void loadNPC(NPC* npc);
 
 void updateGame();
