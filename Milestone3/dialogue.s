@@ -98,6 +98,7 @@ drawDialogueUI:
 	.word	drawImage4
 	.word	drawString4
 	.size	drawDialogueUI, .-drawDialogueUI
+	.global	__aeabi_uidivmod
 	.align	2
 	.global	typeDialogue
 	.syntax unified
@@ -114,18 +115,19 @@ typeDialogue:
 	cmp	r2, #0
 	beq	.L22
 	mov	r5, r0
-	mov	r9, r1
 	mov	r10, r3
-	ldr	r8, .L38
-	ldr	r7, .L38+4
-	ldr	fp, .L38+8
-	rsb	r6, r4, #0
+	mov	r6, r1
+	ldr	r1, .L38
+	ldr	r9, .L38+4
+	ldr	fp, [r1]
+	ldr	r8, .L38+8
+	rsb	r7, r4, #0
 .L24:
 	tst	r2, #223
 	moveq	r3, #6
 	beq	.L29
 	mov	r2, r4
-	add	r0, r6, #1
+	add	r0, r7, #1
 .L25:
 	add	r3, r0, r2
 	ldrb	r1, [r2, #1]!	@ zero_extendqisi2
@@ -139,31 +141,46 @@ typeDialogue:
 	cmp	r3, #223
 	movgt	r5, #124
 	ldr	r3, .L38+12
-	str	r3, [r8]
+	str	r3, [r9]
 	addle	r5, r5, #6
-	addgt	r9, r9, #10
+	addgt	r6, r6, #10
 	ldrb	r2, [r4]	@ zero_extendqisi2
 	mov	r3, r10
-	mov	r1, r9
+	mov	r1, r6
 	mov	r0, r5
 	mov	lr, pc
-	bx	r7
+	bx	r8
 	mov	r3, #100663296
-	str	r3, [r8]
-	mov	r1, r9
+	str	r3, [r9]
+	mov	r1, r6
 	ldrb	r2, [r4]	@ zero_extendqisi2
 	mov	r3, r10
 	mov	r0, r5
 	mov	lr, pc
-	bx	r7
-	mov	lr, pc
-	bx	fp
+	bx	r8
 	ldr	r3, .L38+16
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L38+20
+	mov	r1, fp
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L38+24
+	mov	r2, #0
+	add	r0, r3, r1
+	mov	r1, #1
+	ldr	r3, .L38+28
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L38+32
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L38+36
 	mov	lr, pc
 	bx	r3
 	ldrb	r2, [r4, #1]!	@ zero_extendqisi2
 	cmp	r2, #0
-	sub	r6, r6, #1
+	sub	r7, r7, #1
 	bne	.L24
 .L22:
 	pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
@@ -171,10 +188,15 @@ typeDialogue:
 .L39:
 	.align	2
 .L38:
+	.word	talksounds_length
 	.word	videoBuffer
 	.word	drawChar4
-	.word	waitForVBlank
 	.word	100704256
+	.word	rand
+	.word	__aeabi_uidivmod
+	.word	talksounds_data
+	.word	playSoundB
+	.word	waitForVBlank
 	.word	flipPage
 	.size	typeDialogue, .-typeDialogue
 	.align	2
@@ -338,4 +360,6 @@ selectChoice:
 	.word	currentTarget
 	.size	selectChoice, .-selectChoice
 	.comm	selectedChoice,4,4
+	.comm	soundB,32,4
+	.comm	soundA,32,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

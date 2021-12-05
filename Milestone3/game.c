@@ -2,18 +2,15 @@
 #include <stdio.h>
 #include "myLib.h"
 #include "game.h"
-
 #include "standardpalette.h"
-
 #include "level1foreground.h"
 #include "level1midground.h"
 #include "level1background.h"
 #include "level1collisionmap.h"
-
 #include "spritesheet.h"
-
 #include "talkingheadtest.h"
 #include "talkingheadtest2.h"
+#include "levels.h"
 
 
 NPC* currentTarget;
@@ -26,6 +23,7 @@ NPC npcs[MAX_NPCS_PER_LEVEL];
 
 int hOff;
 int vOff;
+
 
 unsigned char* level1collisionmap = level1collisionmapBitmap;
 
@@ -57,39 +55,23 @@ void drawGame() {
     REG_BG0HOFF = hOff;
     REG_BG0VOFF = vOff;
 
+    REG_BG1HOFF = hOff / 2;
+    REG_BG1VOFF = vOff / 2;
+
+    REG_BG2HOFF = hOff / 3;
+    REG_BG2VOFF = vOff / 3;
+    
+
+    // REG_BG2HOFF = hOff / 8;
+    // REG_BG2VOFF = vOff / 8;
+
 }
 
 
 
 void initLevels() {
 
-    //assign level1 information
-    level1.levelSize = BG_SIZE_WIDE;
-    level1.worldPixelWidth = 512;
-    level1.worldPixelHeight = 256;
-    level1.playerWorldSpawnCol = 450;
-    level1.playerWorldSpawnRow = 177;
-    level1.initHOff = 262;
-    level1.initVOff = 64;
-
-    level1.foregroundTilesLen = level1foregroundTilesLen;
-    level1.foregroundMapLen = level1foregroundMapLen;
-    level1.foregroundTiles = level1foregroundTiles;
-    level1.foregroundMap = level1foregroundMap;
-
-    level1.midgroundTilesLen = level1midgroundTilesLen;
-    level1.midgroundMapLen = level1midgroundMapLen;
-    level1.midgroundTiles = level1midgroundTiles;
-    level1.midgroundMap = level1midgroundMap;
-
-    level1.backgroundTilesLen = level1backgroundTilesLen;
-    level1.backgroundMapLen = level1backgroundMapLen;
-    level1.backgroundTiles = level1backgroundTiles;
-    level1.backgroundMap = level1backgroundMap;
-
-    level1.defaultPalette = level1foregroundPal;
-    
-    level1.numNPCS = 4;
+    initLevel1();
 
 }
 
@@ -185,19 +167,24 @@ void initNPCS() {
 
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
-    REG_BG0CNT = level->levelSize | BG_8BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
-    REG_BG1CNT = level->levelSize | BG_8BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
-    REG_BG2CNT = level->levelSize | BG_8BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+    REG_BG0CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+    REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+    REG_BG2CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
 
-    DMANow(3, level->defaultPalette, PALETTE, 256);
+    DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
+
+    DMANow(3, level->midgroundPal, &PALETTE[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+
+    DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
 
-    // DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
-    // DMANow(3, level->midgroundMap, &SCREENBLOCK[27], level->midgroundMapLen / 2);
+    DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
+    DMANow(3, level->midgroundMap, &SCREENBLOCK[28], level->midgroundMapLen / 2);
 
-    // DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
-    // DMANow(3, level->backgroundMap, &SCREENBLOCK[24], level->backgroundMapLen / 2);
+    DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
+    DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
 
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
@@ -250,6 +237,7 @@ void updatePlayer() {
             if (vOff < currentLevel->worldPixelHeight - SCREENHEIGHT && (player.worldRow - vOff) > SCREENHEIGHT / 2) {
                 // Update background offset variable if the above is true
                 vOff++;
+                
             }
         }
     }
@@ -262,6 +250,7 @@ void updatePlayer() {
 
             if (hOff > 0 && (player.worldCol - hOff) <= SCREENWIDTH / 2) {
                 hOff--;
+                
             }
         }
     }
@@ -275,6 +264,7 @@ void updatePlayer() {
 
                 // Update background offset variable if the above is true
                 hOff++;
+                
 
             }
         }
@@ -424,41 +414,41 @@ void drawNPCS() {
     }
 }
 
-void glitchVisuals(int duration) {
+// void glitchVisuals(int duration) {
 
-    int counter = 0;
+//     int counter = 0;
 
-    while (counter < duration) {
-        for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-            npcs[i].cdel = 0;
-            npcs[i].rdel = 0;
-        }
+//     while (counter < duration) {
+//         for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+//             npcs[i].cdel = 0;
+//             npcs[i].rdel = 0;
+//         }
 
-        DMANow(3, currentLevel->midgroundTiles, &CHARBLOCK[1], currentLevel->midgroundTilesLen / 2);
-        DMANow(3, currentLevel->midgroundMap, &SCREENBLOCK[27], currentLevel->midgroundMapLen / 2);
+//         DMANow(3, currentLevel->midgroundTiles, &CHARBLOCK[1], currentLevel->midgroundTilesLen / 2);
+//         DMANow(3, currentLevel->midgroundMap, &SCREENBLOCK[27], currentLevel->midgroundMapLen / 2);
 
-        DMANow(3, currentLevel->backgroundTiles, &CHARBLOCK[2], currentLevel->backgroundTilesLen / 2);
-        DMANow(3, currentLevel->backgroundMap, &SCREENBLOCK[24], currentLevel->backgroundMapLen / 2);
-        waitForVBlank();
-        counter++;
+//         DMANow(3, currentLevel->backgroundTiles, &CHARBLOCK[2], currentLevel->backgroundTilesLen / 2);
+//         DMANow(3, currentLevel->backgroundMap, &SCREENBLOCK[24], currentLevel->backgroundMapLen / 2);
+//         waitForVBlank();
+//         counter++;
         
-    }
+//     }
 
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-            npcs[i].cdel = 1;
-            npcs[i].rdel = 1;
-        }
+//     for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
+//             npcs[i].cdel = 1;
+//             npcs[i].rdel = 1;
+//         }
 
-    DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-    DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-    DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
+//     DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
+//     DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
+//     DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
 
-    DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-    DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-    hideSprites();
-    DMANow(3, shadowOAM, OAM, 512);
+//     DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
+//     DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
+//     hideSprites();
+//     DMANow(3, shadowOAM, OAM, 512);
 
-}
+// }
 
 
 

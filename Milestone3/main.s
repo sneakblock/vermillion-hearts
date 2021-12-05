@@ -10,14 +10,6 @@
 	.eabi_attribute 18, 4
 	.file	"main.c"
 	.text
-	.section	.rodata.str1.4,"aMS",%progbits,1
-	.align	2
-.LC0:
-	.ascii	"PRESS START TO BEGIN.\000"
-	.align	2
-.LC1:
-	.ascii	"PRESS SELECT FOR INSTRUCTIONS.\000"
-	.text
 	.align	2
 	.global	goToStart
 	.arch armv4t
@@ -29,52 +21,29 @@ goToStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, lr}
 	mov	r2, #67108864
-	mov	r4, #0
-	mov	r3, #83886080
-	mvn	r0, #32768
-	ldr	r1, .L4
-	strh	r0, [r3]	@ movhi
+	mov	r1, #5888
+	push	{r4, lr}
+	ldr	r3, .L4
 	strh	r1, [r2]	@ movhi
-	mov	r0, #1
-	strh	r4, [r3, #2]	@ movhi
+	mov	lr, pc
+	bx	r3
 	ldr	r3, .L4+4
+	mov	r1, #0
+	ldr	r0, .L4+8
 	mov	lr, pc
 	bx	r3
-	ldr	r5, .L4+8
-	mov	r3, r4
-	mov	r1, #80
-	mov	r0, #20
-	ldr	r2, .L4+12
-	mov	lr, pc
-	bx	r5
-	mov	r3, r4
-	mov	r1, #100
-	mov	r0, #20
-	ldr	r2, .L4+16
-	mov	lr, pc
-	bx	r5
-	ldr	r3, .L4+20
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L4+24
-	mov	lr, pc
-	bx	r3
-	ldr	r3, .L4+28
-	str	r4, [r3]
-	pop	{r4, r5, r6, lr}
+	mov	r2, #0
+	ldr	r3, .L4+12
+	pop	{r4, lr}
+	str	r2, [r3]
 	bx	lr
 .L5:
 	.align	2
 .L4:
-	.word	1044
-	.word	fillScreen4
-	.word	drawString4
-	.word	.LC0
-	.word	.LC1
-	.word	waitForVBlank
-	.word	flipPage
+	.word	initStart
+	.word	loadLevel
+	.word	startLevel
 	.word	state
 	.size	goToStart, .-goToStart
 	.align	2
@@ -148,17 +117,17 @@ goToGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
-	mov	r4, #67108864
-	mov	r5, #0
 	ldr	r3, .L16
-	strh	r5, [r4]	@ movhi
 	mov	lr, pc
 	bx	r3
-	mov	r2, #4352
-	mov	r3, #16384
-	strh	r2, [r4]	@ movhi
-	mov	r0, #3
+	mov	r5, #0
+	mov	r2, #67108864
+	mov	r1, #5888
+	strh	r5, [r2]	@ movhi
 	ldr	r4, .L16+4
+	strh	r1, [r2]	@ movhi
+	mov	r3, #16384
+	mov	r0, #3
 	ldr	r2, .L16+8
 	ldr	r1, .L16+12
 	mov	lr, pc
@@ -240,43 +209,45 @@ goToDialogue:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, r7, r8, lr}
 	mov	r4, #0
-	mov	r6, #67108864
-	ldr	r5, .L24
-	ldr	r2, [r5]
+	mov	r7, #67108864
+	ldr	r6, .L24
+	ldr	r5, .L24+4
+	mov	lr, pc
+	bx	r5
+	ldr	r2, [r6]
 	ldr	r3, [r2, #80]
 	add	r3, r3, r3, lsr #31
 	mov	r0, #3
 	ldr	r1, [r2, #76]
-	strh	r4, [r6]	@ movhi
+	strh	r4, [r7]	@ movhi
 	mov	r2, #83886080
-	ldr	r7, .L24+4
+	ldr	r8, .L24+8
 	asr	r3, r3, #1
 	mov	lr, pc
-	bx	r7
+	bx	r8
 	mvn	r2, #32768
-	ldr	r1, .L24+8
-	ldr	r3, .L24+12
-	strh	r1, [r6]	@ movhi
+	ldr	r1, .L24+12
+	ldr	r3, .L24+16
+	strh	r1, [r7]	@ movhi
 	strh	r4, [r3, #254]	@ movhi
 	strh	r2, [r3, #252]	@ movhi
-	ldr	r3, .L24+16
+	ldr	r3, .L24+20
 	mov	lr, pc
 	bx	r3
-	ldr	r3, [r5]
+	ldr	r3, [r6]
 	ldr	r2, [r3, #404]
 	add	r3, r3, r2, lsl #5
+	ldr	r2, [r3, #104]
 	mov	r1, #16
 	mov	r0, #124
-	ldr	r2, [r3, #104]
-	ldr	r5, .L24+20
 	mov	r3, #254
+	ldr	r6, .L24+24
+	mov	lr, pc
+	bx	r6
+	ldr	r3, .L24+28
+	str	r4, [r3]
 	mov	lr, pc
 	bx	r5
-	ldr	r2, .L24+24
-	ldr	r3, .L24+28
-	str	r4, [r2]
-	mov	lr, pc
-	bx	r3
 	ldr	r3, .L24+32
 	mov	lr, pc
 	bx	r3
@@ -289,13 +260,13 @@ goToDialogue:
 	.align	2
 .L24:
 	.word	currentTarget
+	.word	waitForVBlank
 	.word	DMANow
 	.word	1044
 	.word	83886336
 	.word	drawDialogueUI
 	.word	typeDialogue
 	.word	selectedChoice
-	.word	waitForVBlank
 	.word	flipPage
 	.word	state
 	.size	goToDialogue, .-goToDialogue
@@ -437,9 +408,9 @@ goToPause:
 	.word	1044
 	.word	state
 	.size	goToPause, .-goToPause
-	.section	.rodata.str1.4
+	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
-.LC2:
+.LC0:
 	.ascii	"PAUSED.\000"
 	.text
 	.align	2
@@ -489,7 +460,7 @@ pause:
 .L68:
 	.word	fillScreen4
 	.word	drawString4
-	.word	.LC2
+	.word	.LC0
 	.word	waitForVBlank
 	.word	flipPage
 	.word	oldButtons
@@ -527,10 +498,10 @@ goToWin:
 	.size	goToWin, .-goToWin
 	.section	.rodata.str1.4
 	.align	2
-.LC3:
+.LC1:
 	.ascii	"YOU REACH AETHER.\000"
 	.align	2
-.LC4:
+.LC2:
 	.ascii	"PRESS START TO REPLAY.\000"
 	.text
 	.align	2
@@ -580,8 +551,8 @@ win:
 .L77:
 	.word	fillScreen4
 	.word	drawString4
-	.word	.LC3
-	.word	.LC4
+	.word	.LC1
+	.word	.LC2
 	.word	waitForVBlank
 	.word	flipPage
 	.word	oldButtons
@@ -631,10 +602,10 @@ goToLose:
 	.size	goToLose, .-goToLose
 	.section	.rodata.str1.4
 	.align	2
-.LC5:
+.LC3:
 	.ascii	"YOU PERISH.\000"
 	.align	2
-.LC6:
+.LC4:
 	.ascii	"PRESS START TO BEGIN ANEW.\000"
 	.text
 	.align	2
@@ -678,28 +649,28 @@ lose:
 .L87:
 	.align	2
 .L86:
-	.word	.LC5
+	.word	.LC3
 	.word	drawString4
-	.word	.LC6
+	.word	.LC4
 	.word	waitForVBlank
 	.word	flipPage
 	.word	oldButtons
 	.size	lose, .-lose
 	.section	.rodata.str1.4
 	.align	2
-.LC7:
+.LC5:
 	.ascii	"DIRECTIONAL BUTTONS TO MOVE.\000"
 	.align	2
-.LC8:
+.LC6:
 	.ascii	"A TO GLITCH TIME.\000"
 	.align	2
-.LC9:
+.LC7:
 	.ascii	"START TO PAUSE.\000"
 	.align	2
-.LC10:
+.LC8:
 	.ascii	"AVOID ENTITIES. REACH END.\000"
 	.align	2
-.LC11:
+.LC9:
 	.ascii	"PRESS START TO RETURN TO START.\000"
 	.text
 	.align	2
@@ -764,11 +735,11 @@ goToInstructions:
 .L90:
 	.word	fillScreen4
 	.word	drawString4
+	.word	.LC5
+	.word	.LC6
 	.word	.LC7
 	.word	.LC8
 	.word	.LC9
-	.word	.LC10
-	.word	.LC11
 	.word	waitForVBlank
 	.word	flipPage
 	.word	state
@@ -783,59 +754,64 @@ start:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
-	ldr	r2, .L104
-	ldr	r4, .L104+4
-	ldr	r0, [r2]
-	ldrh	r3, [r4]
-	add	r0, r0, #1
-	tst	r3, #8
-	str	r0, [r2]
-	beq	.L93
+	push	{r4, r5, r6, lr}
+	ldr	r4, .L104
+	ldr	r3, [r4]
+	ldr	r5, .L104+4
+	add	r3, r3, #1
 	ldr	r2, .L104+8
+	str	r3, [r4]
+	mov	lr, pc
+	bx	r2
+	ldrh	r3, [r5]
+	tst	r3, #8
+	beq	.L93
+	ldr	r2, .L104+12
 	ldrh	r2, [r2]
 	tst	r2, #8
 	beq	.L102
 .L93:
 	tst	r3, #4
 	beq	.L92
-	ldr	r3, .L104+8
+	ldr	r3, .L104+12
 	ldrh	r3, [r3]
 	tst	r3, #4
 	beq	.L103
 .L92:
-	pop	{r4, lr}
+	pop	{r4, r5, r6, lr}
 	bx	lr
 .L103:
-	pop	{r4, lr}
+	pop	{r4, r5, r6, lr}
 	b	goToInstructions
 .L102:
-	ldr	r3, .L104+12
-	mov	lr, pc
-	bx	r3
+	ldr	r0, [r4]
 	ldr	r3, .L104+16
 	mov	lr, pc
 	bx	r3
-	mov	r1, #1
-	ldr	r0, .L104+20
-	ldr	r3, .L104+24
+	ldr	r3, .L104+20
 	mov	lr, pc
 	bx	r3
+	mov	r1, #1
+	ldr	r0, .L104+24
 	ldr	r3, .L104+28
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L104+32
 	mov	r2, #1
 	ldr	r1, [r3]
-	ldr	r0, .L104+32
-	ldr	r3, .L104+36
+	ldr	r0, .L104+36
+	ldr	r3, .L104+40
 	mov	lr, pc
 	bx	r3
 	bl	goToGame
-	ldrh	r3, [r4]
+	ldrh	r3, [r5]
 	b	.L93
 .L105:
 	.align	2
 .L104:
 	.word	seed
 	.word	oldButtons
+	.word	animateStart
 	.word	buttons
 	.word	srand
 	.word	initGame

@@ -1233,6 +1233,8 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 
+extern int seed;
+
 
 
 
@@ -1251,9 +1253,9 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 80 "myLib.h"
+# 82 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 101 "myLib.h"
+# 103 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1298,12 +1300,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 175 "myLib.h"
+# 177 "myLib.h"
 void hideSprites();
-# 201 "myLib.h"
+# 203 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 211 "myLib.h"
+# 213 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1313,11 +1315,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 252 "myLib.h"
+# 254 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 288 "myLib.h"
+# 290 "myLib.h"
 typedef void (*ihp)(void);
-# 308 "myLib.h"
+# 310 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "game.c" 2
 # 1 "game.h" 1
@@ -1325,7 +1327,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 30 "game.h"
+# 28 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1471,7 +1473,12 @@ typedef struct {
     const unsigned short* backgroundTiles;
     const unsigned short* backgroundMap;
 
-    const unsigned short* defaultPalette;
+    const unsigned short* foregroundPal;
+    int foregroundPalLen;
+    const unsigned short* midgroundPal;
+    int midgroundPalLen;
+    const unsigned short* backgroundPal;
+    int backgroundPalLen;
 
     int numNPCS;
     NPC npcs[5];
@@ -1529,66 +1536,75 @@ void changeSprite();
 
 void rotateCollisionMap();
 # 5 "game.c" 2
-
 # 1 "standardpalette.h" 1
 # 20 "standardpalette.h"
 extern const unsigned short standardpalettePal[256];
-# 7 "game.c" 2
-
+# 6 "game.c" 2
 # 1 "level1foreground.h" 1
 # 22 "level1foreground.h"
-extern const unsigned short level1foregroundTiles[19328];
+extern const unsigned short level1foregroundTiles[3168];
 
 
 extern const unsigned short level1foregroundMap[2048];
 
 
-extern const unsigned short level1foregroundPal[256];
-# 9 "game.c" 2
+extern const unsigned short level1foregroundPal[10];
+# 7 "game.c" 2
 # 1 "level1midground.h" 1
-# 21 "level1midground.h"
-extern const unsigned short level1midgroundTiles[5184];
+# 22 "level1midground.h"
+extern const unsigned short level1midgroundTiles[2640];
 
 
 extern const unsigned short level1midgroundMap[2048];
-# 10 "game.c" 2
+
+
+extern const unsigned short level1midgroundPal[2];
+# 8 "game.c" 2
 # 1 "level1background.h" 1
-# 21 "level1background.h"
-extern const unsigned short level1backgroundTiles[17216];
+# 22 "level1background.h"
+extern const unsigned short level1backgroundTiles[8608];
 
 
 extern const unsigned short level1backgroundMap[2048];
-# 11 "game.c" 2
+
+
+extern const unsigned short level1backgroundPal[2];
+# 9 "game.c" 2
 # 1 "level1collisionmap.h" 1
 # 21 "level1collisionmap.h"
 extern const unsigned short level1collisionmapBitmap[65536];
 
 
 extern const unsigned short level1collisionmapPal[256];
-# 12 "game.c" 2
-
+# 10 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short SPRITESHEETTiles[16384];
 
 
 extern const unsigned short SPRITESHEETPal[256];
-# 14 "game.c" 2
-
+# 11 "game.c" 2
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
 extern const unsigned short talkingheadtestBitmap[8816];
 
 
 extern const unsigned short talkingheadtestPal[256];
-# 16 "game.c" 2
+# 12 "game.c" 2
 # 1 "talkingheadtest2.h" 1
 # 21 "talkingheadtest2.h"
 extern const unsigned short talkingheadtest2Bitmap[8816];
 
 
 extern const unsigned short talkingheadtest2Pal[256];
-# 17 "game.c" 2
+# 13 "game.c" 2
+# 1 "levels.h" 1
+extern LEVEL startLevel;
+
+
+void initStart();
+void initLevel1();
+# 14 "game.c" 2
 
 
 NPC* currentTarget;
@@ -1601,6 +1617,7 @@ NPC npcs[5];
 
 int hOff;
 int vOff;
+
 
 unsigned char* level1collisionmap = level1collisionmapBitmap;
 
@@ -1632,39 +1649,23 @@ void drawGame() {
     (*(volatile unsigned short *)0x04000010) = hOff;
     (*(volatile unsigned short *)0x04000012) = vOff;
 
+    (*(volatile unsigned short *)0x04000014) = hOff / 2;
+    (*(volatile unsigned short *)0x04000016) = vOff / 2;
+
+    (*(volatile unsigned short *)0x04000018) = hOff / 3;
+    (*(volatile unsigned short *)0x0400001A) = vOff / 3;
+
+
+
+
+
 }
 
 
 
 void initLevels() {
 
-
-    level1.levelSize = (1 << 14);
-    level1.worldPixelWidth = 512;
-    level1.worldPixelHeight = 256;
-    level1.playerWorldSpawnCol = 450;
-    level1.playerWorldSpawnRow = 177;
-    level1.initHOff = 262;
-    level1.initVOff = 64;
-
-    level1.foregroundTilesLen = 38656;
-    level1.foregroundMapLen = 4096;
-    level1.foregroundTiles = level1foregroundTiles;
-    level1.foregroundMap = level1foregroundMap;
-
-    level1.midgroundTilesLen = 10368;
-    level1.midgroundMapLen = 4096;
-    level1.midgroundTiles = level1midgroundTiles;
-    level1.midgroundMap = level1midgroundMap;
-
-    level1.backgroundTilesLen = 34432;
-    level1.backgroundMapLen = 4096;
-    level1.backgroundTiles = level1backgroundTiles;
-    level1.backgroundMap = level1backgroundMap;
-
-    level1.defaultPalette = level1foregroundPal;
-
-    level1.numNPCS = 4;
+    initLevel1();
 
 }
 
@@ -1760,19 +1761,24 @@ void initNPCS() {
 
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
-    (*(volatile unsigned short *)0x4000008) = level->levelSize | (1 << 7) | ((0) << 2) | ((30) << 8);
-    (*(volatile unsigned short *)0x400000A) = level->levelSize | (1 << 7) | ((1) << 2) | ((28) << 8);
-    (*(volatile unsigned short *)0x400000C) = level->levelSize | (1 << 7) | ((2) << 2) | ((26) << 8);
+    (*(volatile unsigned short *)0x4000008) = level->levelSize | (0 << 7) | ((0) << 2) | ((30) << 8);
+    (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
+    (*(volatile unsigned short *)0x400000C) = level->levelSize | (0 << 7) | ((2) << 2) | ((26) << 8);
 
-    DMANow(3, level->defaultPalette, ((unsigned short *)0x5000000), 256);
+    DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
+
+    DMANow(3, level->midgroundPal, &((unsigned short *)0x5000000)[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+
+    DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
 
+    DMANow(3, level->midgroundTiles, &((charblock *)0x6000000)[1], level->midgroundTilesLen / 2);
+    DMANow(3, level->midgroundMap, &((screenblock *)0x6000000)[28], level->midgroundMapLen / 2);
 
-
-
-
-
+    DMANow(3, level->backgroundTiles, &((charblock *)0x6000000)[2], level->backgroundTilesLen / 2);
+    DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
 
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
@@ -1825,6 +1831,7 @@ void updatePlayer() {
             if (vOff < currentLevel->worldPixelHeight - 160 && (player.worldRow - vOff) > 160 / 2) {
 
                 vOff++;
+
             }
         }
     }
@@ -1837,6 +1844,7 @@ void updatePlayer() {
 
             if (hOff > 0 && (player.worldCol - hOff) <= 240 / 2) {
                 hOff--;
+
             }
         }
     }
@@ -1851,6 +1859,7 @@ void updatePlayer() {
 
                 hOff++;
 
+
             }
         }
     }
@@ -1858,7 +1867,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 301 "game.c"
+# 291 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1872,7 +1881,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 353 "game.c"
+# 343 "game.c"
     animateNPCS();
 
 }
@@ -1887,7 +1896,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 384 "game.c"
+# 374 "game.c"
             player.aniCounter++;
 
 
@@ -1929,40 +1938,4 @@ void drawNPCS() {
 
     }
     }
-}
-
-void glitchVisuals(int duration) {
-
-    int counter = 0;
-
-    while (counter < duration) {
-        for (int i = 0; i < 5 - 1; i++) {
-            npcs[i].cdel = 0;
-            npcs[i].rdel = 0;
-        }
-
-        DMANow(3, currentLevel->midgroundTiles, &((charblock *)0x6000000)[1], currentLevel->midgroundTilesLen / 2);
-        DMANow(3, currentLevel->midgroundMap, &((screenblock *)0x6000000)[27], currentLevel->midgroundMapLen / 2);
-
-        DMANow(3, currentLevel->backgroundTiles, &((charblock *)0x6000000)[2], currentLevel->backgroundTilesLen / 2);
-        DMANow(3, currentLevel->backgroundMap, &((screenblock *)0x6000000)[24], currentLevel->backgroundMapLen / 2);
-        waitForVBlank();
-        counter++;
-
-    }
-
-    for (int i = 0; i < 5 - 1; i++) {
-            npcs[i].cdel = 1;
-            npcs[i].rdel = 1;
-        }
-
-    DMANow(3, currentLevel->defaultPalette, ((unsigned short *)0x5000000), 256);
-    DMANow(3, currentLevel->foregroundTiles, &((charblock *)0x6000000)[0], (currentLevel->foregroundTilesLen) / 2);
-    DMANow(3, currentLevel->foregroundMap, &((screenblock *)0x6000000)[30], (currentLevel->foregroundMapLen) / 2);
-
-    DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
-    DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
-    hideSprites();
-    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
-
 }

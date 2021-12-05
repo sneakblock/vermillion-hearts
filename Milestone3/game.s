@@ -76,60 +76,16 @@ initLevels:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, lr}
-	mov	r6, #512
-	mov	lr, #256
-	mov	ip, #38656
-	mov	r0, #10368
-	mov	r2, #4096
-	mov	r7, #16384
-	mov	r5, #177
-	mov	r4, #64
-	mov	r1, #4
+	push	{r4, lr}
 	ldr	r3, .L8
-	stmib	r3, {r6, lr}
-	add	lr, lr, #194
-	str	lr, [r3, #12]
-	sub	lr, lr, #188
-	str	lr, [r3, #20]
-	str	ip, [r3, #28]
-	ldr	lr, .L8+4
-	ldr	ip, .L8+8
-	str	lr, [r3, #36]
-	str	ip, [r3, #40]
-	ldr	lr, .L8+12
-	ldr	ip, .L8+16
-	str	r0, [r3, #44]
-	add	r0, r0, #24064
-	str	lr, [r3, #52]
-	str	ip, [r3, #56]
-	ldr	lr, .L8+20
-	ldr	ip, .L8+24
-	str	r0, [r3, #60]
-	ldr	r0, .L8+28
-	str	r7, [r3]
-	str	r5, [r3, #16]
-	str	r4, [r3, #24]
-	str	lr, [r3, #68]
-	str	ip, [r3, #72]
-	str	r0, [r3, #76]
-	str	r1, [r3, #80]
-	str	r2, [r3, #32]
-	str	r2, [r3, #48]
-	str	r2, [r3, #64]
-	pop	{r4, r5, r6, r7, lr}
+	mov	lr, pc
+	bx	r3
+	pop	{r4, lr}
 	bx	lr
 .L9:
 	.align	2
 .L8:
-	.word	level1
-	.word	level1foregroundTiles
-	.word	level1foregroundMap
-	.word	level1midgroundTiles
-	.word	level1midgroundMap
-	.word	level1backgroundTiles
-	.word	level1backgroundMap
-	.word	level1foregroundPal
+	.word	initLevel1
 	.size	initLevels, .-initLevels
 	.align	2
 	.global	initPlayer
@@ -308,14 +264,16 @@ initGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	bl	initLevels
+	ldr	r3, .L22
+	mov	lr, pc
+	bx	r3
 	mov	r4, #8
 	mov	lr, #16
 	mov	r2, #0
 	mov	r1, #1
 	mov	ip, #20
 	mov	r0, #2
-	ldr	r3, .L22
+	ldr	r3, .L22+4
 	str	r4, [r3, #28]
 	str	lr, [r3, #32]
 	pop	{r4, lr}
@@ -336,6 +294,7 @@ initGame:
 .L23:
 	.align	2
 .L22:
+	.word	initLevel1
 	.word	player
 	.size	initGame, .-initGame
 	.align	2
@@ -349,31 +308,59 @@ loadLevel:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
-	mov	ip, #67108864
 	mov	r4, r0
-	mov	r5, r1
-	ldrsh	r3, [r0]
-	orr	r0, r3, #7296
-	orr	r2, r3, #6784
-	orr	r0, r0, #4
-	orr	r3, r3, #7808
-	orr	r2, r2, #8
-	lsl	r0, r0, #16
-	lsl	r3, r3, #16
+	mov	ip, #67108864
+	ldrsh	r2, [r0]
+	mov	r6, r1
+	orr	r0, r2, #6656
+	orr	r1, r2, #7168
+	ldr	r3, [r4, #80]
+	orr	r1, r1, #4
+	orr	r2, r2, #7680
+	orr	r0, r0, #8
+	lsl	r1, r1, #16
 	lsl	r2, r2, #16
-	lsr	r0, r0, #16
-	lsr	r3, r3, #16
+	lsl	r0, r0, #16
+	lsr	r1, r1, #16
 	lsr	r2, r2, #16
-	strh	r3, [ip, #8]	@ movhi
-	ldr	r1, [r4, #76]
-	ldr	r6, .L30
-	strh	r0, [ip, #10]	@ movhi
-	mov	r3, #256
-	strh	r2, [ip, #12]	@ movhi
-	mov	r0, #3
+	lsr	r0, r0, #16
+	add	r3, r3, r3, lsr #31
+	strh	r2, [ip, #8]	@ movhi
+	ldr	r5, .L30
+	strh	r1, [ip, #10]	@ movhi
 	mov	r2, #83886080
+	ldr	r1, [r4, #76]
+	asr	r3, r3, #1
+	strh	r0, [ip, #12]	@ movhi
+	mov	r0, #3
 	mov	lr, pc
-	bx	r6
+	bx	r5
+	ldr	r2, [r4, #80]
+	ldr	r3, [r4, #88]
+	add	r2, r2, r2, lsr #31
+	bic	r2, r2, #1
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #84]
+	add	r2, r2, #83886080
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
+	ldr	r3, [r4, #88]
+	ldr	r1, [r4, #80]
+	add	r3, r3, r3, lsr #31
+	asr	r2, r3, #1
+	add	r1, r1, r1, lsr #31
+	ldr	r3, [r4, #96]
+	add	r2, r2, r1, asr #1
+	lsl	r2, r2, #1
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #92]
+	add	r2, r2, #83886080
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
 	ldr	r3, [r4, #28]
 	add	r3, r3, r3, lsr #31
 	mov	r2, #100663296
@@ -381,7 +368,7 @@ loadLevel:
 	ldr	r1, [r4, #36]
 	asr	r3, r3, #1
 	mov	lr, pc
-	bx	r6
+	bx	r5
 	ldr	r3, [r4, #32]
 	add	r3, r3, r3, lsr #31
 	mov	r0, #3
@@ -389,22 +376,54 @@ loadLevel:
 	ldr	r2, .L30+4
 	asr	r3, r3, #1
 	mov	lr, pc
-	bx	r6
-	cmp	r5, #0
+	bx	r5
+	ldr	r3, [r4, #44]
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #52]
+	ldr	r2, .L30+8
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
+	ldr	r3, [r4, #48]
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #56]
+	ldr	r2, .L30+12
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
+	ldr	r3, [r4, #60]
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #68]
+	ldr	r2, .L30+16
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
+	ldr	r3, [r4, #64]
+	add	r3, r3, r3, lsr #31
+	mov	r0, #3
+	ldr	r1, [r4, #72]
+	ldr	r2, .L30+20
+	asr	r3, r3, #1
+	mov	lr, pc
+	bx	r5
+	cmp	r6, #0
 	beq	.L25
 	add	r2, r4, #12
 	ldm	r2, {r2, ip}
-	ldr	r3, .L30+8
-	ldr	r1, .L30+12
+	ldr	r3, .L30+24
+	ldr	r1, .L30+28
 	str	r2, [r3, #16]
 	ldr	r0, [r4, #20]
-	ldr	r2, .L30+16
+	ldr	r2, .L30+32
 	str	ip, [r3, #12]
 	ldr	r3, [r4, #24]
 	str	r0, [r1]
 	str	r3, [r2]
 .L25:
-	ldr	r3, .L30+20
+	ldr	r3, .L30+36
 	str	r4, [r3]
 	pop	{r4, r5, r6, lr}
 	bx	lr
@@ -413,6 +432,10 @@ loadLevel:
 .L30:
 	.word	DMANow
 	.word	100724736
+	.word	100679680
+	.word	100720640
+	.word	100696064
+	.word	100716544
 	.word	player
 	.word	hOff
 	.word	vOff
@@ -523,7 +546,7 @@ updatePlayer:
 	beq	.L94
 .L46:
 	ldr	r3, [r7]
-	ldr	r3, [r3, #80]
+	ldr	r3, [r3, #100]
 	cmp	r3, #0
 	ble	.L52
 	mov	r6, #0
@@ -557,7 +580,7 @@ updatePlayer:
 	beq	.L95
 .L50:
 	ldr	r3, [r7]
-	ldr	r3, [r3, #80]
+	ldr	r3, [r3, #100]
 	cmp	r3, r6
 	add	r5, r5, #464
 	bgt	.L51
@@ -952,18 +975,43 @@ drawGame:
 	ldr	r4, .L134+12
 	mov	r3, #512
 	mov	r2, #117440512
-	ldr	r1, .L134+4
 	mov	r0, #3
+	ldr	r1, .L134+4
 	mov	lr, pc
 	bx	r4
-	mov	r3, #67108864
-	ldr	r2, .L134+16
-	ldrh	r1, [r2]
-	ldr	r2, .L134+20
-	ldrh	r2, [r2]
-	strh	r1, [r3, #16]	@ movhi
+	mov	ip, #67108864
+	ldr	r3, .L134+16
+	ldr	r3, [r3]
+	lsl	r2, r3, #16
+	lsr	r2, r2, #16
+	ldr	r1, .L134+20
+	strh	r2, [ip, #16]	@ movhi
+	ldr	r2, .L134+24
+	ldr	r1, [r1]
+	smull	lr, r0, r2, r3
+	smull	lr, r2, r1, r2
+	sub	r0, r0, r3, asr #31
+	add	lr, r1, r1, lsr #31
+	add	r3, r3, r3, lsr #31
+	sub	r2, r2, r1, asr #31
+	asr	r3, r3, #1
+	asr	lr, lr, #1
+	lsl	r1, r1, #16
+	lsl	r3, r3, #16
+	lsl	lr, lr, #16
+	lsl	r0, r0, #16
+	lsl	r2, r2, #16
+	lsr	lr, lr, #16
+	lsr	r1, r1, #16
+	lsr	r3, r3, #16
+	lsr	r0, r0, #16
+	lsr	r2, r2, #16
+	strh	r1, [ip, #18]	@ movhi
+	strh	r3, [ip, #20]	@ movhi
+	strh	lr, [ip, #22]	@ movhi
+	strh	r0, [ip, #24]	@ movhi
 	pop	{r4, lr}
-	strh	r2, [r3, #18]	@ movhi
+	strh	r2, [ip, #26]	@ movhi
 	bx	lr
 .L131:
 	bl	drawPlayer.part.0
@@ -977,166 +1025,14 @@ drawGame:
 	.word	DMANow
 	.word	hOff
 	.word	vOff
+	.word	1431655766
 	.size	drawGame, .-drawGame
-	.align	2
-	.global	glitchVisuals
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	glitchVisuals, %function
-glitchVisuals:
-	@ Function supports interworking.
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	subs	r8, r0, #0
-	ble	.L143
-	mov	r7, #0
-	ldr	r4, .L144
-	ldr	r6, .L144+4
-	ldr	r5, .L144+8
-	ldr	fp, .L144+12
-	ldr	r10, .L144+16
-	ldr	r9, .L144+20
-.L138:
-	mov	ip, #0
-	ldr	r2, [r6]
-	ldr	r3, [r2, #44]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #52]
-	mov	r0, #3
-	mov	r2, r10
-	asr	r3, r3, #1
-	str	ip, [r4, #24]
-	str	ip, [r4, #20]
-	str	ip, [r4, #488]
-	str	ip, [r4, #484]
-	str	ip, [r4, #952]
-	str	ip, [r4, #948]
-	str	ip, [r4, #1416]
-	str	ip, [r4, #1412]
-	mov	lr, pc
-	bx	r5
-	ldr	r2, [r6]
-	ldr	r3, [r2, #48]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #56]
-	mov	r0, #3
-	mov	r2, r9
-	asr	r3, r3, #1
-	mov	lr, pc
-	bx	r5
-	ldr	r2, [r6]
-	ldr	r3, [r2, #60]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #68]
-	mov	r0, #3
-	ldr	r2, .L144+24
-	asr	r3, r3, #1
-	mov	lr, pc
-	bx	r5
-	ldr	r2, [r6]
-	ldr	r3, [r2, #64]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #72]
-	mov	r0, #3
-	ldr	r2, .L144+28
-	asr	r3, r3, #1
-	add	r7, r7, #1
-	mov	lr, pc
-	bx	r5
-	mov	lr, pc
-	bx	fp
-	cmp	r8, r7
-	bne	.L138
-.L137:
-	mov	r0, #1
-	ldr	r2, [r6]
-	str	r0, [r4, #24]
-	ldr	r1, [r2, #76]
-	str	r0, [r4, #20]
-	str	r0, [r4, #488]
-	str	r0, [r4, #484]
-	str	r0, [r4, #952]
-	str	r0, [r4, #948]
-	str	r0, [r4, #1416]
-	str	r0, [r4, #1412]
-	mov	r3, #256
-	mov	r2, #83886080
-	mov	r0, #3
-	mov	lr, pc
-	bx	r5
-	ldr	r2, [r6]
-	ldr	r3, [r2, #28]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #36]
-	mov	r0, #3
-	mov	r2, #100663296
-	asr	r3, r3, #1
-	mov	lr, pc
-	bx	r5
-	ldr	r2, [r6]
-	ldr	r3, [r2, #32]
-	add	r3, r3, r3, lsr #31
-	ldr	r1, [r2, #40]
-	mov	r0, #3
-	ldr	r2, .L144+32
-	asr	r3, r3, #1
-	mov	lr, pc
-	bx	r5
-	mov	r3, #16384
-	mov	r0, #3
-	ldr	r2, .L144+36
-	ldr	r1, .L144+40
-	mov	lr, pc
-	bx	r5
-	mov	r0, #3
-	ldr	r2, .L144+44
-	ldr	r1, .L144+48
-	mov	r3, #256
-	mov	lr, pc
-	bx	r5
-	ldr	r3, .L144+52
-	mov	lr, pc
-	bx	r3
-	mov	r3, #512
-	mov	r2, #117440512
-	mov	r0, #3
-	ldr	r1, .L144+56
-	mov	lr, pc
-	bx	r5
-	pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	bx	lr
-.L143:
-	ldr	r4, .L144
-	ldr	r6, .L144+4
-	ldr	r5, .L144+8
-	b	.L137
-.L145:
-	.align	2
-.L144:
-	.word	npcs
-	.word	currentLevel
-	.word	DMANow
-	.word	waitForVBlank
-	.word	100679680
-	.word	100718592
-	.word	100696064
-	.word	100712448
-	.word	100724736
-	.word	100728832
-	.word	SPRITESHEETTiles
-	.word	83886592
-	.word	SPRITESHEETPal
-	.word	hideSprites
-	.word	shadowOAM
-	.size	glitchVisuals, .-glitchVisuals
 	.global	level1collisionmap
 	.comm	vOff,4,4
 	.comm	hOff,4,4
 	.comm	npcs,2320,4
 	.comm	player,76,4
-	.comm	level1,2404,4
+	.comm	level1,2424,4
 	.comm	currentLevel,4,4
 	.comm	currentTarget,4,4
 	.data

@@ -10,8 +10,6 @@ enum {UP, DOWN, LEFT, RIGHT};
 
 
 
-
-
 // =================== CHARACTER INFORMATION ===================
 
 // The size, in tiles, of the talking heads in game that appear for dialogues.
@@ -172,7 +170,12 @@ typedef struct {
     const unsigned short* backgroundTiles;
     const unsigned short* backgroundMap;
 
-    const unsigned short* defaultPalette;
+    const unsigned short* foregroundPal;
+    int foregroundPalLen;
+    const unsigned short* midgroundPal;
+    int midgroundPalLen;
+    const unsigned short* backgroundPal;
+    int backgroundPalLen;
 
     int numNPCS;
     NPC npcs[MAX_NPCS_PER_LEVEL];

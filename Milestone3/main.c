@@ -29,6 +29,8 @@
 #include "sound.h"
 #include "trackA.h"
 
+#include "levels.h"
+
 // Prototypes
 void initialize();
 
@@ -119,25 +121,10 @@ void initialize()
 // Sets up the start state
 void goToStart() {
 
-    REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE;
 
-    //load start screen palette
-    //draw the background image
-    PALETTE[0] = WHITE;
-    PALETTE[1] = BLACK;
-
-    fillScreen4(1);
-
-    char* string = "PRESS START TO BEGIN.";
-    char* string1 = "PRESS SELECT FOR INSTRUCTIONS.";
-
-    drawString4(20, 80, string, 0);
-    drawString4(20, 100, string1, 0);
-
-
-    waitForVBlank();
-    flipPage();
-    
+    initStart();
+    loadLevel(&startLevel, 0);
     
     state = START;
 
@@ -148,23 +135,20 @@ void start() {
 
     seed++;
 
-    if (BUTTON_PRESSED(BUTTON_START)) {
+    animateStart();
 
+    if (BUTTON_PRESSED(BUTTON_START)) {
         //glitchVisuals();
         srand(seed);
         initGame();
         loadLevel(&level1, 1);
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
-        
-
     }
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
-
         //glitchVisuals();
         goToInstructions();
-
     }
 
 }
@@ -172,12 +156,12 @@ void start() {
 // Sets up the game state
 void goToGame() {
 
+    waitForVBlank();
+
     //Turn it off!!!
     REG_DISPCTL = 0;
 
-    waitForVBlank();
-
-    REG_DISPCTL = MODE0 | BG0_ENABLE /*| BG1_ENABLE | BG2_ENABLE*/ | SPRITE_ENABLE;
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | SPRITE_ENABLE;
 
     DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
     DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
@@ -200,6 +184,7 @@ void game() {
 
 void goToDialogue() {
 
+    waitForVBlank();
     
     //Turns off display controller
     REG_DISPCTL = 0;

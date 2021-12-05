@@ -1234,6 +1234,8 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 
+extern int seed;
+
 
 
 
@@ -1252,9 +1254,9 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 80 "myLib.h"
+# 82 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 101 "myLib.h"
+# 103 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1299,12 +1301,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 175 "myLib.h"
+# 177 "myLib.h"
 void hideSprites();
-# 201 "myLib.h"
+# 203 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 211 "myLib.h"
+# 213 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1314,11 +1316,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 252 "myLib.h"
+# 254 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 288 "myLib.h"
+# 290 "myLib.h"
 typedef void (*ihp)(void);
-# 308 "myLib.h"
+# 310 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 15 "main.c" 2
 
@@ -1328,7 +1330,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 30 "game.h"
+# 28 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1474,7 +1476,12 @@ typedef struct {
     const unsigned short* backgroundTiles;
     const unsigned short* backgroundMap;
 
-    const unsigned short* defaultPalette;
+    const unsigned short* foregroundPal;
+    int foregroundPalLen;
+    const unsigned short* midgroundPal;
+    int midgroundPalLen;
+    const unsigned short* backgroundPal;
+    int backgroundPalLen;
 
     int numNPCS;
     NPC npcs[5];
@@ -1608,6 +1615,15 @@ extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
 # 31 "main.c" 2
 
+# 1 "levels.h" 1
+extern LEVEL startLevel;
+
+void initStart();
+void animateStart();
+
+void initLevel1();
+# 33 "main.c" 2
+
 
 void initialize();
 
@@ -1698,25 +1714,10 @@ void initialize()
 
 void goToStart() {
 
-    (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 9) | (1 << 10) | (1 << 12);
 
-
-
-    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
-    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (0) << 10);
-
-    fillScreen4(1);
-
-    char* string = "PRESS START TO BEGIN.";
-    char* string1 = "PRESS SELECT FOR INSTRUCTIONS.";
-
-    drawString4(20, 80, string, 0);
-    drawString4(20, 100, string1, 0);
-
-
-    waitForVBlank();
-    flipPage();
-
+    initStart();
+    loadLevel(&startLevel, 0);
 
     state = START;
 
@@ -1727,23 +1728,20 @@ void start() {
 
     seed++;
 
-    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
+    animateStart();
 
+    if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
         srand(seed);
         initGame();
         loadLevel(&level1, 1);
         playSoundA(trackA_data, trackA_length, 1);
         goToGame();
-
-
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
 
-
         goToInstructions();
-
     }
 
 }
@@ -1751,12 +1749,12 @@ void start() {
 
 void goToGame() {
 
+    waitForVBlank();
+
 
     (*(volatile unsigned short *)0x4000000) = 0;
 
-    waitForVBlank();
-
-    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 9) | (1 << 10) | (1 << 12);
 
     DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
     DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
@@ -1779,6 +1777,7 @@ void game() {
 
 void goToDialogue() {
 
+    waitForVBlank();
 
 
     (*(volatile unsigned short *)0x4000000) = 0;
@@ -1823,7 +1822,7 @@ void dialogue() {
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
-# 264 "main.c"
+# 249 "main.c"
         }
 
     }
@@ -1868,7 +1867,7 @@ void pause() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
         goToGame();
-# 326 "main.c"
+# 311 "main.c"
     }
 
 }

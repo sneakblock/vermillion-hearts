@@ -6,6 +6,8 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 
+extern int seed;
+
 // Common Macros
 #define OFFSET(col, row, rowlen) ((row) * (rowlen) + (col))
 

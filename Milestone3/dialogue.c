@@ -3,6 +3,10 @@
 #include "myLib.h"
 #include "dialogue.h"
 #include "selector.h"
+#include "sound.h"
+#include "talksounds.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int selectedChoice;
 
@@ -40,6 +44,7 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
     int col = textboxCol;
     int row = textboxRow;
 
+
     while (*string != '\0') {
 
         int lengthChecker = 0;
@@ -60,6 +65,8 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
         
         videoBuffer = ((unsigned short *)0x6000000);
         drawChar4(col, row, *string, colorIndex);
+
+        playSoundB(&talksounds_data[rand() % talksounds_length], 1, 0);
 
         // prev = *string;
         string++;

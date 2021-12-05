@@ -10,9 +10,30 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-# 64 "myLib.h"
+
+extern int seed;
+
+
+
+
+
+void goToStart();
+void start();
+void goToGame();
+void game();
+void goToDialogue();
+void dialogue();
+void goToPause();
+void pause();
+void goToWin();
+void win();
+void goToLose();
+void lose();
+void goToInstructions();
+void instructions();
+# 82 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 85 "myLib.h"
+# 103 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -57,12 +78,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 159 "myLib.h"
+# 177 "myLib.h"
 void hideSprites();
-# 185 "myLib.h"
+# 203 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 195 "myLib.h"
+# 213 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -72,11 +93,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 236 "myLib.h"
+# 254 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 272 "myLib.h"
+# 290 "myLib.h"
 typedef void (*ihp)(void);
-# 292 "myLib.h"
+# 310 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 2 "sound.c" 2
 # 1 "sound.h" 1
