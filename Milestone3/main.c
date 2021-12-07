@@ -212,7 +212,7 @@ void goToGame() {
 
     }
 
-    if (rand() % 5 > 1) {
+    if (rand() % 10 > 1) {
         loadLevel(currentLevel, 0);
     }
 

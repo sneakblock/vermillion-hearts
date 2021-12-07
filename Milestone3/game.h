@@ -21,6 +21,8 @@ enum {UP, DOWN, LEFT, RIGHT};
 //How many patrol points does each NPC have?
 #define NUM_PATROL_POINTS 3
 
+#define NUM_STEALABLE_SPRITES 10
+
 // A struct to hold dialogues. Each dialogue contains a string of what the dialogue actually says, 
 // a bool that keeps track of it can be responded to, and an index that keeps track of where each choice 
 // will take the player.
@@ -106,6 +108,11 @@ typedef struct
     PATROLPOINT patrolPoints[NUM_PATROL_POINTS];
     // the int that keeps track of what current patrolpoint the NPC is targeting.
     int patrolPointIndex;
+
+    // ================= ABILITIES ==================
+
+    int abilityType;
+
 } NPC;
 
 typedef struct
@@ -137,15 +144,25 @@ typedef struct
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
 
+    // ============ SPRITESTEALING =============
+
+    NPC* currentSprite;
+    NPC* sprites[NUM_STEALABLE_SPRITES];
+    int activeSpriteIndex;
+
+
 } PLAYER;
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LEVEL MANAGEMENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #define MAX_NPCS_PER_LEVEL 5
 
+typedef void (*anim_func)(void);
+
 typedef struct {
 
     int levelSize;
+    unsigned char* collisionMap;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -176,6 +193,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    anim_func animFunc;
 
     int numNPCS;
     NPC npcs[MAX_NPCS_PER_LEVEL];

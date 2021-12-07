@@ -211,9 +211,9 @@ goToGame:
 	ldr	r3, .L17+68
 	smull	r1, r2, r3, r0
 	asr	r3, r0, #31
-	rsb	r3, r3, r2, asr #1
+	rsb	r3, r3, r2, asr #2
 	add	r3, r3, r3, lsl #2
-	sub	r0, r0, r3
+	sub	r0, r0, r3, lsl #1
 	cmp	r0, #1
 	ble	.L13
 	ldr	r3, .L17+32

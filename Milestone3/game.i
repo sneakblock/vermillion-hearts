@@ -1327,7 +1327,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 28 "game.h"
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1409,6 +1409,11 @@ typedef struct
     PATROLPOINT patrolPoints[3];
 
     int patrolPointIndex;
+
+
+
+    int abilityType;
+
 } NPC;
 
 typedef struct
@@ -1440,15 +1445,25 @@ typedef struct
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
 
+
+
+    NPC* currentSprite;
+    NPC* sprites[10];
+    int activeSpriteIndex;
+
+
 } PLAYER;
 
 
 
 
 
+typedef void (*anim_func)(void);
+
 typedef struct {
 
     int levelSize;
+    unsigned char* collisionMap;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -1479,6 +1494,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    anim_func animFunc;
 
     int numNPCS;
     NPC npcs[5];
@@ -1603,15 +1620,27 @@ extern LEVEL startLevel;
 extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
+extern LEVEL level0;
+
 void initStart();
+
 void animateStart();
+void animateLevel0();
 
 void initInstructions();
 
 void initPause();
 
+void initLevel0();
 void initLevel1();
 # 14 "game.c" 2
+# 1 "npcs.h" 1
+extern NPC plantMerchant;
+
+void initNPCS();
+void initPlantMerchant();
+# 15 "game.c" 2
+
 
 
 NPC* currentTarget;
@@ -1626,12 +1655,11 @@ int hOff;
 int vOff;
 
 
-unsigned char* level1collisionmap = level1collisionmapBitmap;
 
 void initGame() {
 
     initLevels();
-    currentLevel = &level1;
+    currentLevel = &level0;
     initPlayer();
     initNPCS();
 
@@ -1641,6 +1669,9 @@ void updateGame() {
 
     updatePlayer();
     updateNPCS();
+    if (currentLevel->animFunc) {
+        currentLevel->animFunc();
+    }
 
 }
 
@@ -1674,6 +1705,7 @@ void drawGame() {
 void initLevels() {
 
     initPause();
+    initLevel0();
     initLevel1();
 
 }
@@ -1697,74 +1729,6 @@ void initPlayer() {
     player.numFrames = 2;
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
-
-}
-
-void initNPCS() {
-
-    for (int i = 0; i < 5 - 1; i++) {
-        npcs[i].active = 1;
-        npcs[i].hide = 0;
-        npcs[i].rdel = 1;
-        npcs[i].cdel = 1;
-        npcs[i].width = 8;
-        npcs[i].height = 16;
-        npcs[i].aniState = DOWN;
-        npcs[i].curFrame = 0;
-        npcs[i].numFrames = 2;
-        npcs[i].gameSpriteTileIDx = 1;
-        npcs[i].gameSpriteTileIDy = 0;
-
-        npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
-        npcs[i].talkingHeadPalette = talkingheadtestPal;
-        npcs[i].talkingHeadPalLen = 512;
-        npcs[i].name = "Plant Merchant:";
-
-        DIALOGUE greeting;
-        greeting.string = "I like plants. Wow I sure do. I love plants so much that I can't even handle it haha. Plants really are my favorite!";
-        greeting.choiceA = "I hate plants.";
-        greeting.choiceB = "I love plants, too.";
-        greeting.choiceAIndex = 1;
-        greeting.choiceBIndex = 2;
-        greeting.promptsChoice = 1;
-        greeting.endsConversation = 0;
-        greeting.satisfiesBool = 0;
-
-        DIALOGUE hatePlants;
-        hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
-        hatePlants.endsConversation = 1;
-        hatePlants.promptsChoice = 0;
-        hatePlants.satisfiesBool = 0;
-
-        DIALOGUE lovePlants;
-        lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
-        lovePlants.endsConversation = 1;
-        lovePlants.promptsChoice = 0;
-        lovePlants.satisfiesBool = 0;
-
-        npcs[i].dialogues[0] = greeting;
-        npcs[i].dialogues[1] = hatePlants;
-        npcs[i].dialogues[2] = lovePlants;
-        npcs[i].dialoguesIndex = 0;
-        npcs[i].postConvoIndex = 0;
-
-    }
-
-    npcs[0].worldCol = 303;
-    npcs[0].worldRow = 241;
-    npcs[0].intendedDirection = UP;
-
-    npcs[1].worldCol = 208;
-    npcs[1].worldRow = 178;
-    npcs[1].intendedDirection = LEFT;
-
-    npcs[2].worldCol = 177;
-    npcs[2].worldRow = 240;
-    npcs[2].intendedDirection = RIGHT;
-
-    npcs[3].worldCol = 172;
-    npcs[3].worldRow = 135;
-    npcs[3].intendedDirection = DOWN;
 
 }
 
@@ -1795,7 +1759,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-# 206 "game.c"
+# 143 "game.c"
 }
 
 void loadNPC(NPC* npc) {
@@ -1809,8 +1773,8 @@ void loadNPC(NPC* npc) {
 void updatePlayer() {
 
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6)))) {
-        if (player.worldRow > 0 && level1collisionmap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
-            level1collisionmap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
+        if (player.worldRow > 0 && currentLevel->collisionMap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
+            currentLevel->collisionMap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
 
                 player.worldRow = player.worldRow - player.rdel;
 
@@ -1821,8 +1785,8 @@ void updatePlayer() {
         }
     }
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 7)))) {
-        if (player.worldRow + player.height < currentLevel->worldPixelHeight && level1collisionmap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
-            level1collisionmap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
+        if (player.worldRow + player.height < currentLevel->worldPixelHeight && currentLevel->collisionMap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
+            currentLevel->collisionMap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
                 player.worldRow = player.worldRow + player.rdel;
 
 
@@ -1837,8 +1801,8 @@ void updatePlayer() {
         }
     }
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 5)))) {
-        if (player.worldCol > 0 && level1collisionmap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))] &&
-            level1collisionmap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))]) {
+        if (player.worldCol > 0 && currentLevel->collisionMap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))] &&
+            currentLevel->collisionMap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))]) {
                 player.worldCol = player.worldCol - player.cdel;
 
 
@@ -1850,8 +1814,8 @@ void updatePlayer() {
         }
     }
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 4)))) {
-        if (player.worldCol + player.width < currentLevel->worldPixelWidth && level1collisionmap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))] &&
-            level1collisionmap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))]) {
+        if (player.worldCol + player.width < currentLevel->worldPixelWidth && currentLevel->collisionMap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))] &&
+            currentLevel->collisionMap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))]) {
 
             player.worldCol = player.worldCol + player.cdel;
 
@@ -1868,7 +1832,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 293 "game.c"
+# 230 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
@@ -1882,7 +1846,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 345 "game.c"
+# 282 "game.c"
     animateNPCS();
 
 }
@@ -1897,7 +1861,7 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 376 "game.c"
+# 313 "game.c"
             player.aniCounter++;
 
 

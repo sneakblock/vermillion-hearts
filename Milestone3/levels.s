@@ -10,9 +10,117 @@
 	.eabi_attribute 18, 4
 	.file	"levels.c"
 	.text
+	.global	__aeabi_uidivmod
+	.align	2
+	.global	animateLevel0
+	.arch armv4t
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	animateLevel0, %function
+animateLevel0:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	ldr	r3, .L8
+	mov	lr, pc
+	bx	r3
+	mov	r5, #83886080
+	mov	r6, #0
+	ldr	r8, .L8+4
+	mov	r1, r0
+	mov	r3, #272
+	ldr	r2, .L8+8
+	mov	r4, r0
+	ldr	r9, .L8+12
+	mov	r0, #3
+	mov	lr, pc
+	bx	r9
+	ldr	r1, .L8+16
+	ldr	r2, .L8+20
+	ldr	r3, [r8]
+	mla	r2, r3, r2, r1
+	ldr	r1, .L8+24
+	cmp	r1, r2, ror #2
+	strh	r6, [r5]	@ movhi
+	bcs	.L7
+	add	r3, r3, #1
+	str	r3, [r8]
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	bx	lr
+.L7:
+	mov	r1, r4
+	mov	r2, #100663296
+	mov	r0, #3
+	mov	r3, #3840
+	mov	lr, pc
+	bx	r9
+	ldrh	r3, [r5, #16]
+	add	r3, r3, r4
+	strh	r3, [r5, #16]	@ movhi
+	ldr	r3, .L8+28
+	str	r6, [r8]
+	mov	lr, pc
+	bx	r3
+	ldr	r3, .L8+32
+	ldr	r10, [r3]
+	mov	r0, r4
+	mov	r1, r10
+	ldr	r3, .L8+36
+	mov	lr, pc
+	bx	r3
+	mov	r4, #50
+	ldr	r5, .L8+40
+	ldr	r6, .L8+44
+	ldr	r7, .L8+48
+	add	r5, r5, r1
+.L3:
+	mov	r2, #0
+	mov	r1, #1
+	mov	r0, r5
+	mov	lr, pc
+	bx	r6
+	mov	lr, pc
+	bx	r7
+	subs	r4, r4, #1
+	bne	.L3
+	mov	r1, r10
+	mov	r0, r5
+	mov	r2, #1
+	mov	lr, pc
+	bx	r6
+	mov	r3, #3840
+	mov	r2, #100663296
+	mov	r0, #3
+	ldr	r1, .L8+52
+	mov	lr, pc
+	bx	r9
+	ldr	r3, [r8]
+	add	r3, r3, #1
+	str	r3, [r8]
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	bx	lr
+.L9:
+	.align	2
+.L8:
+	.word	rand
+	.word	level0AniTimer
+	.word	100696064
+	.word	DMANow
+	.word	17179868
+	.word	652835029
+	.word	8589934
+	.word	stopSound
+	.word	trackA_length
+	.word	__aeabi_uidivmod
+	.word	trackA_data
+	.word	playSoundA
+	.word	waitForVBlank
+	.word	level0foregroundTiles
+	.size	animateLevel0, .-animateLevel0
 	.align	2
 	.global	initStart
-	.arch armv4t
 	.syntax unified
 	.arm
 	.fpu softvfp
@@ -29,44 +137,44 @@ initStart:
 	mov	r4, #16
 	mov	ip, #4
 	mov	r0, #1
-	ldr	r3, .L4
+	ldr	r3, .L12
 	str	lr, [r3]
-	ldr	lr, .L4+4
-	str	lr, [r3, #36]
-	ldr	lr, .L4+8
-	str	r1, [r3, #60]
+	ldr	lr, .L12+4
 	str	lr, [r3, #40]
-	ldr	r1, .L4+12
-	ldr	lr, .L4+16
-	str	r1, [r3, #76]
-	str	lr, [r3, #28]
-	ldr	r1, .L4+20
-	ldr	lr, .L4+24
-	str	r1, [r3, #56]
-	str	lr, [r3, #52]
-	ldr	r1, .L4+28
-	ldr	lr, .L4+32
-	str	r1, [r3, #84]
+	ldr	lr, .L12+8
+	str	r1, [r3, #64]
 	str	lr, [r3, #44]
-	ldr	r1, .L4+36
-	ldr	lr, .L4+40
-	str	r1, [r3, #72]
-	str	lr, [r3, #68]
-	ldr	r1, .L4+44
-	ldr	lr, .L4+48
-	str	r5, [r3, #80]
-	str	r4, [r3, #88]
-	str	lr, [r3, #92]
-	str	ip, [r3, #96]
-	str	r2, [r3, #32]
-	str	r2, [r3, #48]
-	str	r2, [r3, #64]
+	ldr	r1, .L12+12
+	ldr	lr, .L12+16
+	str	r1, [r3, #80]
+	str	lr, [r3, #32]
+	ldr	r1, .L12+20
+	ldr	lr, .L12+24
+	str	r1, [r3, #60]
+	str	lr, [r3, #56]
+	ldr	r1, .L12+28
+	ldr	lr, .L12+32
+	str	r1, [r3, #88]
+	str	lr, [r3, #48]
+	ldr	r1, .L12+36
+	ldr	lr, .L12+40
+	str	r1, [r3, #76]
+	str	lr, [r3, #72]
+	ldr	r1, .L12+44
+	ldr	lr, .L12+48
+	str	r5, [r3, #84]
+	str	r4, [r3, #92]
+	str	lr, [r3, #96]
+	str	ip, [r3, #100]
+	str	r2, [r3, #36]
+	str	r2, [r3, #52]
+	str	r2, [r3, #68]
 	str	r0, [r1]
 	pop	{r4, r5, lr}
 	bx	lr
-.L5:
+.L13:
 	.align	2
-.L4:
+.L12:
 	.word	startLevel
 	.word	startforegroundTiles
 	.word	startforegroundMap
@@ -91,35 +199,35 @@ animateStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r3, .L15
+	ldr	r3, .L23
 	push	{r4, lr}
 	mov	lr, pc
 	bx	r3
-	ldr	ip, .L15+4
-	ldr	r3, .L15+8
+	ldr	ip, .L23+4
+	ldr	r3, .L23+8
 	ldr	r2, [ip]
 	smull	r0, r1, r3, r2
 	asr	r3, r2, #31
 	rsb	r3, r3, r1, asr #3
 	add	r3, r3, r3, lsl #2
 	cmp	r2, r3, lsl #2
-	beq	.L7
-	ldr	r1, .L15+12
-	ldr	r3, .L15+16
+	beq	.L15
+	ldr	r1, .L23+12
+	ldr	r3, .L23+16
 	add	r0, r2, #1
 	ldr	r3, [r3]
 	ldr	r2, [r1]
-.L8:
-	ldr	lr, .L15+20
+.L16:
+	ldr	lr, .L23+20
 	cmp	r2, #10
 	ldr	r2, [lr]
-	bne	.L13
+	bne	.L21
 	cmp	r2, #49
 	movle	r4, #0
 	addle	r2, r2, #1
 	strle	r2, [lr]
 	strle	r4, [r1]
-.L13:
+.L21:
 	mov	r1, #67108864
 	mov	r4, #5
 	mov	lr, #10
@@ -134,9 +242,9 @@ animateStart:
 	strh	r2, [r1, #26]	@ movhi
 	pop	{r4, lr}
 	bx	lr
-.L7:
-	ldr	r2, .L15+24
-	ldr	r1, .L15+16
+.L15:
+	ldr	r2, .L23+24
+	ldr	r1, .L23+16
 	ldr	r3, [r2]
 	cmp	r3, #0
 	ldr	r3, [r1]
@@ -146,20 +254,20 @@ animateStart:
 	str	r3, [r1]
 	movle	r1, #1
 	strle	r1, [r2]
-	ble	.L12
+	ble	.L20
 	cmp	r3, #24
 	movgt	r1, #0
 	strgt	r1, [r2]
-.L12:
+.L20:
 	mov	r0, #1
-	ldr	r1, .L15+12
+	ldr	r1, .L23+12
 	ldr	r2, [r1]
 	add	r2, r2, r0
 	str	r2, [r1]
-	b	.L8
-.L16:
+	b	.L16
+.L24:
 	.align	2
-.L15:
+.L23:
 	.word	waitForVBlank
 	.word	textAniTimer
 	.word	1717986919
@@ -183,25 +291,25 @@ initInstructions:
 	mov	r2, #0
 	mov	r1, #67108864
 	mov	r0, #32
-	ldr	r3, .L19
-	ldr	ip, .L19+4
-	str	ip, [r3, #36]
-	ldr	ip, .L19+8
-	str	lr, [r3, #32]
+	ldr	r3, .L27
+	ldr	ip, .L27+4
 	str	ip, [r3, #40]
-	ldr	lr, .L19+12
-	ldr	ip, .L19+16
-	str	lr, [r3, #28]
+	ldr	ip, .L27+8
+	str	lr, [r3, #36]
+	str	ip, [r3, #44]
+	ldr	lr, .L27+12
+	ldr	ip, .L27+16
+	str	lr, [r3, #32]
 	str	r2, [r3]
-	str	ip, [r3, #76]
-	str	r0, [r3, #80]
+	str	ip, [r3, #80]
+	str	r0, [r3, #84]
 	ldr	lr, [sp], #4
 	strh	r2, [r1, #18]	@ movhi
 	strh	r2, [r1, #16]	@ movhi
 	bx	lr
-.L20:
+.L28:
 	.align	2
-.L19:
+.L27:
 	.word	instructionsLevel
 	.word	instructionsforegroundTiles
 	.word	instructionsforegroundMap
@@ -224,24 +332,24 @@ initPause:
 	mov	lr, #2048
 	mov	r1, #67108864
 	mov	r0, #32
-	ldr	r3, .L23
-	ldr	ip, .L23+4
-	str	ip, [r3, #36]
-	ldr	ip, .L23+8
+	ldr	r3, .L31
+	ldr	ip, .L31+4
 	str	ip, [r3, #40]
-	ldr	ip, .L23+12
-	str	r4, [r3, #28]
-	str	lr, [r3, #32]
+	ldr	ip, .L31+8
+	str	ip, [r3, #44]
+	ldr	ip, .L31+12
+	str	r4, [r3, #32]
+	str	lr, [r3, #36]
 	str	r2, [r3]
-	str	ip, [r3, #76]
-	str	r0, [r3, #80]
+	str	ip, [r3, #80]
+	str	r0, [r3, #84]
 	pop	{r4, lr}
 	strh	r2, [r1, #18]	@ movhi
 	strh	r2, [r1, #16]	@ movhi
 	bx	lr
-.L24:
+.L32:
 	.align	2
-.L23:
+.L31:
 	.word	pauseLevel
 	.word	pauseTiles
 	.word	pauseMap
@@ -257,63 +365,66 @@ initLevel1:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	r0, #6336
+	mov	r0, #256
 	push	{r4, r5, r6, r7, r8, lr}
 	mov	lr, #18
-	mov	r4, #256
 	mov	r2, #4096
 	mov	r8, #16384
 	mov	r7, #512
 	mov	r6, #177
 	mov	r5, #64
+	mov	r4, #6336
 	mov	r1, #4
 	mov	ip, #2
-	ldr	r3, .L27
-	str	r0, [r3, #28]
-	ldr	r0, .L27+4
-	str	lr, [r3, #80]
-	str	r0, [r3, #36]
-	ldr	lr, .L27+8
-	ldr	r0, .L27+12
-	str	lr, [r3, #40]
-	str	r0, [r3, #44]
-	ldr	lr, .L27+16
-	ldr	r0, .L27+20
-	str	lr, [r3, #52]
-	str	r0, [r3, #56]
-	ldr	lr, .L27+24
-	ldr	r0, .L27+28
-	str	lr, [r3, #60]
-	str	r0, [r3, #68]
-	ldr	lr, .L27+32
-	ldr	r0, .L27+36
-	str	r4, [r3, #8]
-	str	lr, [r3, #72]
-	str	r0, [r3, #76]
-	ldr	lr, .L27+40
-	add	r4, r4, #194
-	ldr	r0, .L27+44
-	str	r4, [r3, #12]
-	sub	r4, r4, #188
-	str	r8, [r3]
-	str	r7, [r3, #4]
-	str	r6, [r3, #16]
-	str	r5, [r3, #24]
-	str	r4, [r3, #20]
+	ldr	r3, .L35
+	str	r0, [r3, #12]
+	add	r0, r0, #194
+	str	r0, [r3, #16]
+	sub	r0, r0, #188
+	str	r0, [r3, #24]
+	ldr	r0, .L35+4
+	str	r0, [r3, #4]
+	ldr	r0, .L35+8
 	str	lr, [r3, #84]
-	str	ip, [r3, #88]
-	str	r0, [r3, #92]
-	str	r2, [r3, #32]
-	str	r2, [r3, #48]
-	str	r2, [r3, #64]
-	str	r1, [r3, #96]
+	str	r0, [r3, #40]
+	ldr	lr, .L35+12
+	ldr	r0, .L35+16
+	str	lr, [r3, #44]
+	str	r0, [r3, #48]
+	ldr	lr, .L35+20
+	ldr	r0, .L35+24
+	str	lr, [r3, #56]
+	str	r0, [r3, #60]
+	ldr	lr, .L35+28
+	ldr	r0, .L35+32
+	str	lr, [r3, #64]
+	str	r0, [r3, #72]
+	ldr	lr, .L35+36
+	ldr	r0, .L35+40
+	str	lr, [r3, #76]
+	str	r0, [r3, #80]
+	ldr	lr, .L35+44
+	ldr	r0, .L35+48
+	str	r8, [r3]
+	str	r7, [r3, #8]
+	str	r6, [r3, #20]
+	str	r5, [r3, #28]
+	str	r4, [r3, #32]
+	str	lr, [r3, #88]
+	str	ip, [r3, #92]
+	str	r0, [r3, #96]
+	str	r2, [r3, #36]
+	str	r2, [r3, #52]
+	str	r2, [r3, #68]
 	str	r1, [r3, #100]
+	str	r1, [r3, #108]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L28:
+.L36:
 	.align	2
-.L27:
+.L35:
 	.word	level1
+	.word	level1collisionmapBitmap
 	.word	level1foregroundTiles
 	.word	level1foregroundMap
 	.word	5280
@@ -326,13 +437,104 @@ initLevel1:
 	.word	level1midgroundPal
 	.word	level1backgroundPal
 	.size	initLevel1, .-initLevel1
+	.align	2
+	.global	initLevel0
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initLevel0, %function
+initLevel0:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	ip, #6
+	mov	r0, #544
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	mov	r9, #10
+	mov	r6, #512
+	mov	r5, #7680
+	mov	r4, #12
+	mov	lr, #9792
+	mov	r2, #4096
+	mov	fp, #118
+	mov	r10, #460
+	mov	r8, #32768
+	mov	r7, #256
+	mov	r1, #2
+	ldr	r3, .L39
+	str	ip, [r3, #92]
+	ldr	ip, .L39+4
+	str	r0, [r3, #64]
+	str	ip, [r3, #56]
+	ldr	r0, .L39+8
+	ldr	ip, .L39+12
+	str	r0, [r3, #60]
+	str	ip, [r3, #88]
+	ldr	r0, .L39+16
+	ldr	ip, .L39+20
+	str	r9, [r3, #24]
+	str	r6, [r3, #12]
+	str	r5, [r3, #32]
+	str	r4, [r3, #84]
+	str	lr, [r3, #48]
+	str	r0, [r3, #72]
+	str	ip, [r3, #76]
+	ldr	r9, .L39+24
+	ldr	r6, .L39+28
+	ldr	r5, .L39+32
+	ldr	r4, .L39+36
+	ldr	lr, .L39+40
+	ldr	r0, .L39+44
+	ldr	ip, .L39+48
+	str	r0, [r3, #96]
+	str	fp, [r3, #16]
+	str	r10, [r3, #20]
+	str	r8, [r3]
+	str	r9, [r3, #28]
+	str	r7, [r3, #8]
+	str	r6, [r3, #4]
+	str	r5, [r3, #40]
+	str	r4, [r3, #44]
+	str	lr, [r3, #80]
+	str	r1, [r3, #100]
+	str	ip, [r3, #104]
+	str	r2, [r3, #36]
+	str	r2, [r3, #52]
+	str	r2, [r3, #68]
+	mov	r3, #0
+	ldr	r0, .L39+52
+	str	r3, [r0]
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	bx	lr
+.L40:
+	.align	2
+.L39:
+	.word	level0
+	.word	level0midgroundTiles
+	.word	level0midgroundMap
+	.word	level0midgroundPal
+	.word	level0backgroundTiles
+	.word	level0backgroundMap
+	.word	347
+	.word	level0collisionmapBitmap
+	.word	level0foregroundTiles
+	.word	level0foregroundMap
+	.word	level0foregroundPal
+	.word	level0backgroundPal
+	.word	animateLevel0
+	.word	level0AniTimer
+	.size	initLevel0, .-initLevel0
 	.comm	movingUp,4,4
 	.comm	sunAniTimer,4,4
 	.comm	textAniTimer,4,4
 	.comm	vOffBG2,4,4
 	.comm	vOffBG1,4,4
 	.comm	vOffBG0,4,4
-	.comm	pauseLevel,2424,4
-	.comm	instructionsLevel,2424,4
-	.comm	startLevel,2424,4
+	.comm	level0AniTimer,4,4
+	.comm	level0,2452,4
+	.comm	pauseLevel,2452,4
+	.comm	instructionsLevel,2452,4
+	.comm	startLevel,2452,4
+	.comm	soundB,32,4
+	.comm	soundA,32,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

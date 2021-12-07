@@ -16,13 +16,24 @@
 #include "startmidground.h"
 #include "startbackground.h"
 
+#include "level0background.h"
+#include "level0midground.h"
+#include "level0foreground.h"
+#include "level0collisionmap.h"
+
 #include "instructionsforeground.h"
 
 #include "pause.h"
 
+#include "sound.h"
+#include "trackA.h"
+
 LEVEL startLevel;
 LEVEL instructionsLevel;
 LEVEL pauseLevel;
+
+LEVEL level0;
+int level0AniTimer;
 
 int vOffBG0;
 int vOffBG1;
@@ -161,6 +172,8 @@ void initLevel1() {
     level1.initHOff = 262;
     level1.initVOff = 64;
 
+    level1.collisionMap = (unsigned char*) level1collisionmapBitmap;
+
     level1.foregroundTilesLen = level1foregroundTilesLen;
     level1.foregroundMapLen = level1foregroundMapLen;
     level1.foregroundTiles = level1foregroundTiles;
@@ -201,4 +214,97 @@ void initLevel1() {
     // level1.defaultPalette = level1foregroundPal;
     
     level1.numNPCS = 4;
+}
+
+void initLevel0() {
+
+    // ========= PLAYER ==========
+    level0.playerWorldSpawnCol = 118;
+    level0.playerWorldSpawnRow = 460;
+    level0.initHOff = 10;
+    level0.initVOff = 347;
+    
+
+    // ============= SIZE ===============
+    level0.levelSize = BG_SIZE_TALL;
+    level0.worldPixelWidth = 256;
+    level0.worldPixelHeight = 512;
+    level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+
+
+    // =========== FOREGROUND ============
+
+    level0.foregroundTiles = level0foregroundTiles;
+    level0.foregroundMap = level0foregroundMap;
+    level0.foregroundTilesLen = level0foregroundTilesLen;
+    level0.foregroundMapLen = level0foregroundMapLen;
+
+    level0.foregroundPal = level0foregroundPal;
+    level0.foregroundPalLen = level0foregroundPalLen;
+
+    // =========== MIDGROUND ============
+    
+    level0.midgroundTiles = level0midgroundTiles;
+    level0.midgroundMap = level0midgroundMap;
+    level0.midgroundTilesLen = level0midgroundTilesLen;
+    level0.midgroundMapLen = level0midgroundMapLen;
+
+    level0.midgroundPal = level0midgroundPal;
+    level0.midgroundPalLen = level0midgroundPalLen;
+
+    // =========== BACKGROUND ============
+    
+    level0.backgroundTiles = level0backgroundTiles;
+    level0.backgroundMap = level0backgroundMap;
+    level0.backgroundTilesLen = level0backgroundTilesLen;
+    level0.backgroundMapLen = level0backgroundMapLen;
+    
+    level0.backgroundPal = level0backgroundPal;
+    level0.backgroundPalLen = level0backgroundPalLen;
+
+    // =================== ANIM =====================
+
+    level0.animFunc = animateLevel0;
+    level0AniTimer = 0;
+}
+
+void animateLevel0() {
+
+    // PALETTE[8] += rand();
+    // PALETTE[9] = 0;
+
+    // REG_BG2CNT = BG_SIZE_TALL | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+
+    int randInt = rand();
+
+    DMANow(3, randInt, &CHARBLOCK[2], level0backgroundTilesLen / 2);
+
+    PALETTE[0] = 0;
+
+    if (level0AniTimer % 500 == 0) {
+
+        DMANow(3, randInt, &CHARBLOCK[0], level0foregroundTilesLen / 2);
+        PALETTE[8] += randInt;
+        level0AniTimer = 0;
+
+        stopSound();
+
+        int delay = 0;
+        while (delay < 50) {
+            playSoundA(&trackA_data[randInt % trackA_length], 1, 0);
+            waitForVBlank();
+            delay++;
+        }
+
+        playSoundA(&trackA_data[randInt % trackA_length], trackA_length, 1);
+    
+
+        DMANow(3, level0foregroundTiles, &CHARBLOCK[0], level0foregroundTilesLen / 2);
+
+    }
+
+    level0AniTimer++;
+
+    // DMANow(3, rand(), &PALETTE[(level0foregroundPalLen / 2) + (level0midgroundPalLen / 2)], level0backgroundPalLen / 2);
+
 }

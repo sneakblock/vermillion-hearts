@@ -1327,7 +1327,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 28 "game.h"
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1409,6 +1409,11 @@ typedef struct
     PATROLPOINT patrolPoints[3];
 
     int patrolPointIndex;
+
+
+
+    int abilityType;
+
 } NPC;
 
 typedef struct
@@ -1440,15 +1445,25 @@ typedef struct
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
 
+
+
+    NPC* currentSprite;
+    NPC* sprites[10];
+    int activeSpriteIndex;
+
+
 } PLAYER;
 
 
 
 
 
+typedef void (*anim_func)(void);
+
 typedef struct {
 
     int levelSize;
+    unsigned char* collisionMap;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -1479,6 +1494,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    anim_func animFunc;
 
     int numNPCS;
     NPC npcs[5];
@@ -1603,13 +1620,18 @@ extern LEVEL startLevel;
 extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
+extern LEVEL level0;
+
 void initStart();
+
 void animateStart();
+void animateLevel0();
 
 void initInstructions();
 
 void initPause();
 
+void initLevel0();
 void initLevel1();
 # 14 "levels.c" 2
 
@@ -1644,6 +1666,44 @@ extern const unsigned short startbackgroundMap[1024];
 extern const unsigned short startbackgroundPal[2];
 # 18 "levels.c" 2
 
+# 1 "level0background.h" 1
+# 22 "level0background.h"
+extern const unsigned short level0backgroundTiles[272];
+
+
+extern const unsigned short level0backgroundMap[2048];
+
+
+extern const unsigned short level0backgroundPal[2];
+# 20 "levels.c" 2
+# 1 "level0midground.h" 1
+# 22 "level0midground.h"
+extern const unsigned short level0midgroundTiles[4896];
+
+
+extern const unsigned short level0midgroundMap[2048];
+
+
+extern const unsigned short level0midgroundPal[4];
+# 21 "levels.c" 2
+# 1 "level0foreground.h" 1
+# 22 "level0foreground.h"
+extern const unsigned short level0foregroundTiles[3840];
+
+
+extern const unsigned short level0foregroundMap[2048];
+
+
+extern const unsigned short level0foregroundPal[6];
+# 22 "levels.c" 2
+# 1 "level0collisionmap.h" 1
+# 21 "level0collisionmap.h"
+extern const unsigned short level0collisionmapBitmap[65536];
+
+
+extern const unsigned short level0collisionmapPal[256];
+# 23 "levels.c" 2
+
 # 1 "instructionsforeground.h" 1
 # 22 "instructionsforeground.h"
 extern const unsigned short instructionsforegroundTiles[9968];
@@ -1653,7 +1713,7 @@ extern const unsigned short instructionsforegroundMap[1024];
 
 
 extern const unsigned short instructionsforegroundPal[16];
-# 20 "levels.c" 2
+# 25 "levels.c" 2
 
 # 1 "pause.h" 1
 # 22 "pause.h"
@@ -1664,11 +1724,48 @@ extern const unsigned short pauseMap[1024];
 
 
 extern const unsigned short pausePal[16];
-# 22 "levels.c" 2
+# 27 "levels.c" 2
+
+# 1 "sound.h" 1
+void setupSounds();
+void playSoundA(const signed char* sound, int length, int loops);
+void playSoundB(const signed char* sound, int length, int loops, int freq);
+
+void setupInterrupts();
+void interruptHandler();
+
+void pauseSound();
+void unpauseSound();
+void stopSound();
+# 49 "sound.h"
+typedef struct{
+    const signed char* data;
+    int length;
+    int frequency;
+    int isPlaying;
+    int loops;
+    int duration;
+    int priority;
+    int vBlankCount;
+} SOUND;
+
+SOUND soundA;
+SOUND soundB;
+# 29 "levels.c" 2
+# 1 "trackA.h" 1
+
+
+extern const unsigned int trackA_sampleRate;
+extern const unsigned int trackA_length;
+extern const signed char trackA_data[];
+# 30 "levels.c" 2
 
 LEVEL startLevel;
 LEVEL instructionsLevel;
 LEVEL pauseLevel;
+
+LEVEL level0;
+int level0AniTimer;
 
 int vOffBG0;
 int vOffBG1;
@@ -1807,6 +1904,8 @@ void initLevel1() {
     level1.initHOff = 262;
     level1.initVOff = 64;
 
+    level1.collisionMap = (unsigned char*) level1collisionmapBitmap;
+
     level1.foregroundTilesLen = 6336;
     level1.foregroundMapLen = 4096;
     level1.foregroundTiles = level1foregroundTiles;
@@ -1828,6 +1927,99 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 203 "levels.c"
+# 216 "levels.c"
     level1.numNPCS = 4;
+}
+
+void initLevel0() {
+
+
+    level0.playerWorldSpawnCol = 118;
+    level0.playerWorldSpawnRow = 460;
+    level0.initHOff = 10;
+    level0.initVOff = 347;
+
+
+
+    level0.levelSize = (2 << 14);
+    level0.worldPixelWidth = 256;
+    level0.worldPixelHeight = 512;
+    level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+
+
+
+
+    level0.foregroundTiles = level0foregroundTiles;
+    level0.foregroundMap = level0foregroundMap;
+    level0.foregroundTilesLen = 7680;
+    level0.foregroundMapLen = 4096;
+
+    level0.foregroundPal = level0foregroundPal;
+    level0.foregroundPalLen = 12;
+
+
+
+    level0.midgroundTiles = level0midgroundTiles;
+    level0.midgroundMap = level0midgroundMap;
+    level0.midgroundTilesLen = 9792;
+    level0.midgroundMapLen = 4096;
+
+    level0.midgroundPal = level0midgroundPal;
+    level0.midgroundPalLen = 6;
+
+
+
+    level0.backgroundTiles = level0backgroundTiles;
+    level0.backgroundMap = level0backgroundMap;
+    level0.backgroundTilesLen = 544;
+    level0.backgroundMapLen = 4096;
+
+    level0.backgroundPal = level0backgroundPal;
+    level0.backgroundPalLen = 2;
+
+
+
+    level0.animFunc = animateLevel0;
+    level0AniTimer = 0;
+}
+
+void animateLevel0() {
+
+
+
+
+
+
+    int randInt = rand();
+
+    DMANow(3, randInt, &((charblock *)0x6000000)[2], 544 / 2);
+
+    ((unsigned short *)0x5000000)[0] = 0;
+
+    if (level0AniTimer % 500 == 0) {
+
+        DMANow(3, randInt, &((charblock *)0x6000000)[0], 7680 / 2);
+        ((unsigned short *)0x5000000)[8] += randInt;
+        level0AniTimer = 0;
+
+        stopSound();
+
+        int delay = 0;
+        while (delay < 50) {
+            playSoundA(&trackA_data[randInt % trackA_length], 1, 0);
+            waitForVBlank();
+            delay++;
+        }
+
+        playSoundA(&trackA_data[randInt % trackA_length], trackA_length, 1);
+
+
+        DMANow(3, level0foregroundTiles, &((charblock *)0x6000000)[0], 7680 / 2);
+
+    }
+
+    level0AniTimer++;
+
+
+
 }

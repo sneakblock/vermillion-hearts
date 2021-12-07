@@ -11,6 +11,8 @@
 #include "talkingheadtest.h"
 #include "talkingheadtest2.h"
 #include "levels.h"
+#include "npcs.h"
+
 
 
 NPC* currentTarget;
@@ -24,13 +26,12 @@ NPC npcs[MAX_NPCS_PER_LEVEL];
 int hOff;
 int vOff;
 
-
-unsigned char* level1collisionmap = level1collisionmapBitmap;
+// unsigned char* level1collisionmap = level1collisionmapBitmap;
 
 void initGame() {
 
     initLevels();
-    currentLevel = &level1;
+    currentLevel = &level0;
     initPlayer();
     initNPCS();
 
@@ -40,6 +41,9 @@ void updateGame() {
 
     updatePlayer();
     updateNPCS();
+    if (currentLevel->animFunc) {
+        currentLevel->animFunc();
+    }
 
 }
 
@@ -73,6 +77,7 @@ void drawGame() {
 void initLevels() {
 
     initPause();
+    initLevel0();
     initLevel1();
 
 }
@@ -97,74 +102,6 @@ void initPlayer() {
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
 
-}
-
-void initNPCS() {
-
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-        npcs[i].active = 1;
-        npcs[i].hide = 0;
-        npcs[i].rdel = 1;
-        npcs[i].cdel = 1;
-        npcs[i].width = 8;
-        npcs[i].height = 16;
-        npcs[i].aniState = DOWN;
-        npcs[i].curFrame = 0;
-        npcs[i].numFrames = 2;
-        npcs[i].gameSpriteTileIDx = 1;
-        npcs[i].gameSpriteTileIDy = 0;
-
-        npcs[i].talkingHeadBitmap = talkingheadtestBitmap;
-        npcs[i].talkingHeadPalette = talkingheadtestPal;
-        npcs[i].talkingHeadPalLen = talkingheadtestPalLen;
-        npcs[i].name = "Plant Merchant:";
-
-        DIALOGUE greeting;
-        greeting.string = "I like plants. Wow I sure do. I love plants so much that I can't even handle it haha. Plants really are my favorite!";
-        greeting.choiceA = "I hate plants.";
-        greeting.choiceB = "I love plants, too.";
-        greeting.choiceAIndex = 1;
-        greeting.choiceBIndex = 2;
-        greeting.promptsChoice = 1;
-        greeting.endsConversation = 0;
-        greeting.satisfiesBool = 0;
-
-        DIALOGUE hatePlants;
-        hatePlants.string = "How could you say that? Plants bring us life, light, and joy. :(";
-        hatePlants.endsConversation = 1;
-        hatePlants.promptsChoice = 0;
-        hatePlants.satisfiesBool = 0;
-
-        DIALOGUE lovePlants;
-        lovePlants.string = "I'm so happy to hear that! I'm glad that they bring you joy the same way they do for me!";
-        lovePlants.endsConversation = 1;
-        lovePlants.promptsChoice = 0;
-        lovePlants.satisfiesBool = 0;
-
-        npcs[i].dialogues[0] = greeting;
-        npcs[i].dialogues[1] = hatePlants;
-        npcs[i].dialogues[2] = lovePlants;
-        npcs[i].dialoguesIndex = 0;
-        npcs[i].postConvoIndex = 0;
-        
-    }
-
-    npcs[0].worldCol = 303;
-    npcs[0].worldRow = 241;
-    npcs[0].intendedDirection = UP;
-
-    npcs[1].worldCol = 208;
-    npcs[1].worldRow = 178;
-    npcs[1].intendedDirection = LEFT;
-
-    npcs[2].worldCol = 177;
-    npcs[2].worldRow = 240;
-    npcs[2].intendedDirection = RIGHT;
-
-    npcs[3].worldCol = 172;
-    npcs[3].worldRow = 135;
-    npcs[3].intendedDirection = DOWN;
-    
 }
 
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
@@ -216,8 +153,8 @@ void loadNPC(NPC* npc) {
 void updatePlayer() {
 
     if(BUTTON_HELD(BUTTON_UP)) {
-        if (player.worldRow > 0 && level1collisionmap[OFFSET(player.worldCol, player.worldRow - player.rdel, currentLevel->worldPixelWidth)] && 
-            level1collisionmap[OFFSET(player.worldCol + player.width - 1, player.worldRow - player.rdel, currentLevel->worldPixelWidth)]) {
+        if (player.worldRow > 0 && currentLevel->collisionMap[OFFSET(player.worldCol, player.worldRow - player.rdel, currentLevel->worldPixelWidth)] && 
+            currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1, player.worldRow - player.rdel, currentLevel->worldPixelWidth)]) {
                 
                 player.worldRow = player.worldRow - player.rdel;
 
@@ -228,8 +165,8 @@ void updatePlayer() {
         }
     }
     if(BUTTON_HELD(BUTTON_DOWN)) {
-        if (player.worldRow + player.height < currentLevel->worldPixelHeight && level1collisionmap[OFFSET(player.worldCol, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)] && 
-            level1collisionmap[OFFSET(player.worldCol + player.width - 1, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)]) {
+        if (player.worldRow + player.height < currentLevel->worldPixelHeight && currentLevel->collisionMap[OFFSET(player.worldCol, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)] && 
+            currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)]) {
                 player.worldRow = player.worldRow + player.rdel;
 
             // Update player's world position if the above is true
@@ -244,8 +181,8 @@ void updatePlayer() {
         }
     }
     if(BUTTON_HELD(BUTTON_LEFT)) {
-        if (player.worldCol > 0 && level1collisionmap[OFFSET(player.worldCol - player.cdel, player.worldRow, currentLevel->worldPixelWidth)] && 
-            level1collisionmap[OFFSET(player.worldCol - player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
+        if (player.worldCol > 0 && currentLevel->collisionMap[OFFSET(player.worldCol - player.cdel, player.worldRow, currentLevel->worldPixelWidth)] && 
+            currentLevel->collisionMap[OFFSET(player.worldCol - player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
                 player.worldCol = player.worldCol - player.cdel;
 
             // Update player's world position if the above is true
@@ -257,8 +194,8 @@ void updatePlayer() {
         }
     }
     if(BUTTON_HELD(BUTTON_RIGHT)) {
-        if (player.worldCol + player.width < currentLevel->worldPixelWidth && level1collisionmap[OFFSET(player.worldCol + player.width - 1 + player.cdel, player.worldRow, currentLevel->worldPixelWidth)] && 
-            level1collisionmap[OFFSET(player.worldCol + player.width - 1 + player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
+        if (player.worldCol + player.width < currentLevel->worldPixelWidth && currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1 + player.cdel, player.worldRow, currentLevel->worldPixelWidth)] && 
+            currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1 + player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
 
             player.worldCol = player.worldCol + player.cdel;
 

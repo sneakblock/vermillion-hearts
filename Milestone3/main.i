@@ -1330,7 +1330,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 28 "game.h"
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1412,6 +1412,11 @@ typedef struct
     PATROLPOINT patrolPoints[3];
 
     int patrolPointIndex;
+
+
+
+    int abilityType;
+
 } NPC;
 
 typedef struct
@@ -1442,6 +1447,13 @@ typedef struct
 
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+
+
+
+    NPC* currentSprite;
+    NPC* sprites[10];
+    int activeSpriteIndex;
+
 
 } PLAYER;
 
@@ -1627,6 +1639,8 @@ extern LEVEL startLevel;
 extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
+extern LEVEL level0;
+
 void initStart();
 void animateStart();
 
@@ -1634,6 +1648,7 @@ void initInstructions();
 
 void initPause();
 
+void initLevel0();
 void initLevel1();
 # 34 "main.c" 2
 
@@ -1817,7 +1832,7 @@ void goToGame() {
 
     }
 
-    if (rand() % 5 > 1) {
+    if (rand() % 10 > 1) {
         loadLevel(currentLevel, 0);
     }
 
