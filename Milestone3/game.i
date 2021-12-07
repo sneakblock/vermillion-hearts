@@ -1326,7 +1326,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-enum {UP, DOWN, LEFT, RIGHT};
+enum {DOWN, UP, LEFT, RIGHT};
 # 30 "game.h"
 typedef struct {
 
@@ -1350,6 +1350,8 @@ typedef struct {
     int worldRow;
 } PATROLPOINT;
 
+
+typedef void (*convo_func)(void);
 
 typedef struct
 {
@@ -1392,6 +1394,9 @@ typedef struct
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    convo_func convoFunc;
+
 
     char* name;
 
@@ -1444,6 +1449,7 @@ typedef struct
 
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+    int isMoving;
 
 
 
@@ -1498,7 +1504,7 @@ typedef struct {
     anim_func animFunc;
 
     int numNPCS;
-    NPC npcs[5];
+    NPC* npcs[5];
 
 } LEVEL;
 
@@ -1532,6 +1538,8 @@ void animateNPCS();
 void drawGame();
 void drawPlayer();
 void drawNPCS();
+
+void checkForConvoBools();
 
 
 
@@ -1636,20 +1644,27 @@ void initLevel1();
 # 14 "game.c" 2
 # 1 "npcs.h" 1
 extern NPC plantMerchant;
+extern NPC seer;
+extern NPC knight;
 
 void initNPCS();
-void initPlantMerchant();
+NPC* initPlantMerchant();
+NPC* initSeer();
+NPC* initKnight();
+
+void openGate();
 # 15 "game.c" 2
 
-
+int gateUnlocked;
 
 NPC* currentTarget;
 LEVEL* currentLevel;
+LEVEL level0;
 LEVEL level1;
 PLAYER player;
 
 
-NPC npcs[5];
+
 
 int hOff;
 int vOff;
@@ -1661,7 +1676,9 @@ void initGame() {
     initLevels();
     currentLevel = &level0;
     initPlayer();
-    initNPCS();
+
+
+    gateUnlocked = 0;
 
 }
 
@@ -1671,6 +1688,28 @@ void updateGame() {
     updateNPCS();
     if (currentLevel->animFunc) {
         currentLevel->animFunc();
+    }
+    checkForConvoBools();
+
+    if (player.worldRow < 5) {
+        goToWin();
+    }
+
+}
+
+void checkForConvoBools() {
+
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
+
+        if (currentLevel->npcs[i]->convoBoolSatisfied) {
+
+            if (currentLevel->npcs[i]->convoFunc) {
+                currentLevel->npcs[i]->convoFunc();
+                currentLevel->npcs[i]->convoBoolSatisfied = 0;
+            }
+
+        }
+
     }
 
 }
@@ -1726,7 +1765,7 @@ void initPlayer() {
     player.numStates = 1;
     player.prevAniState = 0;
     player.curFrame = 0;
-    player.numFrames = 2;
+    player.numFrames = 3;
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
 
@@ -1759,7 +1798,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-# 143 "game.c"
+# 168 "game.c"
 }
 
 void loadNPC(NPC* npc) {
@@ -1772,11 +1811,14 @@ void loadNPC(NPC* npc) {
 
 void updatePlayer() {
 
+    player.isMoving = 0;
+
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6)))) {
         if (player.worldRow > 0 && currentLevel->collisionMap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
             currentLevel->collisionMap[((player.worldRow - player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
 
                 player.worldRow = player.worldRow - player.rdel;
+                player.isMoving = 1;
 
             if (vOff > 0 && (player.worldRow - vOff) <= 160 / 2) {
 
@@ -1788,6 +1830,7 @@ void updatePlayer() {
         if (player.worldRow + player.height < currentLevel->worldPixelHeight && currentLevel->collisionMap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol))] &&
             currentLevel->collisionMap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
                 player.worldRow = player.worldRow + player.rdel;
+                player.isMoving = 1;
 
 
 
@@ -1804,6 +1847,7 @@ void updatePlayer() {
         if (player.worldCol > 0 && currentLevel->collisionMap[((player.worldRow) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))] &&
             currentLevel->collisionMap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))]) {
                 player.worldCol = player.worldCol - player.cdel;
+                player.isMoving = 1;
 
 
 
@@ -1818,6 +1862,7 @@ void updatePlayer() {
             currentLevel->collisionMap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1 + player.cdel))]) {
 
             player.worldCol = player.worldCol + player.cdel;
+            player.isMoving = 1;
 
             if (hOff < currentLevel->worldPixelWidth - 240 && (player.worldCol - hOff) > 240 / 2) {
 
@@ -1832,11 +1877,11 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 230 "game.c"
+# 261 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
-            currentTarget = &npcs[i];
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
+            currentTarget = currentLevel->npcs[i];
             goToDialogue();
         }
     }
@@ -1846,7 +1891,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 282 "game.c"
+# 313 "game.c"
     animateNPCS();
 
 }
@@ -1861,21 +1906,24 @@ void animatePlayer() {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 313 "game.c"
-            player.aniCounter++;
+# 344 "game.c"
+            if (player.isMoving) {
+                player.aniCounter++;
+            }
+
 
 
 }
 
 void animateNPCS() {
 
-        for (int i = 0; i < 5 - 1; i++) {
-            npcs[i].aniState = npcs[i].intendedDirection;
-            if (npcs[i].aniCounter % 20 == 0) {
-            npcs[i].curFrame = (npcs[i].curFrame + 1) % npcs[i].numFrames;
-            npcs[i].aniCounter = 0;
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+
+            if (currentLevel->npcs[i]->aniCounter % 20 == 0) {
+            currentLevel->npcs[i]->curFrame = (currentLevel->npcs[i]->curFrame + 1) % currentLevel->npcs[i]->numFrames;
+            currentLevel->npcs[i]->aniCounter = 0;
             }
-            npcs[i].aniCounter++;
+            currentLevel->npcs[i]->aniCounter++;
         }
 
 }
@@ -1893,13 +1941,13 @@ void drawPlayer() {
 }
 
 void drawNPCS() {
-    for (int i = 0; i < 5 - 1; i++) {
-        if (npcs[i].hide) {
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
+        if (currentLevel->npcs[i]->hide) {
         shadowOAM[i + 1].attr0 |= (2 << 8);
         } else {
-        shadowOAM[i + 1].attr0 = (0xFF & (npcs[i].worldRow - vOff)) | (2 << 14) | (0 << 13);
-        shadowOAM[i + 1].attr1 = (0x1FF & (npcs[i].worldCol - hOff)) | (0 << 14);
-        shadowOAM[i + 1].attr2 = ((0) << 12) | (((npcs[i].gameSpriteTileIDy) + (npcs[i].curFrame * (npcs[i].height / 8)))*32 + ((npcs[i].gameSpriteTileIDx) + (npcs[i].aniState * (npcs[i].width / 8))));
+        shadowOAM[i + 1].attr0 = (currentLevel->npcs[i]->worldRow - vOff) | (2 << 14) | (0 << 13);
+        shadowOAM[i + 1].attr1 = (currentLevel->npcs[i]->worldCol - hOff) | (0 << 14);
+        shadowOAM[i + 1].attr2 = ((0) << 12) | (((currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)))*32 + ((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8))));
 
     }
     }

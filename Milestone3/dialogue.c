@@ -13,7 +13,7 @@ int selectedChoice;
 void drawDialogueUI() {
     //Fill both screens with white.
     videoBuffer = ((unsigned short *)0x600A000);
-    fillScreen4(255);
+    fillScreen4(0);
 
     // THESE are intended dimensions.
     // Use some kind of rand to set these dimensions slightly wrongly in order to 
@@ -22,11 +22,11 @@ void drawDialogueUI() {
         drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
     }
     if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 254);
+        drawString4(124, 4, currentTarget->name, 1);
     }
 
     videoBuffer = ((unsigned short *)0x6000000);
-    fillScreen4(255);
+    fillScreen4(0);
 
     // THESE are intended dimensions.
     // Use some kind of rand to set these dimensions slightly wrongly in order to 
@@ -35,7 +35,7 @@ void drawDialogueUI() {
         drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
     }
     if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 254);
+        drawString4(124, 4, currentTarget->name, 1);
     }
 }
 
@@ -92,8 +92,8 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
 
 void drawChoices() {
 
-    drawString4(CHOICE_A_COL, CHOICE_A_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceA, 254);
-    drawString4(CHOICE_B_COL, CHOICE_B_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceB, 254);
+    drawString4(CHOICE_A_COL, CHOICE_A_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceA, 1);
+    drawString4(CHOICE_B_COL, CHOICE_B_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceB, 1);
 
 }
 
@@ -101,13 +101,17 @@ void drawSelector() {
 
     switch (selectedChoice) {
         case CHOICE_A:
-        drawImage4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, selectorBitmap);
-        drawRect4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, 255);
+        // drawImage4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, selectorBitmap);
+        // drawRect4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, 0);
+        drawRect4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, 1);
+        drawRect4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, 0);
         break;
 
         case CHOICE_B:
-        drawImage4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, selectorBitmap);
-        drawRect4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, 255);
+        // drawImage4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, selectorBitmap);
+        // drawRect4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, 0);
+        drawRect4(SELECTOR_B_COL, SELECTOR_B_ROW, 4, 8, 1);
+        drawRect4(SELECTOR_A_COL, SELECTOR_A_ROW, 4, 8, 0);
         break;
     }
 
@@ -131,7 +135,7 @@ void selectChoice() {
         currentTarget->convoBoolSatisfied = 1;
     }
 
-    typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
+    typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 1);
 
 }
 

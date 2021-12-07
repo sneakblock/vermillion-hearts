@@ -1,7 +1,7 @@
 // ++++++++++++++++++++++++++ ENUMS +++++++++++++++++++++++++++++++++++
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-enum {UP, DOWN, LEFT, RIGHT};
+enum {DOWN, UP, LEFT, RIGHT};
 
 
 
@@ -49,6 +49,8 @@ typedef struct {
     int worldRow;
 } PATROLPOINT;
 
+
+typedef void (*convo_func)(void);
 // Generic struct for an NPC
 typedef struct
 {
@@ -91,6 +93,9 @@ typedef struct
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    convo_func convoFunc;
+
     //npc's name
     char* name;
 
@@ -143,6 +148,7 @@ typedef struct
     // aka, the local origin of that character's sub spritesheet
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+    int isMoving;
 
     // ============ SPRITESTEALING =============
 
@@ -197,7 +203,7 @@ typedef struct {
     anim_func animFunc;
 
     int numNPCS;
-    NPC npcs[MAX_NPCS_PER_LEVEL];
+    NPC* npcs[MAX_NPCS_PER_LEVEL];
 
 } LEVEL;
 
@@ -231,6 +237,8 @@ void animateNPCS();
 void drawGame();
 void drawPlayer();
 void drawNPCS();
+
+void checkForConvoBools();
 
 //Some function that glitches the screen, possibly through charblock and charblock overlapping, or through 
 //some scrambling of the tilemap indices.

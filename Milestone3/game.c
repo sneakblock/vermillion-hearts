@@ -13,15 +13,16 @@
 #include "levels.h"
 #include "npcs.h"
 
-
+int gateUnlocked;
 
 NPC* currentTarget;
 LEVEL* currentLevel;
+LEVEL level0;
 LEVEL level1;
 PLAYER player;
 
 //NPC stuff Milestone 3
-NPC npcs[MAX_NPCS_PER_LEVEL];
+// NPC npcs[MAX_NPCS_PER_LEVEL];
 
 int hOff;
 int vOff;
@@ -33,7 +34,9 @@ void initGame() {
     initLevels();
     currentLevel = &level0;
     initPlayer();
-    initNPCS();
+    // initNPCS();
+
+    gateUnlocked = 0;
 
 }
 
@@ -43,6 +46,28 @@ void updateGame() {
     updateNPCS();
     if (currentLevel->animFunc) {
         currentLevel->animFunc();
+    }
+    checkForConvoBools();
+
+    if (player.worldRow < 5) {
+        goToWin();
+    }
+
+}
+
+void checkForConvoBools() {
+
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
+
+        if (currentLevel->npcs[i]->convoBoolSatisfied) {
+
+            if (currentLevel->npcs[i]->convoFunc) {
+                currentLevel->npcs[i]->convoFunc();
+                currentLevel->npcs[i]->convoBoolSatisfied = 0;
+            }
+
+        }
+
     }
 
 }
@@ -98,7 +123,7 @@ void initPlayer() {
     player.numStates = 1;
     player.prevAniState = 0;
     player.curFrame = 0;
-    player.numFrames = 2;
+    player.numFrames = 3;
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
 
@@ -152,11 +177,14 @@ void loadNPC(NPC* npc) {
 
 void updatePlayer() {
 
+    player.isMoving = 0;
+
     if(BUTTON_HELD(BUTTON_UP)) {
         if (player.worldRow > 0 && currentLevel->collisionMap[OFFSET(player.worldCol, player.worldRow - player.rdel, currentLevel->worldPixelWidth)] && 
             currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1, player.worldRow - player.rdel, currentLevel->worldPixelWidth)]) {
                 
                 player.worldRow = player.worldRow - player.rdel;
+                player.isMoving = 1;
 
             if (vOff > 0 && (player.worldRow - vOff) <= SCREENHEIGHT / 2) {
                 // Update background offset variable if the above is true
@@ -168,6 +196,7 @@ void updatePlayer() {
         if (player.worldRow + player.height < currentLevel->worldPixelHeight && currentLevel->collisionMap[OFFSET(player.worldCol, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)] && 
             currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)]) {
                 player.worldRow = player.worldRow + player.rdel;
+                player.isMoving = 1;
 
             // Update player's world position if the above is true
 
@@ -184,6 +213,7 @@ void updatePlayer() {
         if (player.worldCol > 0 && currentLevel->collisionMap[OFFSET(player.worldCol - player.cdel, player.worldRow, currentLevel->worldPixelWidth)] && 
             currentLevel->collisionMap[OFFSET(player.worldCol - player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
                 player.worldCol = player.worldCol - player.cdel;
+                player.isMoving = 1;
 
             // Update player's world position if the above is true
 
@@ -198,6 +228,7 @@ void updatePlayer() {
             currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1 + player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
 
             player.worldCol = player.worldCol + player.cdel;
+            player.isMoving = 1;
 
             if (hOff < currentLevel->worldPixelWidth - SCREENWIDTH && (player.worldCol - hOff) > SCREENWIDTH / 2) {
 
@@ -229,8 +260,8 @@ void updatePlayer() {
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
         //Temp solution
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height) && BUTTON_PRESSED(BUTTON_A)) {
-            currentTarget = &npcs[i];
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height) && BUTTON_PRESSED(BUTTON_A)) {
+            currentTarget = currentLevel->npcs[i];
             goToDialogue();
         }
     }
@@ -310,20 +341,23 @@ void animatePlayer() {
         //     player.aniCounter = 0;
         //     player.aniState = player.prevAniState;
         // } else {
-            player.aniCounter++;
+            if (player.isMoving) {
+                player.aniCounter++;
+            }
+            
         // }
 
 }
 
 void animateNPCS() {
 
-        for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-            npcs[i].aniState = npcs[i].intendedDirection;
-            if (npcs[i].aniCounter % 20 == 0) {
-            npcs[i].curFrame = (npcs[i].curFrame + 1) % npcs[i].numFrames;
-            npcs[i].aniCounter = 0;
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+            // currentLevel->npcs[i]->aniState = currentLevel->npcs[i]->intendedDirection;
+            if (currentLevel->npcs[i]->aniCounter % 20 == 0) {
+            currentLevel->npcs[i]->curFrame = (currentLevel->npcs[i]->curFrame + 1) % currentLevel->npcs[i]->numFrames;
+            currentLevel->npcs[i]->aniCounter = 0;
             }
-            npcs[i].aniCounter++;
+            currentLevel->npcs[i]->aniCounter++;
         }
 
 }
@@ -341,13 +375,13 @@ void drawPlayer() {
 }
 
 void drawNPCS() {
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-        if (npcs[i].hide) {
+    for (int i = 0; i < currentLevel->numNPCS; i++) {
+        if (currentLevel->npcs[i]->hide) {
         shadowOAM[i + 1].attr0 |= ATTR0_HIDE;
         } else {
-        shadowOAM[i + 1].attr0 = (ROWMASK & (npcs[i].worldRow - vOff)) | ATTR0_TALL | ATTR0_4BPP;
-        shadowOAM[i + 1].attr1 = (COLMASK & (npcs[i].worldCol - hOff)) | ATTR1_TINY;
-        shadowOAM[i + 1].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((npcs[i].gameSpriteTileIDx) + (npcs[i].aniState * (npcs[i].width / 8)), (npcs[i].gameSpriteTileIDy) + (npcs[i].curFrame * (npcs[i].height / 8)));
+        shadowOAM[i + 1].attr0 = (currentLevel->npcs[i]->worldRow - vOff) | ATTR0_TALL | ATTR0_4BPP;
+        shadowOAM[i + 1].attr1 = (currentLevel->npcs[i]->worldCol - hOff) | ATTR1_TINY;
+        shadowOAM[i + 1].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8)), (currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)));
         // shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
     }
     }

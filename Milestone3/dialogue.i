@@ -7,7 +7,7 @@
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {UP, DOWN, LEFT, RIGHT};
-# 28 "game.h"
+# 30 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -89,6 +89,11 @@ typedef struct
     PATROLPOINT patrolPoints[3];
 
     int patrolPointIndex;
+
+
+
+    int abilityType;
+
 } NPC;
 
 typedef struct
@@ -120,15 +125,25 @@ typedef struct
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
 
+
+
+    NPC* currentSprite;
+    NPC* sprites[10];
+    int activeSpriteIndex;
+
+
 } PLAYER;
 
 
 
 
 
+typedef void (*anim_func)(void);
+
 typedef struct {
 
     int levelSize;
+    unsigned char* collisionMap;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -160,8 +175,10 @@ typedef struct {
     const unsigned short* backgroundPal;
     int backgroundPalLen;
 
+    anim_func animFunc;
+
     int numNPCS;
-    NPC npcs[5];
+    NPC* npcs[5];
 
 } LEVEL;
 
@@ -1608,7 +1625,7 @@ int selectedChoice;
 void drawDialogueUI() {
 
     videoBuffer = ((unsigned short *)0x600A000);
-    fillScreen4(255);
+    fillScreen4(0);
 
 
 
@@ -1617,11 +1634,11 @@ void drawDialogueUI() {
         drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
     }
     if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 254);
+        drawString4(124, 4, currentTarget->name, 1);
     }
 
     videoBuffer = ((unsigned short *)0x6000000);
-    fillScreen4(255);
+    fillScreen4(0);
 
 
 
@@ -1630,7 +1647,7 @@ void drawDialogueUI() {
         drawImage4(4, 4, 116, 92, currentTarget->talkingHeadBitmap);
     }
     if (currentTarget->name) {
-        drawString4(124, 4, currentTarget->name, 254);
+        drawString4(124, 4, currentTarget->name, 1);
     }
 }
 
@@ -1687,8 +1704,8 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
 
 void drawChoices() {
 
-    drawString4(12, 112, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceA, 254);
-    drawString4(12, 136, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceB, 254);
+    drawString4(12, 112, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceA, 1);
+    drawString4(12, 136, currentTarget->dialogues[currentTarget->dialoguesIndex].choiceB, 1);
 
 }
 
@@ -1696,13 +1713,17 @@ void drawSelector() {
 
     switch (selectedChoice) {
         case CHOICE_A:
-        drawImage4(4, 112, 4, 8, selectorBitmap);
-        drawRect4(4, 136, 4, 8, 255);
+
+
+        drawRect4(4, 112, 4, 8, 1);
+        drawRect4(4, 136, 4, 8, 0);
         break;
 
         case CHOICE_B:
-        drawImage4(4, 136, 4, 8, selectorBitmap);
-        drawRect4(4, 112, 4, 8, 255);
+
+
+        drawRect4(4, 136, 4, 8, 1);
+        drawRect4(4, 112, 4, 8, 0);
         break;
     }
 
@@ -1726,6 +1747,6 @@ void selectChoice() {
         currentTarget->convoBoolSatisfied = 1;
     }
 
-    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
+    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 1);
 
 }

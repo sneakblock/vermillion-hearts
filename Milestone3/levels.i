@@ -1326,7 +1326,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-enum {UP, DOWN, LEFT, RIGHT};
+enum {DOWN, UP, LEFT, RIGHT};
 # 30 "game.h"
 typedef struct {
 
@@ -1350,6 +1350,8 @@ typedef struct {
     int worldRow;
 } PATROLPOINT;
 
+
+typedef void (*convo_func)(void);
 
 typedef struct
 {
@@ -1392,6 +1394,9 @@ typedef struct
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    convo_func convoFunc;
+
 
     char* name;
 
@@ -1444,6 +1449,7 @@ typedef struct
 
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+    int isMoving;
 
 
 
@@ -1498,7 +1504,7 @@ typedef struct {
     anim_func animFunc;
 
     int numNPCS;
-    NPC npcs[5];
+    NPC* npcs[5];
 
 } LEVEL;
 
@@ -1532,6 +1538,8 @@ void animateNPCS();
 void drawGame();
 void drawPlayer();
 void drawNPCS();
+
+void checkForConvoBools();
 
 
 
@@ -1760,6 +1768,19 @@ extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
 # 30 "levels.c" 2
 
+# 1 "npcs.h" 1
+extern NPC plantMerchant;
+extern NPC seer;
+extern NPC knight;
+
+void initNPCS();
+NPC* initPlantMerchant();
+NPC* initSeer();
+NPC* initKnight();
+
+void openGate();
+# 32 "levels.c" 2
+
 LEVEL startLevel;
 LEVEL instructionsLevel;
 LEVEL pauseLevel;
@@ -1927,7 +1948,7 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 216 "levels.c"
+# 218 "levels.c"
     level1.numNPCS = 4;
 }
 
@@ -1945,6 +1966,12 @@ void initLevel0() {
     level0.worldPixelWidth = 256;
     level0.worldPixelHeight = 512;
     level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+
+
+    level0.numNPCS = 3;
+    level0.npcs[0] = initSeer();
+    level0.npcs[1] = initPlantMerchant();
+    level0.npcs[2] = initKnight();
 
 
 

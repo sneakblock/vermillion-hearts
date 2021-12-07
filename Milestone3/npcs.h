@@ -1,4 +1,10 @@
 extern NPC plantMerchant;
+extern NPC seer;
+extern NPC knight;
 
 void initNPCS();
-void initPlantMerchant();
+NPC* initPlantMerchant();
+NPC* initSeer();
+NPC* initKnight();
+
+void openGate();

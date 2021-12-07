@@ -2,7 +2,13 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "main.c"
-# 12 "main.c"
+
+
+
+
+
+
+
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -811,7 +817,7 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 13 "main.c" 2
+# 9 "main.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 36 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/9.1.0/include/stddef.h" 1 3 4
@@ -1222,7 +1228,7 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 14 "main.c" 2
+# 10 "main.c" 2
 # 1 "myLib.h" 1
 
 
@@ -1322,14 +1328,14 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 typedef void (*ihp)(void);
 # 310 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 15 "main.c" 2
+# 11 "main.c" 2
 
 
 # 1 "game.h" 1
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-enum {UP, DOWN, LEFT, RIGHT};
+enum {DOWN, UP, LEFT, RIGHT};
 # 30 "game.h"
 typedef struct {
 
@@ -1353,6 +1359,8 @@ typedef struct {
     int worldRow;
 } PATROLPOINT;
 
+
+typedef void (*convo_func)(void);
 
 typedef struct
 {
@@ -1395,6 +1403,9 @@ typedef struct
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    convo_func convoFunc;
+
 
     char* name;
 
@@ -1447,6 +1458,7 @@ typedef struct
 
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+    int isMoving;
 
 
 
@@ -1461,9 +1473,12 @@ typedef struct
 
 
 
+typedef void (*anim_func)(void);
+
 typedef struct {
 
     int levelSize;
+    unsigned char* collisionMap;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -1495,8 +1510,10 @@ typedef struct {
     const unsigned short* backgroundPal;
     int backgroundPalLen;
 
+    anim_func animFunc;
+
     int numNPCS;
-    NPC npcs[5];
+    NPC* npcs[5];
 
 } LEVEL;
 
@@ -1531,6 +1548,8 @@ void drawGame();
 void drawPlayer();
 void drawNPCS();
 
+void checkForConvoBools();
+
 
 
 
@@ -1550,7 +1569,7 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 18 "main.c" 2
+# 14 "main.c" 2
 
 
 # 1 "spritesheet.h" 1
@@ -1559,7 +1578,7 @@ extern const unsigned short SPRITESHEETTiles[16384];
 
 
 extern const unsigned short SPRITESHEETPal[256];
-# 21 "main.c" 2
+# 17 "main.c" 2
 
 
 # 1 "text.h" 1
@@ -1570,7 +1589,7 @@ void drawString3(int col, int row, char *str, unsigned short color);
 
 void drawChar4(int col, int row, char ch, unsigned char colorIndex);
 void drawString4(int col, int row, char *str, unsigned char colorIndex);
-# 24 "main.c" 2
+# 20 "main.c" 2
 
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
@@ -1578,7 +1597,7 @@ extern const unsigned short talkingheadtestBitmap[8816];
 
 
 extern const unsigned short talkingheadtestPal[256];
-# 26 "main.c" 2
+# 22 "main.c" 2
 
 # 1 "dialogue.h" 1
 # 25 "dialogue.h"
@@ -1591,7 +1610,7 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
 void drawChoices();
 void drawSelector();
 void selectChoice();
-# 28 "main.c" 2
+# 24 "main.c" 2
 
 # 1 "sound.h" 1
 void setupSounds();
@@ -1618,21 +1637,21 @@ typedef struct{
 
 SOUND soundA;
 SOUND soundB;
-# 30 "main.c" 2
+# 26 "main.c" 2
 # 1 "trackA.h" 1
 
 
 extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
-# 31 "main.c" 2
+# 27 "main.c" 2
 # 1 "trackB.h" 1
 
 
 extern const unsigned int trackB_sampleRate;
 extern const unsigned int trackB_length;
 extern const signed char trackB_data[];
-# 32 "main.c" 2
+# 28 "main.c" 2
 
 # 1 "levels.h" 1
 extern LEVEL startLevel;
@@ -1642,7 +1661,9 @@ extern LEVEL pauseLevel;
 extern LEVEL level0;
 
 void initStart();
+
 void animateStart();
+void animateLevel0();
 
 void initInstructions();
 
@@ -1650,7 +1671,7 @@ void initPause();
 
 void initLevel0();
 void initLevel1();
-# 34 "main.c" 2
+# 30 "main.c" 2
 
 
 void initialize();
@@ -1836,6 +1857,7 @@ void goToGame() {
         loadLevel(currentLevel, 0);
     }
 
+
     state = GAME;
 
 }
@@ -1855,18 +1877,20 @@ void goToDialogue() {
 
     (*(volatile unsigned short *)0x4000000) = 0;
 
-    DMANow(3, currentTarget->talkingHeadPalette, ((unsigned short *)0x5000000), currentTarget->talkingHeadPalLen / 2);
+
 
 
     (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
-    ((unsigned short *)0x5000000)[255] = ((0) | (0) << 5 | (0) << 10);
-    ((unsigned short *)0x5000000)[254] = ((31) | (31) << 5 | (31) << 10);
+    ((unsigned short *)0x5000000)[0] = ((0) | (0) << 5 | (0) << 10);
+    ((unsigned short *)0x5000000)[1] = ((31) | (31) << 5 | (31) << 10);
 
     drawDialogueUI();
-    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
+    typeDialogue(124, 16, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 1);
 
-    selectedChoice = CHOICE_A;
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        selectedChoice = CHOICE_A;
+    }
 
     waitForVBlank();
     flipPage();
@@ -1877,7 +1901,7 @@ void goToDialogue() {
 
 void dialogue() {
 
-    if ((!(~(oldButtons) & ((1 << 6))) && (~buttons & ((1 << 6)))) || (!(~(oldButtons) & ((1 << 7))) && (~buttons & ((1 << 7))))) {
+    if (((!(~(oldButtons) & ((1 << 6))) && (~buttons & ((1 << 6)))) || (!(~(oldButtons) & ((1 << 7))) && (~buttons & ((1 << 7))))) && (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice)) {
         if (selectedChoice == CHOICE_A) {
             selectedChoice = CHOICE_B;
         } else {
@@ -1891,6 +1915,9 @@ void dialogue() {
         }
         else if (!currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice && !currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex++;
+
+
+            goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
@@ -1911,7 +1938,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 302 "main.c"
+# 304 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
     loadLevel(&pauseLevel, 0);

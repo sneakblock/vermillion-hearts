@@ -1,13 +1,9 @@
-// Milestone 3 Update
-// 
-// For this milestone, I focused on getting basic game mechanics working. I wanted to get complex movement right,
-// as well as having romaing enemies. While most glitch mechanics aren't yet implemented, I spent a while figuring
-// out interesting ways to glitch the screen with Mode 4 switches and screenblock overwriting, both of which will
-// be more prevalant in the final game. Art and mood are important to my game, and so I also spent some time on them.
-// This will be the first level of the game, and later areas will allow for more abilites and glitch mechanics.
-// To play, use the directional inputs and avoid enemies. Start goes to pause.
-// Take note of the red flickering upon death and the "channel tune" effect on the Mode 4 swap, leveraging page flipping.
-// Check out the glitch time freeze, still a work in progress, with A during the game.
+// Milestone 4 update
+// For milestone 4, I added a dialogue system, multiple NPCs, animated sprites, an entirely new level, and
+// sound, along with animated menus, and backgrounds for all states. Multiple realtime glitches play throughout
+// the game to set the mood, and I have refocused my goals to focus on dialogue instead of glitch puzzle 
+// mechanics, so that dialogue flags allow the player to progress to the ending. Notice the glitched palettes,
+// sound work, and dialogue characters!
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -215,6 +211,7 @@ void goToGame() {
     if (rand() % 10 > 1) {
         loadLevel(currentLevel, 0);
     }
+    
 
     state = GAME;
 
@@ -235,18 +232,20 @@ void goToDialogue() {
     //Turns off display controller
     REG_DISPCTL = 0;
 
-    DMANow(3, currentTarget->talkingHeadPalette, PALETTE, currentTarget->talkingHeadPalLen / 2);
+    // DMANow(3, currentTarget->talkingHeadPalette, PALETTE, currentTarget->talkingHeadPalLen / 2);
 
     // Goes to Mode4
     REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
 
-    PALETTE[255] = BLACK;
-    PALETTE[254] = WHITE;
+    PALETTE[0] = BLACK;
+    PALETTE[1] = WHITE;
     
     drawDialogueUI();
-    typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 254);
+    typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 1);
 
-    selectedChoice = CHOICE_A;
+    if (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice) {
+        selectedChoice = CHOICE_A;
+    }
 
     waitForVBlank();
     flipPage();
@@ -257,7 +256,7 @@ void goToDialogue() {
 
 void dialogue() {
 
-    if (BUTTON_PRESSED(BUTTON_UP) || BUTTON_PRESSED(BUTTON_DOWN)) {
+    if ((BUTTON_PRESSED(BUTTON_UP) || BUTTON_PRESSED(BUTTON_DOWN)) && (currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice)) {
         if (selectedChoice == CHOICE_A) {
             selectedChoice = CHOICE_B;
         } else {
@@ -271,6 +270,9 @@ void dialogue() {
         }
         else if (!currentTarget->dialogues[currentTarget->dialoguesIndex].promptsChoice && !currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex++;
+            // drawDialogueUI();
+            // typeDialogue(TEXTBOX_COL, TEXTBOX_ROW, currentTarget->dialogues[currentTarget->dialoguesIndex].string, 1);
+            goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
             currentTarget->dialoguesIndex = currentTarget->postConvoIndex;

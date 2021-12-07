@@ -28,6 +28,8 @@
 #include "sound.h"
 #include "trackA.h"
 
+#include "npcs.h"
+
 LEVEL startLevel;
 LEVEL instructionsLevel;
 LEVEL pauseLevel;
@@ -230,6 +232,12 @@ void initLevel0() {
     level0.worldPixelWidth = 256;
     level0.worldPixelHeight = 512;
     level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+
+    // ============== NPCS =================
+    level0.numNPCS = 3;
+    level0.npcs[0] = initSeer();
+    level0.npcs[1] = initPlantMerchant();
+    level0.npcs[2] = initKnight();
 
 
     // =========== FOREGROUND ============

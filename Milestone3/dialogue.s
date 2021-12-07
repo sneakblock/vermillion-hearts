@@ -25,7 +25,7 @@ drawDialogueUI:
 	ldr	r3, .L20
 	ldr	r6, .L20+4
 	ldr	r4, .L20+8
-	mov	r0, #255
+	mov	r0, #0
 	ldr	r5, .L20+12
 	sub	sp, sp, #12
 	str	r3, [r6]
@@ -48,7 +48,7 @@ drawDialogueUI:
 	ldr	r2, [r3, #416]
 	cmp	r2, #0
 	beq	.L3
-	mov	r3, #254
+	mov	r3, #1
 	mov	r1, #4
 	mov	r0, #124
 	ldr	r7, .L20+20
@@ -56,7 +56,7 @@ drawDialogueUI:
 	bx	r7
 .L3:
 	mov	r3, #100663296
-	mov	r0, #255
+	mov	r0, #0
 	str	r3, [r6]
 	mov	lr, pc
 	bx	r5
@@ -77,7 +77,7 @@ drawDialogueUI:
 	ldr	r2, [r3, #416]
 	cmp	r2, #0
 	beq	.L1
-	mov	r3, #254
+	mov	r3, #1
 	mov	r1, #4
 	mov	r0, #124
 	ldr	r4, .L20+20
@@ -286,7 +286,7 @@ drawChoices:
 	add	r3, r3, r2, lsl #5
 	ldr	r2, [r3, #108]
 	ldr	r4, .L47+4
-	mov	r3, #254
+	mov	r3, #1
 	mov	r1, #112
 	mov	r0, #12
 	mov	lr, pc
@@ -296,7 +296,7 @@ drawChoices:
 	add	r3, r3, r2, lsl #5
 	ldr	r2, [r3, #112]
 	mov	r1, #136
-	mov	r3, #254
+	mov	r3, #1
 	mov	r0, #12
 	mov	lr, pc
 	bx	r4
@@ -318,66 +318,60 @@ drawSelector:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
+	push	{r4, r5, lr}
 	ldr	r3, .L54
-	ldr	r3, [r3]
-	cmp	r3, #0
-	sub	sp, sp, #8
+	ldr	r4, [r3]
+	cmp	r4, #0
+	sub	sp, sp, #12
 	beq	.L50
-	cmp	r3, #1
+	cmp	r4, #1
 	bne	.L49
 	mov	r2, #4
-	ldr	r3, .L54+4
+	mov	r3, #8
 	mov	r0, r2
 	mov	r1, #136
-	str	r3, [sp]
-	ldr	r4, .L54+8
-	mov	r3, #8
+	str	r4, [sp]
+	ldr	r4, .L54+4
 	mov	lr, pc
 	bx	r4
-	mov	r3, #255
+	mov	r3, #0
 	mov	r2, #4
 	str	r3, [sp]
 	mov	r0, r2
 	mov	r3, #8
 	mov	r1, #112
-	ldr	r4, .L54+12
 	mov	lr, pc
 	bx	r4
 .L49:
-	add	sp, sp, #8
+	add	sp, sp, #12
 	@ sp needed
-	pop	{r4, lr}
+	pop	{r4, r5, lr}
 	bx	lr
 .L50:
 	mov	r2, #4
-	ldr	r3, .L54+4
+	mov	r3, #1
 	mov	r0, r2
 	str	r3, [sp]
+	ldr	r5, .L54+4
+	mov	r3, #8
 	mov	r1, #112
-	mov	r3, #8
-	ldr	r4, .L54+8
 	mov	lr, pc
-	bx	r4
+	bx	r5
 	mov	r2, #4
-	mov	r3, #255
-	mov	r0, r2
-	str	r3, [sp]
-	mov	r1, #136
 	mov	r3, #8
-	ldr	r4, .L54+12
+	mov	r0, r2
+	mov	r1, #136
+	str	r4, [sp]
 	mov	lr, pc
-	bx	r4
-	add	sp, sp, #8
+	bx	r5
+	add	sp, sp, #12
 	@ sp needed
-	pop	{r4, lr}
+	pop	{r4, r5, lr}
 	bx	lr
 .L55:
 	.align	2
 .L54:
 	.word	selectedChoice
-	.word	selectorBitmap
-	.word	drawImage4
 	.word	drawRect4
 	.size	drawSelector, .-drawSelector
 	.align	2
@@ -412,7 +406,7 @@ selectChoice:
 	mov	r0, #124
 	ldr	r2, [r3, #104]
 	mov	r1, #16
-	mov	r3, #254
+	mov	r3, #1
 	pop	{r4, lr}
 	b	typeDialogue
 .L57:
