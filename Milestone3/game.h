@@ -15,7 +15,10 @@ enum {DOWN, UP, LEFT, RIGHT};
 #define TALKINGHEAD_TILE_SIZE 4
 
 //How many dialogues can each character have? They can have less, but this value is the max.
-#define NUM_DIALOGUES 10
+#define NUM_DIALOGUES 50
+
+#define NUM_RECOGNIZED_NPCS 3
+
 
 //How many patrol points does each NPC have?
 #define NUM_PATROL_POINTS 3
@@ -47,7 +50,6 @@ typedef struct {
     int worldCol;
     int worldRow;
 } PATROLPOINT;
-
 
 typedef void (*convo_func)(void);
 typedef void (*ability_func)(void);
@@ -93,6 +95,14 @@ typedef struct
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    int recognizesNPCS;
+
+    char* recognizedNPCS[NUM_RECOGNIZED_NPCS];
+
+    int recognizedAindex;
+    int recognizedBindex;
+    int recognizedCindex;
 
     convo_func convoFunc;
 
@@ -216,6 +226,7 @@ extern NPC* currentTarget;
 extern LEVEL* currentLevel;
 
 extern LEVEL level1;
+extern PLAYER player;
 
 // +++++++++++++++++++++ METHOD HEADERS OR STUBS OR WHATEVER :) ++++++++++++++++++++++++++
 

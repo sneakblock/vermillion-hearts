@@ -1338,7 +1338,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 29 "game.h"
+# 32 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1360,7 +1360,6 @@ typedef struct {
     int worldCol;
     int worldRow;
 } PATROLPOINT;
-
 
 typedef void (*convo_func)(void);
 typedef void (*ability_func)(void);
@@ -1401,11 +1400,19 @@ typedef struct
     const unsigned short* talkingHeadPalette;
     int talkingHeadPalLen;
 
-    DIALOGUE dialogues[10];
+    DIALOGUE dialogues[50];
 
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    int recognizesNPCS;
+
+    struct NPC* recognizedNPCS[3];
+
+    int recognizedAindex;
+    int recognizedBindex;
+    int recognizedCindex;
 
     convo_func convoFunc;
 
@@ -1529,6 +1536,7 @@ extern NPC* currentTarget;
 extern LEVEL* currentLevel;
 
 extern LEVEL level1;
+extern PLAYER player;
 
 
 
@@ -1836,7 +1844,8 @@ void start() {
         loadLevel(currentLevel, 1);
         stopSound();
         playSoundA(trackA_data, trackA_length, 1);
-        goToGame();
+        glitchDMA(100);
+
     }
 
     if ((!(~(oldButtons) & ((1 << 2))) && (~buttons & ((1 << 2))))) {
@@ -1953,7 +1962,7 @@ void dialogue() {
             goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
-            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
+            currentTarget->dialoguesIndex = 0;
             goToGame();
         }
 
@@ -1971,7 +1980,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 321 "main.c"
+# 322 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
     loadLevel(&pauseLevel, 0);

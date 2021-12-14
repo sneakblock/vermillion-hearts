@@ -45,7 +45,7 @@ drawDialogueUI:
 	bx	r7
 	ldr	r3, [r4]
 .L2:
-	ldr	r2, [r3, #420]
+	ldr	r2, [r3, #1728]
 	cmp	r2, #0
 	beq	.L3
 	mov	r3, #1
@@ -74,7 +74,7 @@ drawDialogueUI:
 	bx	r5
 	ldr	r3, [r4]
 .L4:
-	ldr	r2, [r3, #420]
+	ldr	r2, [r3, #1728]
 	cmp	r2, #0
 	beq	.L1
 	mov	r3, #1
@@ -282,7 +282,7 @@ drawChoices:
 	push	{r4, r5, r6, lr}
 	ldr	r5, .L47
 	ldr	r3, [r5]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r2, [r3, #108]
 	ldr	r4, .L47+4
@@ -292,7 +292,7 @@ drawChoices:
 	mov	lr, pc
 	bx	r4
 	ldr	r3, [r5]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r2, [r3, #112]
 	mov	r1, #136
@@ -393,16 +393,16 @@ selectChoice:
 	cmp	r3, #1
 	ldr	r3, .L65+4
 	ldr	r2, [r3]
-	ldr	r3, [r2, #404]
+	ldr	r3, [r2, #1684]
 	addeq	r3, r2, r3, lsl #5
 	ldreq	r3, [r3, #92]
-	streq	r3, [r2, #404]
+	streq	r3, [r2, #1684]
 .L59:
 	add	r3, r2, r3, lsl #5
 	ldr	r1, [r3, #100]
 	cmp	r1, #0
 	movne	r1, #1
-	strne	r1, [r2, #412]
+	strne	r1, [r2, #1692]
 	mov	r0, #124
 	ldr	r2, [r3, #104]
 	mov	r1, #16
@@ -412,10 +412,10 @@ selectChoice:
 .L57:
 	ldr	r3, .L65+4
 	ldr	r2, [r3]
-	ldr	r3, [r2, #404]
+	ldr	r3, [r2, #1684]
 	add	r3, r2, r3, lsl #5
 	ldr	r3, [r3, #88]
-	str	r3, [r2, #404]
+	str	r3, [r2, #1684]
 	b	.L59
 .L66:
 	.align	2

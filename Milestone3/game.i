@@ -1329,7 +1329,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 29 "game.h"
+# 32 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1351,7 +1351,6 @@ typedef struct {
     int worldCol;
     int worldRow;
 } PATROLPOINT;
-
 
 typedef void (*convo_func)(void);
 typedef void (*ability_func)(void);
@@ -1392,11 +1391,19 @@ typedef struct
     const unsigned short* talkingHeadPalette;
     int talkingHeadPalLen;
 
-    DIALOGUE dialogues[10];
+    DIALOGUE dialogues[50];
 
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    int recognizesNPCS;
+
+    char* recognizedNPCS[3];
+
+    int recognizedAindex;
+    int recognizedBindex;
+    int recognizedCindex;
 
     convo_func convoFunc;
 
@@ -1520,6 +1527,7 @@ extern NPC* currentTarget;
 extern LEVEL* currentLevel;
 
 extern LEVEL level1;
+extern PLAYER player;
 
 
 
@@ -1912,8 +1920,26 @@ void updatePlayer() {
                         }
                     }
                 }
-            } else if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))) ) {
+            } else
+            if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))) ) {
                 currentTarget = currentLevel->npcs[i];
+                if (currentTarget->recognizesNPCS != 0) {
+                    for (int i = 0; i < 3; i++) {
+                        if (player.currentSprite->name == currentTarget->recognizedNPCS[i]) {
+                            switch (i){
+                                case 0:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedAindex;
+                                    break;
+                                case 1:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedBindex;
+                                    break;
+                                case 2:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedCindex;
+                                    break;
+                                }
+                            }
+                        }
+                }
                 goToDialogue();
             }
         }

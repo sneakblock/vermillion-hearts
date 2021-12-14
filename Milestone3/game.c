@@ -275,8 +275,26 @@ void updatePlayer() {
                         }
                     }
                 }
-            } else if (BUTTON_PRESSED(BUTTON_A) /*&& !BUTTON_HELD(BUTTON_B) && !BUTTON_HELD(BUTTON_L)*/) {
+            } else 
+            if (BUTTON_PRESSED(BUTTON_A) /*&& !BUTTON_HELD(BUTTON_B) && !BUTTON_HELD(BUTTON_L)*/) {
                 currentTarget = currentLevel->npcs[i];
+                if (currentTarget->recognizesNPCS != 0) {
+                    for (int i = 0; i < NUM_RECOGNIZED_NPCS; i++) {
+                        if (player.currentSprite->name == currentTarget->recognizedNPCS[i]) {
+                            switch (i){
+                                case 0:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedAindex;
+                                    break;
+                                case 1:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedBindex;
+                                    break;
+                                case 2:
+                                    currentTarget->dialoguesIndex = currentTarget->recognizedCindex;
+                                    break;
+                                }
+                            }
+                        }
+                }
                 goToDialogue();
             }
         } 

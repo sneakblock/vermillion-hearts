@@ -175,7 +175,8 @@ void start() {
         loadLevel(currentLevel, 1);
         stopSound();
         playSoundA(trackA_data, trackA_length, 1);
-        goToGame();
+        glitchDMA(100);
+        // goToGame();
     }
 
     if (BUTTON_PRESSED(BUTTON_SELECT)) {
@@ -292,7 +293,7 @@ void dialogue() {
             goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
-            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
+            currentTarget->dialoguesIndex = 0;
             goToGame();
         }
         

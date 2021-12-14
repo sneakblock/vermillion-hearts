@@ -7,7 +7,7 @@
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 29 "game.h"
+# 32 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -29,7 +29,6 @@ typedef struct {
     int worldCol;
     int worldRow;
 } PATROLPOINT;
-
 
 typedef void (*convo_func)(void);
 typedef void (*ability_func)(void);
@@ -70,11 +69,19 @@ typedef struct
     const unsigned short* talkingHeadPalette;
     int talkingHeadPalLen;
 
-    DIALOGUE dialogues[10];
+    DIALOGUE dialogues[50];
 
     int dialoguesIndex;
     int postConvoIndex;
     int convoBoolSatisfied;
+
+    int recognizesNPCS;
+
+    struct NPC* recognizedNPCS[3];
+
+    int recognizedAindex;
+    int recognizedBindex;
+    int recognizedCindex;
 
     convo_func convoFunc;
 
@@ -183,6 +190,8 @@ typedef struct {
     const unsigned short* backgroundPal;
     int backgroundPalLen;
 
+    unsigned short* masterPal;
+
     anim_func animFunc;
 
     int numNPCS;
@@ -196,6 +205,7 @@ extern NPC* currentTarget;
 extern LEVEL* currentLevel;
 
 extern LEVEL level1;
+extern PLAYER player;
 
 
 
@@ -281,9 +291,11 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 82 "myLib.h"
+void goToSeer();
+void seerFunc();
+# 84 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 103 "myLib.h"
+# 105 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -328,12 +340,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 177 "myLib.h"
+# 179 "myLib.h"
 void hideSprites();
-# 203 "myLib.h"
+# 205 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 213 "myLib.h"
+# 215 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -343,11 +355,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 254 "myLib.h"
+# 256 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 290 "myLib.h"
+# 292 "myLib.h"
 typedef void (*ihp)(void);
-# 310 "myLib.h"
+# 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "dialogue.c" 2
 # 1 "dialogue.h" 1

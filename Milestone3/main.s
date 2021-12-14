@@ -301,7 +301,7 @@ goToDialogue:
 	mov	lr, pc
 	bx	r3
 	ldr	r3, [r6]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	mov	r1, #16
 	mov	r0, #124
@@ -311,7 +311,7 @@ goToDialogue:
 	mov	lr, pc
 	bx	r7
 	ldr	r3, [r6]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r3, [r3, #84]
 	cmp	r3, r4
@@ -361,7 +361,7 @@ dialogue:
 .L32:
 	ldr	r4, .L74+8
 	ldr	r2, [r4]
-	ldr	r1, [r2, #404]
+	ldr	r1, [r2, #1684]
 	add	ip, r2, r1, lsl #5
 	ldr	ip, [ip, #84]
 	cmp	ip, #0
@@ -394,7 +394,7 @@ dialogue:
 .L33:
 	ldr	r4, .L74+8
 	ldr	r2, [r4]
-	ldr	r1, [r2, #404]
+	ldr	r1, [r2, #1684]
 	tst	r3, #1
 	add	r3, r2, r1, lsl #5
 	ldr	r3, [r3, #84]
@@ -424,11 +424,11 @@ dialogue:
 	ldr	r3, [ip, #96]
 	cmp	r3, #0
 	beq	.L73
-	ldr	r3, [r2, #408]
-	str	r3, [r2, #404]
+	mov	r3, #0
+	str	r3, [r2, #1684]
 	bl	goToGame
 	ldr	r3, [r4]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r3, [r3, #84]
 	b	.L37
@@ -448,16 +448,16 @@ dialogue:
 	mov	lr, pc
 	bx	r3
 	ldr	r3, [r4]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r3, [r3, #84]
 	b	.L37
 .L73:
 	add	r1, r1, #1
-	str	r1, [r2, #404]
+	str	r1, [r2, #1684]
 	bl	goToDialogue
 	ldr	r3, [r4]
-	ldr	r2, [r3, #404]
+	ldr	r2, [r3, #1684]
 	add	r3, r3, r2, lsl #5
 	ldr	r3, [r3, #84]
 	b	.L37
@@ -884,7 +884,10 @@ start:
 	ldr	r3, .L124+76
 	mov	lr, pc
 	bx	r3
-	bl	goToGame
+	ldr	r3, .L124+80
+	mov	r0, #100
+	mov	lr, pc
+	bx	r3
 	ldr	r3, .L124+8
 	ldrh	r3, [r3]
 	b	.L109
@@ -911,6 +914,7 @@ start:
 	.word	trackA_length
 	.word	trackA_data
 	.word	playSoundA
+	.word	glitchDMA
 	.size	start, .-start
 	.section	.text.startup,"ax",%progbits
 	.align	2
