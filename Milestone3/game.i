@@ -1643,6 +1643,7 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
@@ -1652,6 +1653,7 @@ void initStart();
 
 void animateStart();
 void animateLevel0();
+void unlockGateLevel0();
 
 void initInstructions();
 
@@ -1659,6 +1661,7 @@ void initPause();
 
 void initLevel0();
 void initLevel1();
+void initLevel2();
 # 14 "game.c" 2
 # 1 "npcs.h" 1
 extern NPC cloud;
@@ -1681,6 +1684,7 @@ NPC* currentTarget;
 LEVEL* currentLevel;
 LEVEL level0;
 LEVEL level1;
+LEVEL level2;
 PLAYER player;
 
 
@@ -1697,8 +1701,6 @@ void initGame() {
     currentLevel = &level0;
     initPlayer();
 
-    gateUnlocked = 0;
-
 }
 
 void updateGame() {
@@ -1710,8 +1712,14 @@ void updateGame() {
     }
     checkForConvoBools();
 
-    if (player.worldRow < 5) {
-        goToWin();
+    if (player.worldRow < 60 && currentLevel == &level0) {
+        for (int i = 0; i < 5; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level2;
+        goToGame();
+        loadLevel(currentLevel, 1);
     }
 
 }
@@ -1762,6 +1770,7 @@ void initLevels() {
     initPause();
     initLevel0();
     initLevel1();
+    initLevel2();
 
 }
 
@@ -1791,6 +1800,7 @@ void initPlayer() {
 
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
+    (*(volatile unsigned short *)0x4000000) = 0 | (1 << 12) | (1 << 8);
     (*(volatile unsigned short *)0x4000008) = level->levelSize | (0 << 7) | ((0) << 2) | ((30) << 8);
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
@@ -1798,6 +1808,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
 
     if (level->midgroundTiles) {
+        (*(volatile unsigned short *)0x4000000) |= (1 << 9);
         (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
         DMANow(3, level->midgroundTiles, &((charblock *)0x6000000)[1], level->midgroundTilesLen / 2);
         DMANow(3, level->midgroundMap, &((screenblock *)0x6000000)[28], level->midgroundMapLen / 2);
@@ -1805,12 +1816,13 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     }
 
     if (level->backgroundTiles) {
+        (*(volatile unsigned short *)0x4000000) |= (1 << 10);
         (*(volatile unsigned short *)0x400000C) = level->levelSize | (0 << 7) | ((2) << 2) | ((26) << 8);
         DMANow(3, level->backgroundTiles, &((charblock *)0x6000000)[2], level->backgroundTilesLen / 2);
         DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
         DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
     }
-# 162 "game.c"
+# 171 "game.c"
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
         player.worldRow = level->playerWorldSpawnRow;
@@ -1818,11 +1830,18 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         vOff = level->initVOff;
     }
 
+    for (int i = 0; i < 5; i++) {
+        loadNPC(level->npcs[i]);
+    }
+
 }
 
 void loadNPC(NPC* npc) {
 
-    npc->active = 1;
+    if (npc) {
+        npc->active = 1;
+        npc->hide = 0;
+    }
 
 }
 
@@ -1897,7 +1916,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 256 "game.c"
+# 272 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {

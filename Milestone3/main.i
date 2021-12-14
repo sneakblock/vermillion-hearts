@@ -1408,7 +1408,7 @@ typedef struct
 
     int recognizesNPCS;
 
-    struct NPC* recognizedNPCS[3];
+    char* recognizedNPCS[3];
 
     int recognizedAindex;
     int recognizedBindex;
@@ -1673,6 +1673,7 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
@@ -1682,6 +1683,7 @@ void initStart();
 
 void animateStart();
 void animateLevel0();
+void unlockGateLevel0();
 
 void initInstructions();
 
@@ -1689,6 +1691,7 @@ void initPause();
 
 void initLevel0();
 void initLevel1();
+void initLevel2();
 # 30 "main.c" 2
 
 # 1 "seerscreen.h" 1

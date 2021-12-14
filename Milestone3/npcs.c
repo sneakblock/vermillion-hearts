@@ -1,11 +1,13 @@
 #include "game.h"
 #include "myLib.h"
 #include "npcs.h"
+#include "levels.h"
 
 #include "talkingheadtest.h"
 #include "seer.h"
 #include "knight.h"
 #include "level0collisionmap2.h"
+#include "level0foreground2.h"
 
 // NPC npcs[];
 
@@ -109,27 +111,34 @@ NPC* initSeer() {
     seer.name = "Seer:";
 
     DIALOGUE greeting;
-    greeting.string = "When I was a boy, these flickering crags were diving clear rivers and high green blades of sweet smelling grass.";
+    greeting.string = "When I was a boy, these flickering crags were diving clear rivers and high sheer plains of sweet grass that quivered.";
     greeting.promptsChoice = 0;
     greeting.endsConversation = 0;
     greeting.satisfiesBool = 0;
 
     DIALOGUE greeting2;
-    greeting2.string = "A young hero would come again and again to us, to let us drink our dreams from the cup his long tales. He would always move on.";
+    greeting2.string = "A young hero would come again and again, to let us drink our dreams from his cup of warm gin.";
     greeting2.promptsChoice = 0;
     greeting2.endsConversation = 0;
     greeting2.satisfiesBool = 0;
 
     DIALOGUE end;
-    end.string = "My brother, older than I. He, even as a boy, saw all the colors of the world. Find him.";
+    end.string = "I see what you are and I see the real you, I have a presentiment of our ending, for all Seers do.";
     end.promptsChoice = 0;
-    end.endsConversation = 1;
+    end.endsConversation = 0;
     end.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "The song of emulsion, that long frozen note. You see that we all hang, like puppets, from ropes.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
     
 
     seer.dialogues[0] = greeting;
     seer.dialogues[1] = greeting2;
     seer.dialogues[2] = end;
+    seer.dialogues[3] = end2;
     seer.dialoguesIndex = 0;
     seer.postConvoIndex = 0;
 
@@ -146,7 +155,7 @@ NPC* initSeer() {
 
 void openGate() {
 
-    currentLevel->collisionMap = level0collisionmap2Bitmap;
+    unlockGateLevel0();
 
 }
 
@@ -192,7 +201,7 @@ NPC* initKnight() {
     needToSee.satisfiesBool = 0;
 
     DIALOGUE whoAmI;
-    whoAmI.string = "Back away from me, child of the static mist. You, like the rest, are an artifact of the failing silver sun.";
+    whoAmI.string = "Back away from me, child of the static mist. You are an artifact of the failing silver sun.";
     whoAmI.choiceA = "Silver sun...";
     whoAmI.choiceB = "I am a man.";
     whoAmI.choiceAIndex = 3;
@@ -245,14 +254,14 @@ NPC* initKnight() {
     knightFollow.string = "Her decree was that none would come back from this place. Have you forgotten your vows?";
     knightFollow.promptsChoice = 1;
     knightFollow.choiceA = "We have slain the source of the rot.";
-    knightFollow.choiceB = "I am to investigate the death of the silversun.";
+    knightFollow.choiceB = "The silversun can be saved.";
     knightFollow.choiceAIndex = 10;
     knightFollow.choiceBIndex = 11;
     knightFollow.endsConversation = 0;
     knightFollow.satisfiesBool = 0;
 
     DIALOGUE knightEnd;
-    knightEnd.string = "Away, spectre! There is no slaying atrophy.";
+    knightEnd.string = "Away, spectre! There is no slaying atrophy!";
     knightEnd.promptsChoice = 0;
     knightEnd.endsConversation = 1;
     knightEnd.satisfiesBool = 0;
@@ -261,7 +270,7 @@ NPC* initKnight() {
     knightUnlock.string = "I understand. What might rekindle our memory's fire?";
     knightUnlock.promptsChoice = 1;
     knightUnlock.choiceA = "I am not at liberty to say.";
-    knightUnlock.choiceB = "We must bring her to Emulsion.";
+    knightUnlock.choiceB = "A thing called Emulsion.";
     knightUnlock.choiceAIndex = 12;
     knightUnlock.choiceBIndex = 12;
     knightUnlock.endsConversation = 0;

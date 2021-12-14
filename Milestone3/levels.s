@@ -829,6 +829,93 @@ initLevel0:
 	.word	animateLevel0
 	.word	level0AniTimer
 	.size	initLevel0, .-initLevel0
+	.align	2
+	.global	initLevel2
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initLevel2, %function
+initLevel2:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r0, #10
+	push	{r4, r5, r6, lr}
+	mov	lr, #64
+	mov	r6, #118
+	mov	r5, #460
+	mov	r4, #0
+	mov	r2, #256
+	mov	ip, #2048
+	mov	r1, #4
+	ldr	r3, .L71
+	str	r0, [r3, #24]
+	ldr	r0, .L71+4
+	str	r0, [r3, #28]
+	ldr	r0, .L71+8
+	str	lr, [r3, #32]
+	str	r0, [r3, #40]
+	ldr	lr, .L71+12
+	ldr	r0, .L71+16
+	str	r6, [r3, #16]
+	str	r5, [r3, #20]
+	str	r4, [r3]
+	str	lr, [r3, #44]
+	str	ip, [r3, #36]
+	str	r0, [r3, #80]
+	str	r1, [r3, #84]
+	str	r2, [r3, #8]
+	str	r2, [r3, #12]
+	pop	{r4, r5, r6, lr}
+	bx	lr
+.L72:
+	.align	2
+.L71:
+	.word	level2
+	.word	347
+	.word	level2foregroundTiles
+	.word	level2foregroundMap
+	.word	level2foregroundPal
+	.size	initLevel2, .-initLevel2
+	.align	2
+	.global	unlockGateLevel0
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	unlockGateLevel0, %function
+unlockGateLevel0:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r1, #7360
+	mov	ip, #4096
+	push	{r4, lr}
+	ldr	r3, .L75
+	ldr	r2, .L75+4
+	ldr	lr, .L75+8
+	ldr	r0, .L75+12
+	str	r1, [r3, #32]
+	ldr	r1, .L75+16
+	str	r2, [r3, #40]
+	ldr	r2, .L75+20
+	str	lr, [r3, #44]
+	str	ip, [r3, #36]
+	str	r0, [r3, #4]
+	str	r3, [r1]
+	mov	lr, pc
+	bx	r2
+	pop	{r4, lr}
+	bx	lr
+.L76:
+	.align	2
+.L75:
+	.word	level0
+	.word	level0foreground2Tiles
+	.word	level0foreground2Map
+	.word	level0collisionmap2Bitmap
+	.word	currentLevel
+	.word	goToGame
+	.size	unlockGateLevel0, .-unlockGateLevel0
 	.comm	movingUp,4,4
 	.comm	sunAniTimer,4,4
 	.comm	textAniTimer,4,4
@@ -836,6 +923,7 @@ initLevel0:
 	.comm	vOffBG1,4,4
 	.comm	vOffBG0,4,4
 	.comm	level0AniTimer,4,4
+	.comm	level2,136,4
 	.comm	level0,136,4
 	.comm	pauseLevel,136,4
 	.comm	instructionsLevel,136,4

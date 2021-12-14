@@ -20,6 +20,10 @@
 #include "level0midground.h"
 #include "level0foreground.h"
 #include "level0collisionmap.h"
+#include "level0foreground2.h"
+#include "level0collisionmap2.h"
+
+#include "level2foreground.h"
 
 #include "instructionsforeground.h"
 
@@ -36,6 +40,7 @@ LEVEL instructionsLevel;
 LEVEL pauseLevel;
 
 LEVEL level0;
+LEVEL level2;
 int level0AniTimer;
 
 int vOffBG0;
@@ -334,6 +339,81 @@ void initLevel0() {
 
     level0.animFunc = animateLevel0;
     level0AniTimer = 0;
+}
+
+void initLevel2() {
+
+    // ========= PLAYER ==========
+    level2.playerWorldSpawnCol = 118;
+    level2.playerWorldSpawnRow = 460;
+    level2.initHOff = 10;
+    level2.initVOff = 347;
+    
+
+    // ============= SIZE ===============
+    level2.levelSize = BG_SIZE_SMALL;
+    level2.worldPixelWidth = 256;
+    level2.worldPixelHeight = 256;
+    // level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+
+    // // ============== NPCS =================
+    // level0.numNPCS = 3;
+    // level0.npcs[0] = initSeer();
+    // level0.npcs[1] = initPlantMerchant();
+    // level0.npcs[2] = initKnight();
+
+
+    // =========== FOREGROUND ============
+
+    level2.foregroundTiles = level2foregroundTiles;
+    level2.foregroundMap = level2foregroundMap;
+    level2.foregroundTilesLen = level2foregroundTilesLen;
+    level2.foregroundMapLen = level2foregroundMapLen;
+
+    level2.foregroundPal = level2foregroundPal;
+    level2.foregroundPalLen = level2foregroundPalLen;
+
+    // // =========== MIDGROUND ============
+    
+    // level0.midgroundTiles = level0midgroundTiles;
+    // level0.midgroundMap = level0midgroundMap;
+    // level0.midgroundTilesLen = level0midgroundTilesLen;
+    // level0.midgroundMapLen = level0midgroundMapLen;
+
+    // level0.midgroundPal = level0midgroundPal;
+    // level0.midgroundPalLen = level0midgroundPalLen;
+
+    // // =========== BACKGROUND ============
+    
+    // level0.backgroundTiles = level0backgroundTiles;
+    // level0.backgroundMap = level0backgroundMap;
+    // level0.backgroundTilesLen = level0backgroundTilesLen;
+    // level0.backgroundMapLen = level0backgroundMapLen;
+    
+    // level0.backgroundPal = level0backgroundPal;
+    // level0.backgroundPalLen = level0backgroundPalLen;
+
+    // // =================== ANIM =====================
+
+    // level0.animFunc = animateLevel0;
+    // level0AniTimer = 0;
+
+}
+
+void unlockGateLevel0() {
+
+    level0.foregroundTiles = level0foreground2Tiles;
+    level0.foregroundTilesLen = level0foreground2TilesLen;
+
+    level0.foregroundMap = level0foreground2Map;
+    level0.foregroundMapLen = level0foreground2MapLen;
+
+    level0.collisionMap = level0collisionmap2Bitmap;
+
+    currentLevel = &level0;
+
+    goToGame();
+
 }
 
 void animateLevel0() {

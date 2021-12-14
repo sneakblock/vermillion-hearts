@@ -21,17 +21,16 @@ openGate:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	ldr	r3, .L3
-	ldr	r2, .L3+4
-	ldr	r3, [r3]
-	str	r2, [r3, #4]
+	push	{r4, lr}
+	ldr	r3, .L4
+	mov	lr, pc
+	bx	r3
+	pop	{r4, lr}
 	bx	lr
-.L4:
+.L5:
 	.align	2
-.L3:
-	.word	currentLevel
-	.word	level0collisionmap2Bitmap
+.L4:
+	.word	unlockGateLevel0
 	.size	openGate, .-openGate
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
@@ -50,15 +49,15 @@ initCloud:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	mov	r3, #0
-	ldr	r0, .L6
-	ldr	r2, .L6+4
+	ldr	r0, .L7
+	ldr	r2, .L7+4
 	str	r3, [r0, #60]
 	str	r3, [r0, #64]
 	str	r2, [r0, #1728]
 	bx	lr
-.L7:
+.L8:
 	.align	2
-.L6:
+.L7:
 	.word	cloud
 	.word	.LC0
 	.size	initCloud, .-initCloud
@@ -106,23 +105,23 @@ initPlantMerchant:
 	mov	r1, #2
 	mov	lr, #73
 	mov	ip, #168
-	ldr	r0, .L10
+	ldr	r0, .L11
 	str	r4, [r0, #56]
-	ldr	r4, .L10+4
+	ldr	r4, .L11+4
 	str	r4, [r0, #72]
-	ldr	r4, .L10+8
+	ldr	r4, .L11+8
 	str	r4, [r0, #76]
-	ldr	r4, .L10+12
+	ldr	r4, .L11+12
 	str	r4, [r0, #1728]
-	ldr	r4, .L10+16
+	ldr	r4, .L11+16
 	str	r4, [r0, #104]
-	ldr	r4, .L10+20
+	ldr	r4, .L11+20
 	str	r4, [r0, #108]
-	ldr	r4, .L10+24
+	ldr	r4, .L11+24
 	str	r4, [r0, #112]
-	ldr	r4, .L10+28
+	ldr	r4, .L11+28
 	str	r4, [r0, #136]
-	ldr	r4, .L10+32
+	ldr	r4, .L11+32
 	str	r7, [r0, #28]
 	str	r6, [r0, #32]
 	str	r5, [r0, #80]
@@ -155,9 +154,9 @@ initPlantMerchant:
 	str	ip, [r0, #12]
 	pop	{r4, r5, r6, r7, lr}
 	bx	lr
-.L11:
+.L12:
 	.align	2
-.L10:
+.L11:
 	.word	plantMerchant
 	.word	talkingheadtestBitmap
 	.word	talkingheadtestPal
@@ -175,17 +174,20 @@ initPlantMerchant:
 	.align	2
 .LC8:
 	.ascii	"When I was a boy, these flickering crags were divin"
-	.ascii	"g clear rivers and high green blades of sweet smell"
-	.ascii	"ing grass.\000"
+	.ascii	"g clear rivers and high sheer plains of sweet grass"
+	.ascii	" that quivered.\000"
 	.align	2
 .LC9:
-	.ascii	"A young hero would come again and again to us, to l"
-	.ascii	"et us drink our dreams from the cup his long tales."
-	.ascii	" He would always move on.\000"
+	.ascii	"A young hero would come again and again, to let us "
+	.ascii	"drink our dreams from his cup of warm gin.\000"
 	.align	2
 .LC10:
-	.ascii	"My brother, older than I. He, even as a boy, saw al"
-	.ascii	"l the colors of the world. Find him.\000"
+	.ascii	"I see what you are and I see the real you, I have a"
+	.ascii	" presentiment of our ending, for all Seers do.\000"
+	.align	2
+.LC11:
+	.ascii	"The song of emulsion, that long frozen note. You se"
+	.ascii	"e that we all hang, like puppets, from ropes.\000"
 	.text
 	.align	2
 	.global	initSeer
@@ -197,39 +199,39 @@ initSeer:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, lr}
 	mov	r2, #1
-	mov	lr, #3
+	push	{r4, r5, r6, lr}
+	mov	lr, #512
 	mov	r3, #0
 	mov	r6, #8
 	mov	r5, #16
-	mov	r4, #512
+	mov	r4, #3
 	mov	ip, #242
 	mov	r1, #174
-	ldr	r0, .L14
+	ldr	r0, .L15
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
 	str	r2, [r0, #60]
-	str	r2, [r0, #160]
-	str	lr, [r0, #56]
-	ldr	r2, .L14+4
-	ldr	lr, .L14+8
-	str	r2, [r0, #76]
-	str	lr, [r0, #72]
-	ldr	r2, .L14+12
-	ldr	lr, .L14+16
-	str	r2, [r0, #104]
-	str	lr, [r0, #1728]
-	ldr	r2, .L14+20
-	ldr	lr, .L14+24
+	str	r2, [r0, #192]
+	ldr	r2, .L15+4
+	str	lr, [r0, #80]
+	str	r2, [r0, #72]
+	ldr	lr, .L15+8
+	ldr	r2, .L15+12
+	str	lr, [r0, #76]
+	str	r2, [r0, #1728]
+	ldr	lr, .L15+16
+	ldr	r2, .L15+20
+	str	lr, [r0, #104]
+	str	r2, [r0, #136]
+	ldr	lr, .L15+24
+	ldr	r2, .L15+28
 	str	r6, [r0, #28]
 	str	r5, [r0, #32]
-	str	r4, [r0, #80]
-	str	lr, [r0, #136]
-	str	r2, [r0, #168]
-	str	ip, [r0, #16]
-	str	r1, [r0, #12]
+	str	r4, [r0, #56]
+	str	lr, [r0, #168]
+	str	r2, [r0, #200]
 	str	r3, [r0, #36]
 	str	r3, [r0, #44]
 	str	r3, [r0, #52]
@@ -241,107 +243,112 @@ initSeer:
 	str	r3, [r0, #128]
 	str	r3, [r0, #132]
 	str	r3, [r0, #148]
+	str	r3, [r0, #160]
 	str	r3, [r0, #164]
+	str	r3, [r0, #180]
+	str	r3, [r0, #196]
 	str	r3, [r0, #1684]
 	str	r3, [r0, #1688]
 	str	r3, [r0, #1780]
+	str	ip, [r0, #16]
+	str	r1, [r0, #12]
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L15:
+.L16:
 	.align	2
-.L14:
+.L15:
 	.word	seer
-	.word	seerPal
 	.word	seerBitmap
-	.word	.LC8
+	.word	seerPal
 	.word	.LC7
-	.word	.LC10
+	.word	.LC8
 	.word	.LC9
+	.word	.LC10
+	.word	.LC11
 	.size	initSeer, .-initSeer
 	.section	.rodata.str1.4
 	.align	2
-.LC11:
+.LC12:
 	.ascii	"Knight:\000"
 	.align	2
-.LC12:
+.LC13:
 	.ascii	"Away.\000"
 	.align	2
-.LC13:
+.LC14:
 	.ascii	"Who am I?\000"
 	.align	2
-.LC14:
+.LC15:
 	.ascii	"I need to see the Dutchess.\000"
 	.align	2
-.LC15:
+.LC16:
 	.ascii	"I have instructions to let the protagonist pass. Yo"
 	.ascii	"u are not that young man, wretch.\000"
 	.align	2
-.LC16:
-	.ascii	"Back away from me, child of the static mist. You, l"
-	.ascii	"ike the rest, are an artifact of the failing silver"
-	.ascii	" sun.\000"
-	.align	2
 .LC17:
-	.ascii	"Silver sun...\000"
+	.ascii	"Back away from me, child of the static mist. You ar"
+	.ascii	"e an artifact of the failing silver sun.\000"
 	.align	2
 .LC18:
-	.ascii	"I am a man.\000"
+	.ascii	"Silver sun...\000"
 	.align	2
 .LC19:
+	.ascii	"I am a man.\000"
+	.align	2
+.LC20:
 	.ascii	"In Royal Court they know of it. A silver disk, it s"
 	.ascii	"ends energy at intervals, it is the clock of the wo"
 	.ascii	"rld. It is slowing, now. The Dutchess seeks a solut"
 	.ascii	"ion.\000"
 	.align	2
-.LC20:
+.LC21:
 	.ascii	"You may speak true. Perhaps, when things were right"
 	.ascii	", you were. Though you are not any longer.\000"
 	.align	2
-.LC21:
+.LC22:
 	.ascii	"Morwenna, I remember how you threw rose petals like"
 	.ascii	" rubies across my path at my knighting.\000"
 	.align	2
-.LC22:
+.LC23:
 	.ascii	"I hope the static comes over us quickly, now. I can"
 	.ascii	"not bear to turn you away, though I must.\000"
 	.align	2
-.LC23:
+.LC24:
 	.ascii	"Close your eyes and let the last scents of summer c"
 	.ascii	"ome over you. I am sorry.\000"
 	.align	2
-.LC24:
+.LC25:
 	.ascii	"...Yes?\000"
 	.align	2
-.LC25:
+.LC26:
 	.ascii	"On orders from the Dutchess to pass.\000"
 	.align	2
-.LC26:
+.LC27:
 	.ascii	"Stand aside.\000"
 	.align	2
-.LC27:
+.LC28:
 	.ascii	"Her decree was that none would come back from this "
 	.ascii	"place. Have you forgotten your vows?\000"
 	.align	2
-.LC28:
+.LC29:
 	.ascii	"We have slain the source of the rot.\000"
 	.align	2
-.LC29:
-	.ascii	"I am to investigate the death of the silversun.\000"
-	.align	2
 .LC30:
-	.ascii	"Away, spectre! There is no slaying atrophy.\000"
+	.ascii	"The silversun can be saved.\000"
 	.align	2
 .LC31:
+	.ascii	"Away, spectre! There is no slaying atrophy!\000"
+	.align	2
+.LC32:
 	.ascii	"I understand. What might rekindle our memory's fire"
 	.ascii	"?\000"
 	.align	2
-.LC32:
+.LC33:
 	.ascii	"I am not at liberty to say.\000"
 	.align	2
-.LC33:
-	.ascii	"We must bring her to Emulsion.\000"
-	.align	2
 .LC34:
+	.ascii	"A thing called Emulsion.\000"
+	.align	2
+.LC35:
 	.ascii	"Go safely. I am blessed by her today.\000"
 	.text
 	.align	2
@@ -362,27 +369,27 @@ initKnight:
 	mov	r1, #3
 	mov	lr, #8
 	mov	fp, #512
-	ldr	r0, .L18
+	ldr	r0, .L19
 	mov	r4, #9
 	mov	r8, #4
 	str	r9, [r0, #92]
-	ldr	r9, .L18+4
+	ldr	r9, .L19+4
 	str	r9, [r0, #1700]
-	ldr	r9, .L18+8
+	ldr	r9, .L19+8
 	str	r9, [r0, #1704]
-	ldr	r9, .L18+12
+	ldr	r9, .L19+12
 	str	r9, [r0, #104]
-	ldr	r9, .L18+16
+	ldr	r9, .L19+16
 	str	r9, [r0, #108]
-	ldr	r9, .L18+20
+	ldr	r9, .L19+20
 	str	r10, [r0, #32]
 	str	r9, [r0, #112]
-	ldr	r10, .L18+24
-	ldr	r9, .L18+28
+	ldr	r10, .L19+24
+	ldr	r9, .L19+28
 	str	r10, [r0, #72]
 	str	r9, [r0, #168]
-	ldr	r10, .L18+32
-	ldr	r9, .L18+36
+	ldr	r10, .L19+32
+	ldr	r9, .L19+36
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
@@ -407,23 +414,23 @@ initKnight:
 	str	r9, [r0, #1728]
 	str	r9, [r0, #1708]
 	str	r1, [r0, #120]
-	ldr	r1, .L18+40
+	ldr	r1, .L19+40
 	str	r1, [r0, #136]
-	ldr	r1, .L18+44
+	ldr	r1, .L19+44
 	str	r1, [r0, #140]
-	ldr	r1, .L18+48
+	ldr	r1, .L19+48
 	str	r1, [r0, #144]
-	ldr	r1, .L18+52
+	ldr	r1, .L19+52
 	str	r1, [r0, #200]
-	ldr	r1, .L18+56
+	ldr	r1, .L19+56
 	str	r1, [r0, #232]
-	ldr	r1, .L18+60
+	ldr	r1, .L19+60
 	str	r1, [r0, #264]
-	ldr	r1, .L18+64
+	ldr	r1, .L19+64
 	str	r1, [r0, #296]
-	ldr	r1, .L18+68
+	ldr	r1, .L19+68
 	str	r1, [r0, #328]
-	ldr	r1, .L18+72
+	ldr	r1, .L19+72
 	str	r3, [r0, #128]
 	str	r3, [r0, #132]
 	str	r3, [r0, #180]
@@ -457,17 +464,17 @@ initKnight:
 	str	r3, [r0, #468]
 	str	r3, [r0, #1712]
 	str	r3, [r0, #1688]
-	ldr	r3, .L18+76
+	ldr	r3, .L19+76
 	str	r3, [r0, #368]
-	ldr	r3, .L18+80
+	ldr	r3, .L19+80
 	str	r3, [r0, #392]
-	ldr	r3, .L18+84
+	ldr	r3, .L19+84
 	str	r3, [r0, #400]
-	ldr	r3, .L18+88
+	ldr	r3, .L19+88
 	str	r3, [r0, #456]
-	ldr	r3, .L18+92
+	ldr	r3, .L19+92
 	str	r3, [r0, #464]
-	ldr	r3, .L18+96
+	ldr	r3, .L19+96
 	str	r3, [r0, #1724]
 	mov	r3, #147
 	mov	r7, #10
@@ -482,14 +489,14 @@ initKnight:
 	str	r2, [r0, #480]
 	str	r2, [r0, #484]
 	str	r2, [r0, #1780]
-	ldr	r2, .L18+100
+	ldr	r2, .L19+100
 	str	r2, [r0, #396]
-	ldr	r2, .L18+104
+	ldr	r2, .L19+104
 	str	r2, [r0, #424]
-	ldr	r2, .L18+108
-	ldr	r1, .L18+112
+	ldr	r2, .L19+108
+	ldr	r1, .L19+112
 	str	r2, [r0, #460]
-	ldr	r2, .L18+116
+	ldr	r2, .L19+116
 	str	lr, [r0, #1720]
 	str	r7, [r0, #376]
 	str	r6, [r0, #380]
@@ -501,20 +508,19 @@ initKnight:
 	str	r3, [r0, #12]
 	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L19:
+.L20:
 	.align	2
-.L18:
+.L19:
 	.word	knight
 	.word	.LC0
 	.word	.LC1
-	.word	.LC12
 	.word	.LC13
 	.word	.LC14
-	.word	knightBitmap
 	.word	.LC15
-	.word	knightPal
-	.word	.LC11
+	.word	knightBitmap
 	.word	.LC16
+	.word	knightPal
+	.word	.LC12
 	.word	.LC17
 	.word	.LC18
 	.word	.LC19
@@ -523,17 +529,18 @@ initKnight:
 	.word	.LC22
 	.word	.LC23
 	.word	.LC24
-	.word	.LC26
+	.word	.LC25
 	.word	.LC27
-	.word	.LC29
-	.word	.LC31
-	.word	.LC33
-	.word	openGate
 	.word	.LC28
 	.word	.LC30
 	.word	.LC32
-	.word	.LC25
 	.word	.LC34
+	.word	openGate
+	.word	.LC29
+	.word	.LC31
+	.word	.LC33
+	.word	.LC26
+	.word	.LC35
 	.size	initKnight, .-initKnight
 	.comm	knight,1784,4
 	.comm	seer,1784,4

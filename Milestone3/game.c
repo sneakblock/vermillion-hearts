@@ -19,6 +19,7 @@ NPC* currentTarget;
 LEVEL* currentLevel;
 LEVEL level0;
 LEVEL level1;
+LEVEL level2;
 PLAYER player;
 
 //NPC stuff Milestone 3
@@ -35,8 +36,6 @@ void initGame() {
     currentLevel = &level0;
     initPlayer();
 
-    gateUnlocked = 0;
-
 }
 
 void updateGame() {
@@ -48,8 +47,14 @@ void updateGame() {
     }
     checkForConvoBools();
 
-    if (player.worldRow < 5) {
-        goToWin();
+    if (player.worldRow < 60 && currentLevel == &level0) {
+        for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level2;
+        goToGame();
+        loadLevel(currentLevel, 1);
     }
 
 }
@@ -100,6 +105,7 @@ void initLevels() {
     initPause();
     initLevel0();
     initLevel1();
+    initLevel2();
 
 }
 
@@ -129,6 +135,7 @@ void initPlayer() {
 
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
+    REG_DISPCTL = MODE0 | SPRITE_ENABLE | BG0_ENABLE;
     REG_BG0CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
@@ -136,6 +143,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     
 
     if (level->midgroundTiles) {
+        REG_DISPCTL |= BG1_ENABLE;
         REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
         DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
         DMANow(3, level->midgroundMap, &SCREENBLOCK[28], level->midgroundMapLen / 2);
@@ -143,6 +151,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     }
 
     if (level->backgroundTiles) {
+        REG_DISPCTL |= BG2_ENABLE;
         REG_BG2CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
         DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
         DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
@@ -166,11 +175,18 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         vOff = level->initVOff;
     }
 
+    for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+        loadNPC(level->npcs[i]);
+    }
+
 }
 
 void loadNPC(NPC* npc) {
 
-    npc->active = 1;
+    if (npc) {
+        npc->active = 1;
+        npc->hide = 0;
+    }
 
 }
 
