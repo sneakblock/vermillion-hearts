@@ -27,6 +27,7 @@
 
 #include "sound.h"
 #include "trackA.h"
+#include "trackB.h"
 
 #include "npcs.h"
 
@@ -47,6 +48,65 @@ int sunAniTimer;
 #define SUN_ANI_FRAMES_TO_WAIT 10
 int movingUp;
 
+void glitchPalette(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        // Interesting glitch pulverizes all colors.
+        // PALETTE[rand() % 16] = PALETTE[rand() % 16];
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = PALETTE[a];
+
+        PALETTE[a] = PALETTE[b];
+
+        PALETTE[b] = temp;
+
+        }
+
+    }
+
+    if (rand() % 10 > 1) {
+        loadLevel(currentLevel, 0);
+    }
+}
+
+void glitchDMA(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        DMANow(3, rand(), &CHARBLOCK[rand() % 5], rand);
+
+        playSoundA(&trackA_data[rand() % trackA_length], 1, 0);
+
+    }
+
+    goToGame();
+}
+
+void crushPalette(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        
+        PALETTE[rand() % 16] = PALETTE[rand() % 16];
+
+        }
+
+    }
+
+    loadLevel(currentLevel, 0);
+    
+}
 
 void initStart() {
 
@@ -298,7 +358,7 @@ void animateLevel0() {
         stopSound();
 
         int delay = 0;
-        while (delay < 50) {
+        while (delay < 10) {
             playSoundA(&trackA_data[randInt % trackA_length], 1, 0);
             waitForVBlank();
             delay++;

@@ -1260,9 +1260,11 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 82 "myLib.h"
+void goToSeer();
+void seerFunc();
+# 84 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 103 "myLib.h"
+# 105 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1307,12 +1309,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 177 "myLib.h"
+# 179 "myLib.h"
 void hideSprites();
-# 203 "myLib.h"
+# 205 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 213 "myLib.h"
+# 215 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1322,11 +1324,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 254 "myLib.h"
+# 256 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 290 "myLib.h"
+# 292 "myLib.h"
 typedef void (*ihp)(void);
-# 310 "myLib.h"
+# 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 11 "main.c" 2
 
@@ -1336,7 +1338,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 30 "game.h"
+# 29 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1361,6 +1363,7 @@ typedef struct {
 
 
 typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 
 typedef struct
 {
@@ -1426,7 +1429,8 @@ typedef struct
 
 
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -1509,6 +1513,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    unsigned short* masterPal;
 
     anim_func animFunc;
 
@@ -1660,6 +1666,10 @@ extern LEVEL pauseLevel;
 
 extern LEVEL level0;
 
+void glitchPalette(int duration);
+void glitchDMA(int duration);
+void crushPalette(int duration);
+
 void initStart();
 
 void animateStart();
@@ -1673,6 +1683,14 @@ void initLevel0();
 void initLevel1();
 # 30 "main.c" 2
 
+# 1 "seerscreen.h" 1
+# 21 "seerscreen.h"
+extern const unsigned short seerscreenTiles[1616];
+
+
+extern const unsigned short seerscreenMap[1024];
+# 32 "main.c" 2
+
 
 void initialize();
 
@@ -1684,6 +1702,7 @@ enum
     START,
     GAME,
     SPEAKING,
+
     PAUSE,
     WIN,
     INSTRUCTIONS,
@@ -1704,6 +1723,12 @@ int dialogueTypeRow = 12;
 char* source;
 char* clone;
 int index;
+
+int selectedPalColor;
+int selectedPalRow;
+int selectedPalCol;
+int swapIndex1;
+int swapIndex2;
 
 int main()
 {
@@ -1727,6 +1752,9 @@ int main()
         case SPEAKING:
             dialogue();
             break;
+
+
+
         case PAUSE:
             pause();
             break;
@@ -1750,6 +1778,10 @@ void initialize()
 
     setupInterrupts();
     setupSounds();
+
+    selectedPalColor = 0;
+    selectedPalCol = 0;
+    selectedPalRow = 0;
 
     goToStart();
 }
@@ -1853,10 +1885,11 @@ void goToGame() {
 
     }
 
-    if (rand() % 10 > 1) {
-        loadLevel(currentLevel, 0);
-    }
 
+
+
+
+    loadLevel(currentLevel, 0);
 
     state = GAME;
 
@@ -1938,7 +1971,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 304 "main.c"
+# 321 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
     loadLevel(&pauseLevel, 0);

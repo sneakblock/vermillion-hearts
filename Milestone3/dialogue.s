@@ -45,7 +45,7 @@ drawDialogueUI:
 	bx	r7
 	ldr	r3, [r4]
 .L2:
-	ldr	r2, [r3, #416]
+	ldr	r2, [r3, #420]
 	cmp	r2, #0
 	beq	.L3
 	mov	r3, #1
@@ -74,7 +74,7 @@ drawDialogueUI:
 	bx	r5
 	ldr	r3, [r4]
 .L4:
-	ldr	r2, [r3, #416]
+	ldr	r2, [r3, #420]
 	cmp	r2, #0
 	beq	.L1
 	mov	r3, #1

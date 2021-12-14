@@ -9,6 +9,7 @@
 
 // NPC npcs[];
 
+NPC cloud;
 NPC plantMerchant;
 NPC seer;
 NPC knight;
@@ -19,6 +20,12 @@ NPC knight;
 //     initSeer();
     
 // }
+
+NPC* initCloud() {
+    cloud.gameSpriteTileIDx = 0;
+    cloud.gameSpriteTileIDy = 0;
+    return &cloud;
+}
 
 NPC* initPlantMerchant() {
 
@@ -146,7 +153,10 @@ NPC* initSeer() {
     seer.worldCol = 242;
     seer.worldRow = 174;
 
-    seer.convoFunc = openGate;
+    // seer.convoFunc = openGate;
+    seer.isStealable = 1;
+    // seer.abilityFunc = goToSeer;
+
 
     return &seer;
 }
@@ -225,3 +235,4 @@ NPC* initKnight() {
 
     return &knight;
 }
+

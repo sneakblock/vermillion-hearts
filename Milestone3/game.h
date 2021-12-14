@@ -4,7 +4,6 @@ enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 enum {DOWN, UP, LEFT, RIGHT};
 
 
-
 // &*&*&*&&*&*&*&*&&*&&*&*&*&*&*&*&*&* GLITCHING *&&&^^^^&^&^&&^**&*&*&*&*&*&*&*&*&*&*%%&
 #define NUM_PALETTES 3
 
@@ -51,6 +50,7 @@ typedef struct {
 
 
 typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 // Generic struct for an NPC
 typedef struct
 {
@@ -116,7 +116,8 @@ typedef struct
 
     // ================= ABILITIES ==================
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -199,6 +200,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+    
+    unsigned short* masterPal;
 
     anim_func animFunc;
 

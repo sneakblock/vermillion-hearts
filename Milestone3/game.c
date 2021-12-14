@@ -34,7 +34,6 @@ void initGame() {
     initLevels();
     currentLevel = &level0;
     initPlayer();
-    // initNPCS();
 
     gateUnlocked = 0;
 
@@ -90,10 +89,7 @@ void drawGame() {
 
     REG_BG2HOFF = hOff / 3;
     REG_BG2VOFF = vOff / 3;
-    
 
-    // REG_BG2HOFF = hOff / 8;
-    // REG_BG2VOFF = vOff / 8;
 
 }
 
@@ -109,7 +105,6 @@ void initLevels() {
 
 void initPlayer() {
 
-    player.currentEidolon = CLOUD;
     player.rdel = 1;
     player.cdel = 1;
     player.width = 8;
@@ -119,13 +114,16 @@ void initPlayer() {
 
     player.aniCounter = 0;
     player.framesToWait = 20;
-    player.aniState = 0;
+    player.aniState = DOWN;
     player.numStates = 1;
     player.prevAniState = 0;
     player.curFrame = 0;
     player.numFrames = 3;
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
+
+    player.sprites[0] = initCloud();
+    player.currentSprite = player.sprites[0];
 
 }
 
@@ -135,6 +133,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
     DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
+    
 
     if (level->midgroundTiles) {
         REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
@@ -149,6 +148,16 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
         DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
     }
+    
+
+    // if ((level->foregroundPalLen / 2) + (level->midgroundPalLen / 2) +  (level->backgroundPalLen / 2) <= 14) {
+    //     for (int i = (level->foregroundPalLen / 2) + (level->midgroundPalLen / 2) +  (level->backgroundPalLen / 2); i < 15; i++) {
+    //         PALETTE[i] = BLACK;
+    //     }
+    //     PALETTE[14] = WHITE;
+    //     PALETTE[15] = BLACK;
+    // }
+    
 
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
@@ -156,14 +165,6 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-
-    // for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
-    //     if (&level->npcs[i] != NULL) {
-    //         loadNPC(&level->npcs[i]);
-    //     }
-    // }
-
-    // currentLevel = level;
 
 }
 
@@ -177,6 +178,7 @@ void loadNPC(NPC* npc) {
 
 void updatePlayer() {
 
+    int playerCollidingWithNPC = 0;
     player.isMoving = 0;
 
     if(BUTTON_HELD(BUTTON_UP)) {
@@ -244,26 +246,52 @@ void updatePlayer() {
         goToPause();
     }
 
-    // for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-    //     if (collision(player.worldCol, player.worldRow, player.width, player.height, npcs[i].worldCol, npcs[i].worldRow, npcs[i].width, npcs[i].height)) {
-    //         goToLose();
+    // if (BUTTON_PRESSED(BUTTON_R)) {
+    //     if (player.currentSprite->abilityFunc) {
+    //         player.currentSprite->abilityFunc();
+    //         return;
     //     }
-    // }
-
-    // if (player.worldCol == 0) {
-    //     goToWin();
-    // }
-
-    // if (BUTTON_PRESSED(BUTTON_A)) {
-    //     glitchVisuals (40);
     // }
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
         //Temp solution
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height) && BUTTON_PRESSED(BUTTON_A)) {
-            currentTarget = currentLevel->npcs[i];
-            goToDialogue();
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {
+            playerCollidingWithNPC = 1;
+            if (BUTTON_PRESSED(BUTTON_L)) {
+                for (int j = 0; j < NUM_STEALABLE_SPRITES; j++) {
+                    if (player.sprites[j] == currentLevel->npcs[i]) {
+                        break;
+                    } else if (!player.sprites[j]) {
+                        if (currentLevel->npcs[i]->isStealable) {
+                            glitchPalette(500);
+                            glitchDMA(10);
+                            player.sprites[j] = currentLevel->npcs[i];
+                            player.activeSpriteIndex = j;
+                            player.currentSprite = player.sprites[j];
+                            break;
+                        } else {
+                            glitchDMA(50);
+                            break;
+                        }
+                    }
+                }
+            } else if (BUTTON_PRESSED(BUTTON_A) /*&& !BUTTON_HELD(BUTTON_B) && !BUTTON_HELD(BUTTON_L)*/) {
+                currentTarget = currentLevel->npcs[i];
+                goToDialogue();
+            }
+        } 
+    }
+
+    if (!playerCollidingWithNPC && BUTTON_PRESSED(BUTTON_L)) {
+
+        glitchDMA(10);
+
+        if (player.sprites[player.activeSpriteIndex + 1] && player.activeSpriteIndex + 1 <= NUM_STEALABLE_SPRITES) {
+            player.activeSpriteIndex++;
+        } else {
+            player.activeSpriteIndex = 0;
         }
+        player.currentSprite = player.sprites[player.activeSpriteIndex];
     }
 
     animatePlayer();
@@ -272,80 +300,22 @@ void updatePlayer() {
 
 void updateNPCS() {
 
-    // for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-
-    //     switch (npcs[i].intendedDirection) {
-    //         case UP:
-    //             if (npcs[i].worldRow > 0 && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)] && 
-    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow - npcs[i].rdel, currentLevel->worldPixelWidth)]) {
-    //                 npcs[i].worldRow -= npcs[i].rdel;
-    //             } else {
-    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-    //             }
-    //             break;
-    //         case DOWN:
-    //             if (npcs[i].worldRow < currentLevel->worldPixelHeight - npcs[i].height && level1collisionmap[OFFSET(npcs[i].worldCol, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)] && 
-    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1, npcs[i].worldRow + npcs[i].height - 1 + npcs[i].rdel, currentLevel->worldPixelWidth)]) {
-    //                 npcs[i].worldRow += npcs[i].rdel;
-    //             } else {
-    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-    //             }
-    //             break;
-    //         case LEFT:
-    //             if (npcs[i].worldCol > 0 && level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
-    //             level1collisionmap[OFFSET(npcs[i].worldCol - npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
-    //             npcs[i].worldCol -= npcs[i].cdel;
-    //             } else {
-    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-    //             }
-    //             break;
-    //         case RIGHT:
-    //             if (npcs[i].worldCol < currentLevel->worldPixelWidth - npcs[i].width && level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow, currentLevel->worldPixelWidth)] && 
-    //             level1collisionmap[OFFSET(npcs[i].worldCol + npcs[i].width - 1 + npcs[i].cdel, npcs[i].worldRow + npcs[i].height - 1, currentLevel->worldPixelWidth)]) {
-    //             npcs[i].worldCol += npcs[i].cdel;
-    //             } else {
-    //                 npcs[i].intendedDirection = rand() % (3 + 1 - 0) + 0;
-    //             }
-    //             break;
-    //     }
-    // }
-
     animateNPCS();
 
 }
 
 void animatePlayer() {
 
-        // Set previous state to current state
-        // player.prevAniState = player.aniState;
-        // player.aniState = IDLE;
 
         if(player.aniCounter % player.framesToWait == 0) {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
 
-        // Control movement and change animation state
-        // if(BUTTON_HELD(BUTTON_UP))
-        //     player.aniState = UP;
-        // if(BUTTON_HELD(BUTTON_DOWN))
-        //     player.aniState = DOWN;
-        // if(BUTTON_HELD(BUTTON_LEFT))
-        //     player.aniState = LEFT;
-        // if(BUTTON_HELD(BUTTON_RIGHT))
-        //     player.aniState = RIGHT;
+        if (player.isMoving) {
+            player.aniCounter++;
+        }
 
-        // If the player aniState is idle, frame is player standing
-        // if (player.aniState == IDLE) {
-        //     player.curFrame = 0;
-        //     player.aniCounter = 0;
-        //     player.aniState = player.prevAniState;
-        // } else {
-            if (player.isMoving) {
-                player.aniCounter++;
-            }
-            
-        // }
 
 }
 
@@ -369,7 +339,7 @@ void drawPlayer() {
     } else {
         shadowOAM[0].attr0 = (ROWMASK & (player.worldRow - vOff)) | ATTR0_TALL | ATTR0_4BPP;
         shadowOAM[0].attr1 = (COLMASK & (player.worldCol - hOff)) | ATTR1_TINY;
-        shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((player.gameSpriteTileIDx) + (player.aniState * (player.width / 8)), (player.gameSpriteTileIDy) + (player.curFrame * (player.height / 8)));
+        shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((player.currentSprite->gameSpriteTileIDx) + (player.aniState * (player.width / 8)), (player.currentSprite->gameSpriteTileIDy) + (player.curFrame * (player.height / 8)));
         // shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
     }
 }
@@ -386,42 +356,6 @@ void drawNPCS() {
     }
     }
 }
-
-// void glitchVisuals(int duration) {
-
-//     int counter = 0;
-
-//     while (counter < duration) {
-//         for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-//             npcs[i].cdel = 0;
-//             npcs[i].rdel = 0;
-//         }
-
-//         DMANow(3, currentLevel->midgroundTiles, &CHARBLOCK[1], currentLevel->midgroundTilesLen / 2);
-//         DMANow(3, currentLevel->midgroundMap, &SCREENBLOCK[27], currentLevel->midgroundMapLen / 2);
-
-//         DMANow(3, currentLevel->backgroundTiles, &CHARBLOCK[2], currentLevel->backgroundTilesLen / 2);
-//         DMANow(3, currentLevel->backgroundMap, &SCREENBLOCK[24], currentLevel->backgroundMapLen / 2);
-//         waitForVBlank();
-//         counter++;
-        
-//     }
-
-//     for (int i = 0; i < MAX_NPCS_PER_LEVEL - 1; i++) {
-//             npcs[i].cdel = 1;
-//             npcs[i].rdel = 1;
-//         }
-
-//     DMANow(3, currentLevel->defaultPalette, PALETTE, 256);
-//     DMANow(3, currentLevel->foregroundTiles, &CHARBLOCK[0], (currentLevel->foregroundTilesLen) / 2);
-//     DMANow(3, currentLevel->foregroundMap, &SCREENBLOCK[30], (currentLevel->foregroundMapLen) / 2);
-
-//     DMANow(3, SPRITESHEETTiles, &CHARBLOCK[4], SPRITESHEETTilesLen / 2);
-//     DMANow(3, SPRITESHEETPal, SPRITEPALETTE, SPRITESHEETPalLen / 2);
-//     hideSprites();
-//     DMANow(3, shadowOAM, OAM, 512);
-
-// }
 
 
 

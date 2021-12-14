@@ -1253,9 +1253,11 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 82 "myLib.h"
+void goToSeer();
+void seerFunc();
+# 84 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 103 "myLib.h"
+# 105 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1300,12 +1302,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 177 "myLib.h"
+# 179 "myLib.h"
 void hideSprites();
-# 203 "myLib.h"
+# 205 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 213 "myLib.h"
+# 215 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1315,11 +1317,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 254 "myLib.h"
+# 256 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 290 "myLib.h"
+# 292 "myLib.h"
 typedef void (*ihp)(void);
-# 310 "myLib.h"
+# 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "levels.c" 2
 # 1 "game.h" 1
@@ -1327,7 +1329,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 30 "game.h"
+# 29 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1352,6 +1354,7 @@ typedef struct {
 
 
 typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 
 typedef struct
 {
@@ -1417,7 +1420,8 @@ typedef struct
 
 
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -1500,6 +1504,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    unsigned short* masterPal;
 
     anim_func animFunc;
 
@@ -1629,6 +1635,10 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+
+void glitchPalette(int duration);
+void glitchDMA(int duration);
+void crushPalette(int duration);
 
 void initStart();
 
@@ -1767,19 +1777,28 @@ extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
 # 30 "levels.c" 2
+# 1 "trackB.h" 1
+
+
+extern const unsigned int trackB_sampleRate;
+extern const unsigned int trackB_length;
+extern const signed char trackB_data[];
+# 31 "levels.c" 2
 
 # 1 "npcs.h" 1
+extern NPC cloud;
 extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 
 void initNPCS();
+NPC* initCloud();
 NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
 
 void openGate();
-# 32 "levels.c" 2
+# 33 "levels.c" 2
 
 LEVEL startLevel;
 LEVEL instructionsLevel;
@@ -1798,6 +1817,65 @@ int sunAniTimer;
 
 int movingUp;
 
+void glitchPalette(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = ((unsigned short *)0x5000000)[a];
+
+        ((unsigned short *)0x5000000)[a] = ((unsigned short *)0x5000000)[b];
+
+        ((unsigned short *)0x5000000)[b] = temp;
+
+        }
+
+    }
+
+    if (rand() % 10 > 1) {
+        loadLevel(currentLevel, 0);
+    }
+}
+
+void glitchDMA(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        DMANow(3, rand(), &((charblock *)0x6000000)[rand() % 5], rand);
+
+        playSoundA(&trackA_data[rand() % trackA_length], 1, 0);
+
+    }
+
+    goToGame();
+}
+
+void crushPalette(int duration) {
+    for (int i = 0; i < duration; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+        ((unsigned short *)0x5000000)[rand() % 16] = ((unsigned short *)0x5000000)[rand() % 16];
+
+        }
+
+    }
+
+    loadLevel(currentLevel, 0);
+
+}
 
 void initStart() {
 
@@ -1948,7 +2026,7 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 218 "levels.c"
+# 278 "levels.c"
     level1.numNPCS = 4;
 }
 
@@ -2032,7 +2110,7 @@ void animateLevel0() {
         stopSound();
 
         int delay = 0;
-        while (delay < 50) {
+        while (delay < 10) {
             playSoundA(&trackA_data[randInt % trackA_length], 1, 0);
             waitForVBlank();
             delay++;

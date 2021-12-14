@@ -11,28 +11,27 @@
 	.file	"npcs.c"
 	.text
 	.align	2
-	.global	openGate
+	.global	initCloud
 	.arch armv4t
 	.syntax unified
 	.arm
 	.fpu softvfp
-	.type	openGate, %function
-openGate:
+	.type	initCloud, %function
+initCloud:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	ldr	r3, .L3
-	ldr	r2, .L3+4
-	ldr	r3, [r3]
-	str	r2, [r3, #4]
+	mov	r3, #0
+	ldr	r0, .L3
+	str	r3, [r0, #60]
+	str	r3, [r0, #64]
 	bx	lr
 .L4:
 	.align	2
 .L3:
-	.word	currentLevel
-	.word	level0collisionmap2Bitmap
-	.size	openGate, .-openGate
+	.word	cloud
+	.size	initCloud, .-initCloud
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC0:
@@ -137,6 +136,28 @@ initPlantMerchant:
 	.word	.LC4
 	.word	.LC5
 	.size	initPlantMerchant, .-initPlantMerchant
+	.align	2
+	.global	openGate
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	openGate, %function
+openGate:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	ldr	r3, .L10
+	ldr	r2, .L10+4
+	ldr	r3, [r3]
+	str	r2, [r3, #4]
+	bx	lr
+.L11:
+	.align	2
+.L10:
+	.word	currentLevel
+	.word	level0collisionmap2Bitmap
+	.size	openGate, .-openGate
 	.section	.rodata.str1.4
 	.align	2
 .LC6:
@@ -188,67 +209,66 @@ initSeer:
 	mov	r5, #4
 	mov	lr, #242
 	mov	ip, #174
-	ldr	r0, .L11
+	ldr	r0, .L14
 	str	r4, [r0, #32]
-	ldr	r4, .L11+4
+	ldr	r4, .L14+4
 	str	r4, [r0, #72]
-	ldr	r4, .L11+8
+	ldr	r4, .L14+8
 	str	r4, [r0, #76]
-	ldr	r4, .L11+12
+	ldr	r4, .L14+12
 	str	r4, [r0, #420]
-	ldr	r4, .L11+16
+	ldr	r4, .L14+16
 	str	r4, [r0, #104]
-	ldr	r4, .L11+20
+	ldr	r4, .L14+20
 	str	r4, [r0, #136]
-	ldr	r4, .L11+24
+	ldr	r4, .L14+24
 	str	r4, [r0, #168]
-	ldr	r4, .L11+28
+	ldr	r4, .L14+28
 	str	r4, [r0, #172]
-	ldr	r4, .L11+32
+	ldr	r4, .L14+32
 	str	r7, [r0, #28]
 	str	r6, [r0, #80]
 	str	r5, [r0, #156]
+	str	r4, [r0, #176]
+	str	r1, [r0, #56]
+	ldr	r4, .L14+36
+	str	r2, [r0]
+	str	r2, [r0, #20]
+	str	r2, [r0, #24]
+	str	r2, [r0, #60]
+	str	r2, [r0, #148]
 	str	r3, [r0, #36]
 	str	r3, [r0, #44]
 	str	r3, [r0, #52]
 	str	r3, [r0, #64]
 	str	r3, [r0, #84]
 	str	r3, [r0, #96]
-	str	r4, [r0, #176]
 	str	r3, [r0, #100]
-	ldr	r4, .L11+36
 	str	r3, [r0, #116]
 	str	r3, [r0, #128]
 	str	r3, [r0, #132]
 	str	r3, [r0, #160]
 	str	r3, [r0, #164]
 	str	r3, [r0, #180]
-	str	r1, [r0, #56]
-	str	r2, [r0]
-	str	r2, [r0, #20]
-	str	r2, [r0, #24]
-	str	r2, [r0, #60]
-	str	r2, [r0, #148]
 	str	r1, [r0, #152]
-	ldr	r1, .L11+40
-	str	r3, [r0, #212]
-	str	r3, [r0, #228]
-	str	r3, [r0, #404]
-	str	r3, [r0, #408]
-	ldr	r3, .L11+44
+	ldr	r1, .L14+40
 	str	r4, [r0, #200]
 	str	lr, [r0, #16]
 	str	r2, [r0, #192]
 	str	r2, [r0, #196]
+	str	r3, [r0, #212]
 	str	r2, [r0, #224]
+	str	r3, [r0, #228]
+	str	r3, [r0, #404]
+	str	r3, [r0, #408]
+	str	r2, [r0, #472]
 	str	r1, [r0, #232]
 	str	ip, [r0, #12]
-	str	r3, [r0, #416]
 	pop	{r4, r5, r6, r7, lr}
 	bx	lr
-.L12:
+.L15:
 	.align	2
-.L11:
+.L14:
 	.word	seer
 	.word	seerBitmap
 	.word	seerPal
@@ -260,7 +280,6 @@ initSeer:
 	.word	.LC11
 	.word	.LC12
 	.word	.LC13
-	.word	openGate
 	.size	initSeer, .-initSeer
 	.section	.rodata.str1.4
 	.align	2
@@ -328,23 +347,23 @@ initKnight:
 	mov	r5, #4
 	mov	lr, #147
 	mov	ip, #83
-	ldr	r0, .L15
+	ldr	r0, .L18
 	str	r4, [r0, #32]
-	ldr	r4, .L15+4
+	ldr	r4, .L18+4
 	str	r4, [r0, #72]
-	ldr	r4, .L15+8
+	ldr	r4, .L18+8
 	str	r4, [r0, #76]
-	ldr	r4, .L15+12
+	ldr	r4, .L18+12
 	str	r4, [r0, #420]
-	ldr	r4, .L15+16
+	ldr	r4, .L18+16
 	str	r4, [r0, #104]
-	ldr	r4, .L15+20
+	ldr	r4, .L18+20
 	str	r4, [r0, #108]
-	ldr	r4, .L15+24
+	ldr	r4, .L18+24
 	str	r4, [r0, #112]
-	ldr	r4, .L15+28
+	ldr	r4, .L18+28
 	str	r4, [r0, #168]
-	ldr	r4, .L15+32
+	ldr	r4, .L18+32
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
@@ -371,17 +390,17 @@ initKnight:
 	str	r1, [r0, #120]
 	str	r4, [r0, #136]
 	str	r3, [r0, #180]
-	ldr	r4, .L15+36
+	ldr	r4, .L18+36
 	str	r2, [r0, #192]
 	str	r3, [r0, #196]
 	str	r3, [r0, #212]
 	str	r2, [r0, #224]
-	ldr	r1, .L15+40
+	ldr	r1, .L18+40
 	str	r3, [r0, #228]
 	str	r3, [r0, #404]
 	str	r3, [r0, #408]
-	ldr	r2, .L15+44
-	ldr	r3, .L15+48
+	ldr	r2, .L18+44
+	ldr	r3, .L18+48
 	str	r4, [r0, #140]
 	str	lr, [r0, #16]
 	str	r1, [r0, #144]
@@ -390,9 +409,9 @@ initKnight:
 	str	ip, [r0, #12]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L16:
+.L19:
 	.align	2
-.L15:
+.L18:
 	.word	knight
 	.word	knightBitmap
 	.word	knightPal
@@ -407,7 +426,8 @@ initKnight:
 	.word	.LC22
 	.word	.LC23
 	.size	initKnight, .-initKnight
-	.comm	knight,472,4
-	.comm	seer,472,4
-	.comm	plantMerchant,472,4
+	.comm	knight,476,4
+	.comm	seer,476,4
+	.comm	plantMerchant,476,4
+	.comm	cloud,476,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

@@ -28,6 +28,8 @@
 
 #include "levels.h"
 
+#include "seerscreen.h"
+
 // Prototypes
 void initialize();
 
@@ -39,6 +41,7 @@ enum
     START,
     GAME,
     SPEAKING,
+    /*SEERSTATE,*/
     PAUSE,
     WIN,
     INSTRUCTIONS,
@@ -59,6 +62,12 @@ int dialogueTypeRow = 12;
 char* source;
 char* clone;
 int index;
+
+int selectedPalColor;
+int selectedPalRow;
+int selectedPalCol;
+int swapIndex1;
+int swapIndex2;
 
 int main()
 {
@@ -82,6 +91,9 @@ int main()
         case SPEAKING:
             dialogue();
             break;
+        // case SEERSTATE:
+        //     seerFunc();
+        //     break;
         case PAUSE:
             pause();
             break;
@@ -105,6 +117,10 @@ void initialize()
 
     setupInterrupts();
     setupSounds();
+
+    selectedPalColor = 0;
+    selectedPalCol = 0;
+    selectedPalRow = 0;
     
     goToStart();
 }
@@ -208,11 +224,12 @@ void goToGame() {
 
     }
 
-    if (rand() % 10 > 1) {
-        loadLevel(currentLevel, 0);
-    }
-    
+    // if (rand() % 10 > 1) {
+    //     loadLevel(currentLevel, 0);
+    // }
 
+    loadLevel(currentLevel, 0);
+    
     state = GAME;
 
 }
@@ -405,3 +422,126 @@ void instructions() {
     }
 
 }
+
+// void goToSeer() {
+
+//     waitForVBlank();
+
+//     //Turn it off!!!
+//     REG_DISPCTL = 0;
+
+//     loadLevel(currentLevel, 0);
+
+//     REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
+//     REG_BG0CNT = BG_SIZE_SMALL | BG_4BPP |  BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+
+//     DMANow(3, seerscreenTiles, &CHARBLOCK[0], seerscreenTilesLen / 2);
+//     DMANow(3, seerscreenMap, &SCREENBLOCK[30], seerscreenMapLen / 2);
+
+//     swapIndex1 = -1;
+//     swapIndex2 = -1;
+
+//     // if (!PALETTE[14]) {
+//     //     PALETTE[14] = BLACK;
+//     // }
+
+//     // if (!PALETTE[15]) {
+//     //     PALETTE[15] = WHITE;
+//     // }
+
+//     stopSound();
+
+//     state = SEERSTATE;
+
+// }
+
+// void seerFunc() {
+
+//     hideSprites();
+//     DMANow(3, shadowOAM, OAM, 128 * 4);
+
+//     REG_BG0HOFF = 0;
+//     REG_BG0VOFF = 0;
+
+//     if (BUTTON_PRESSED(BUTTON_LEFT)) {
+//         if (selectedPalColor == 0 || selectedPalColor == 4 || selectedPalColor == 8 || selectedPalColor == 12) {
+//             selectedPalColor += 3;
+//         } else {
+//             selectedPalColor--;
+//         }
+//         if (selectedPalCol == 0) {
+//             selectedPalCol = 3;
+//         } else {
+//             selectedPalCol--;
+//         }
+//     }
+
+//     if (BUTTON_PRESSED(BUTTON_RIGHT)) {
+//         if (selectedPalColor == 3 || selectedPalColor == 7 || selectedPalColor == 11 || selectedPalColor == 15) {
+//             selectedPalColor -= 3;
+//         } else {
+//             selectedPalColor++;
+//         }
+//         if (selectedPalCol == 3) {
+//             selectedPalCol = 0;
+//         } else {
+//             selectedPalCol++;
+//         }
+//     }
+
+//     if (BUTTON_PRESSED(BUTTON_UP)) {
+//         if (selectedPalColor <= 3) {
+//             selectedPalColor += 12;
+//         } else {
+//             selectedPalColor -= 4;
+//         }
+//         if (selectedPalRow == 0) {
+//             selectedPalRow = 3;
+//         } else {
+//             selectedPalRow--;
+//         }
+//     }
+
+//     if (BUTTON_PRESSED(BUTTON_DOWN)) {
+//         if (selectedPalColor >= 12) {
+//             selectedPalColor -= 12;
+//         } else {
+//             selectedPalColor += 4;
+//         }
+//         if (selectedPalRow == 3) {
+//             selectedPalRow = 0;
+//         } else {
+//             selectedPalRow++;
+//         }
+//     }
+
+//     if (BUTTON_PRESSED(BUTTON_A)) {
+//         if (swapIndex1 == -1) {
+//             swapIndex1 = selectedPalColor;
+//         } else if (swapIndex2 == -1) {
+//             swapIndex2 = selectedPalColor;
+//         }
+//         if (swapIndex1 != -1 && swapIndex2 != -1) {
+
+//             unsigned short temp = PALETTE[swapIndex1];
+
+//             // unsigned short temp = PALETTE[swapIndex1];
+//             // PALETTE[swapIndex1] = PALETTE[swapIndex2];
+//             // PALETTE[swapIndex2] = temp;
+
+//             swapIndex1 = -1;
+//             swapIndex2 = -1;
+//         }
+//     }
+
+//     shadowOAM[0].attr0 = ATTR0_4BPP | ATTR0_SQUARE | ((selectedPalRow * 22) + 65);
+//     shadowOAM[0].attr1 = ATTR1_TINY | (((selectedPalCol * 23) + 84) - 4);
+//     shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(8, 0);
+
+//     DMANow(3, shadowOAM, OAM, 512);
+
+//     if (BUTTON_PRESSED(BUTTON_R)) {
+//         goToGame();
+//     }
+
+// }

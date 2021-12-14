@@ -6,8 +6,8 @@
 
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
-enum {UP, DOWN, LEFT, RIGHT};
-# 30 "game.h"
+enum {DOWN, UP, LEFT, RIGHT};
+# 29 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -30,6 +30,9 @@ typedef struct {
     int worldRow;
 } PATROLPOINT;
 
+
+typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 
 typedef struct
 {
@@ -73,6 +76,9 @@ typedef struct
     int postConvoIndex;
     int convoBoolSatisfied;
 
+    convo_func convoFunc;
+
+
     char* name;
 
 
@@ -92,7 +98,8 @@ typedef struct
 
 
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -124,6 +131,7 @@ typedef struct
 
     int gameSpriteTileIDx;
     int gameSpriteTileIDy;
+    int isMoving;
 
 
 
@@ -212,6 +220,8 @@ void animateNPCS();
 void drawGame();
 void drawPlayer();
 void drawNPCS();
+
+void checkForConvoBools();
 
 
 

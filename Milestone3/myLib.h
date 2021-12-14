@@ -26,6 +26,8 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
+void goToSeer();
+void seerFunc();
 
 // ================================= DISPLAY ==================================
 

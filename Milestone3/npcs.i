@@ -7,7 +7,7 @@
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 30 "game.h"
+# 29 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -32,6 +32,7 @@ typedef struct {
 
 
 typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 
 typedef struct
 {
@@ -97,7 +98,8 @@ typedef struct
 
 
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -180,6 +182,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    unsigned short* masterPal;
 
     anim_func animFunc;
 
@@ -270,9 +274,11 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 82 "myLib.h"
+void goToSeer();
+void seerFunc();
+# 84 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 103 "myLib.h"
+# 105 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -317,12 +323,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 177 "myLib.h"
+# 179 "myLib.h"
 void hideSprites();
-# 203 "myLib.h"
+# 205 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 213 "myLib.h"
+# 215 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -332,19 +338,21 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 254 "myLib.h"
+# 256 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 290 "myLib.h"
+# 292 "myLib.h"
 typedef void (*ihp)(void);
-# 310 "myLib.h"
+# 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 3 "npcs.c" 2
 # 1 "npcs.h" 1
+extern NPC cloud;
 extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 
 void initNPCS();
+NPC* initCloud();
 NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
@@ -383,10 +391,17 @@ extern const unsigned short level0collisionmap2Pal[256];
 
 
 
+NPC cloud;
 NPC plantMerchant;
 NPC seer;
 NPC knight;
-# 23 "npcs.c"
+# 24 "npcs.c"
+NPC* initCloud() {
+    cloud.gameSpriteTileIDx = 0;
+    cloud.gameSpriteTileIDy = 0;
+    return &cloud;
+}
+
 NPC* initPlantMerchant() {
 
     plantMerchant.active = 1;
@@ -513,7 +528,10 @@ NPC* initSeer() {
     seer.worldCol = 242;
     seer.worldRow = 174;
 
-    seer.convoFunc = openGate;
+
+    seer.isStealable = 1;
+
+
 
     return &seer;
 }

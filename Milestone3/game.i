@@ -1253,9 +1253,11 @@ void goToLose();
 void lose();
 void goToInstructions();
 void instructions();
-# 82 "myLib.h"
+void goToSeer();
+void seerFunc();
+# 84 "myLib.h"
 extern volatile unsigned short *videoBuffer;
-# 103 "myLib.h"
+# 105 "myLib.h"
 typedef struct
 {
     u16 tileimg[8192];
@@ -1300,12 +1302,12 @@ typedef struct
 
 
 extern OBJ_ATTR shadowOAM[];
-# 177 "myLib.h"
+# 179 "myLib.h"
 void hideSprites();
-# 203 "myLib.h"
+# 205 "myLib.h"
 extern unsigned short oldButtons;
 extern unsigned short buttons;
-# 213 "myLib.h"
+# 215 "myLib.h"
 typedef volatile struct
 {
     volatile const void *src;
@@ -1315,11 +1317,11 @@ typedef volatile struct
 
 
 extern DMA *dma;
-# 254 "myLib.h"
+# 256 "myLib.h"
 void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned int cnt);
-# 290 "myLib.h"
+# 292 "myLib.h"
 typedef void (*ihp)(void);
-# 310 "myLib.h"
+# 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
 # 4 "game.c" 2
 # 1 "game.h" 1
@@ -1327,7 +1329,7 @@ int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, i
 enum {CLOUD, SEER, ECLECTIC, MAIDEN};
 
 enum {DOWN, UP, LEFT, RIGHT};
-# 30 "game.h"
+# 29 "game.h"
 typedef struct {
 
     int promptsChoice;
@@ -1352,6 +1354,7 @@ typedef struct {
 
 
 typedef void (*convo_func)(void);
+typedef void (*ability_func)(void);
 
 typedef struct
 {
@@ -1417,7 +1420,8 @@ typedef struct
 
 
 
-    int abilityType;
+    ability_func abilityFunc;
+    int isStealable;
 
 } NPC;
 
@@ -1500,6 +1504,8 @@ typedef struct {
     int midgroundPalLen;
     const unsigned short* backgroundPal;
     int backgroundPalLen;
+
+    unsigned short* masterPal;
 
     anim_func animFunc;
 
@@ -1630,6 +1636,10 @@ extern LEVEL pauseLevel;
 
 extern LEVEL level0;
 
+void glitchPalette(int duration);
+void glitchDMA(int duration);
+void crushPalette(int duration);
+
 void initStart();
 
 void animateStart();
@@ -1643,11 +1653,13 @@ void initLevel0();
 void initLevel1();
 # 14 "game.c" 2
 # 1 "npcs.h" 1
+extern NPC cloud;
 extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 
 void initNPCS();
+NPC* initCloud();
 NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
@@ -1676,7 +1688,6 @@ void initGame() {
     initLevels();
     currentLevel = &level0;
     initPlayer();
-
 
     gateUnlocked = 0;
 
@@ -1734,9 +1745,6 @@ void drawGame() {
     (*(volatile unsigned short *)0x0400001A) = vOff / 3;
 
 
-
-
-
 }
 
 
@@ -1751,7 +1759,6 @@ void initLevels() {
 
 void initPlayer() {
 
-    player.currentEidolon = CLOUD;
     player.rdel = 1;
     player.cdel = 1;
     player.width = 8;
@@ -1761,13 +1768,16 @@ void initPlayer() {
 
     player.aniCounter = 0;
     player.framesToWait = 20;
-    player.aniState = 0;
+    player.aniState = DOWN;
     player.numStates = 1;
     player.prevAniState = 0;
     player.curFrame = 0;
     player.numFrames = 3;
     player.gameSpriteTileIDx = 0;
     player.gameSpriteTileIDy = 0;
+
+    player.sprites[0] = initCloud();
+    player.currentSprite = player.sprites[0];
 
 }
 
@@ -1777,6 +1787,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
     DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
+
 
     if (level->midgroundTiles) {
         (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
@@ -1791,14 +1802,14 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
         DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
     }
-
+# 162 "game.c"
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
         player.worldRow = level->playerWorldSpawnRow;
         hOff = level->initHOff;
         vOff = level->initVOff;
     }
-# 168 "game.c"
+
 }
 
 void loadNPC(NPC* npc) {
@@ -1811,6 +1822,7 @@ void loadNPC(NPC* npc) {
 
 void updatePlayer() {
 
+    int playerCollidingWithNPC = 0;
     player.isMoving = 0;
 
     if((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6)))) {
@@ -1877,13 +1889,46 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 261 "game.c"
+# 256 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
-        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height) && (!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0))))) {
-            currentTarget = currentLevel->npcs[i];
-            goToDialogue();
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {
+            playerCollidingWithNPC = 1;
+            if ((!(~(oldButtons) & ((1 << 9))) && (~buttons & ((1 << 9))))) {
+                for (int j = 0; j < 10; j++) {
+                    if (player.sprites[j] == currentLevel->npcs[i]) {
+                        break;
+                    } else if (!player.sprites[j]) {
+                        if (currentLevel->npcs[i]->isStealable) {
+                            glitchPalette(500);
+                            glitchDMA(10);
+                            player.sprites[j] = currentLevel->npcs[i];
+                            player.activeSpriteIndex = j;
+                            player.currentSprite = player.sprites[j];
+                            break;
+                        } else {
+                            glitchDMA(50);
+                            break;
+                        }
+                    }
+                }
+            } else if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))) ) {
+                currentTarget = currentLevel->npcs[i];
+                goToDialogue();
+            }
         }
+    }
+
+    if (!playerCollidingWithNPC && (!(~(oldButtons) & ((1 << 9))) && (~buttons & ((1 << 9))))) {
+
+        glitchDMA(10);
+
+        if (player.sprites[player.activeSpriteIndex + 1] && player.activeSpriteIndex + 1 <= 10) {
+            player.activeSpriteIndex++;
+        } else {
+            player.activeSpriteIndex = 0;
+        }
+        player.currentSprite = player.sprites[player.activeSpriteIndex];
     }
 
     animatePlayer();
@@ -1891,7 +1936,7 @@ void updatePlayer() {
 }
 
 void updateNPCS() {
-# 313 "game.c"
+
     animateNPCS();
 
 }
@@ -1899,18 +1944,14 @@ void updateNPCS() {
 void animatePlayer() {
 
 
-
-
-
         if(player.aniCounter % player.framesToWait == 0) {
             player.curFrame = (player.curFrame + 1) % player.numFrames;
             player.aniCounter = 0;
         }
-# 344 "game.c"
-            if (player.isMoving) {
-                player.aniCounter++;
-            }
 
+        if (player.isMoving) {
+            player.aniCounter++;
+        }
 
 
 }
@@ -1935,7 +1976,7 @@ void drawPlayer() {
     } else {
         shadowOAM[0].attr0 = (0xFF & (player.worldRow - vOff)) | (2 << 14) | (0 << 13);
         shadowOAM[0].attr1 = (0x1FF & (player.worldCol - hOff)) | (0 << 14);
-        shadowOAM[0].attr2 = ((0) << 12) | (((player.gameSpriteTileIDy) + (player.curFrame * (player.height / 8)))*32 + ((player.gameSpriteTileIDx) + (player.aniState * (player.width / 8))));
+        shadowOAM[0].attr2 = ((0) << 12) | (((player.currentSprite->gameSpriteTileIDy) + (player.curFrame * (player.height / 8)))*32 + ((player.currentSprite->gameSpriteTileIDx) + (player.aniState * (player.width / 8))));
 
     }
 }

@@ -22,11 +22,11 @@ SPRITESHEETPal:
 	.short	6636
 	.short	12555
 	.short	19974
-	.short	15994
+	.short	24510
 	.short	8984
 	.short	7379
 	.short	9474
-	.short	24510
+	.short	15994
 	.short	9619
 	.short	6279
 	.short	15566
@@ -277,34 +277,34 @@ SPRITESHEETPal:
 	.size	SPRITESHEETTiles, 32768
 SPRITESHEETTiles:
 	.short	0
-	.short	145
+	.short	81
 	.short	4292
-	.short	2457
+	.short	1365
 	.short	-13188
 	.short	30588
 	.short	7292
-	.short	31100
+	.short	30076
 	.short	6007
-	.short	31121
+	.short	30033
 	.short	7287
-	.short	-26311
+	.short	21813
 	.short	30583
-	.short	13203
+	.short	13139
 	.short	30588
-	.short	14649
+	.short	13621
 	.short	-8192
 	.short	3
-	.short	-11008
+	.short	-9984
 	.short	3
-	.short	21760
+	.short	-26368
 	.short	62
-	.short	21760
-	.short	229
-	.short	21760
-	.short	5
+	.short	-26368
+	.short	233
+	.short	-26368
+	.short	9
 	.short	-24576
-	.short	5
-	.short	20480
+	.short	9
+	.short	-28672
 	.short	51
 	.short	13056
 	.short	819
@@ -406,14 +406,14 @@ SPRITESHEETTiles:
 	.short	2929
 	.short	0
 	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
+	.short	20480
+	.short	5
+	.short	1280
+	.short	80
+	.short	80
+	.short	1280
+	.short	5
+	.short	20480
 	.short	0
 	.short	0
 	.short	0
@@ -791,20 +791,20 @@ SPRITESHEETTiles:
 	.short	30583
 	.short	13107
 	.short	7372
-	.short	14649
+	.short	13621
 	.short	7872
 	.short	13105
 	.short	7872
-	.short	14649
-	.short	-25572
+	.short	13621
+	.short	23580
 	.short	13111
 	.short	7185
-	.short	14649
+	.short	13621
 	.short	4369
 	.short	4881
 	.short	4368
 	.short	-13108
-	.short	15184
+	.short	15248
 	.short	3003
 	.short	-19536
 	.short	3003
@@ -1320,16 +1320,16 @@ SPRITESHEETTiles:
 	.short	0
 	.short	12288
 	.short	3
-	.short	13568
+	.short	14592
 	.short	238
-	.short	21760
+	.short	-26368
 	.short	227
-	.short	21760
-	.short	5
-	.short	21760
-	.short	5
-	.short	20480
-	.short	53
+	.short	-26368
+	.short	9
+	.short	-26368
+	.short	9
+	.short	-28672
+	.short	57
 	.short	-23808
 	.short	819
 	.short	0
@@ -1828,7 +1828,7 @@ SPRITESHEETTiles:
 	.short	-8056
 	.short	10
 	.short	8
-	.short	13136
+	.short	13200
 	.short	3003
 	.short	13232
 	.short	-17485
@@ -2342,17 +2342,17 @@ SPRITESHEETTiles:
 	.short	6161
 	.short	12288
 	.short	14
-	.short	13568
+	.short	14592
 	.short	227
-	.short	21760
+	.short	-26368
 	.short	62
-	.short	21760
-	.short	5
-	.short	21760
-	.short	5
-	.short	20480
-	.short	5
-	.short	20480
+	.short	-26368
+	.short	9
+	.short	-26368
+	.short	9
+	.short	-28672
+	.short	9
+	.short	-28672
 	.short	51
 	.short	13056
 	.short	819
@@ -2838,21 +2838,21 @@ SPRITESHEETTiles:
 	.short	0
 	.short	-14361
 	.short	4369
-	.short	-12642
+	.short	-12706
 	.short	6161
-	.short	-13927
+	.short	-15019
 	.short	4369
-	.short	-12642
+	.short	-12706
 	.short	6161
-	.short	-13927
+	.short	-15019
 	.short	-16100
-	.short	-24930
-	.short	-24861
-	.short	-26215
-	.short	-26210
-	.short	-26210
-	.short	-26215
-	.short	15184
+	.short	24158
+	.short	24291
+	.short	21845
+	.short	21854
+	.short	21854
+	.short	21845
+	.short	15248
 	.short	3003
 	.short	13232
 	.short	2995

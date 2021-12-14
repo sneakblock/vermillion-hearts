@@ -4,6 +4,10 @@ extern LEVEL pauseLevel;
 
 extern LEVEL level0;
 
+void glitchPalette(int duration);
+void glitchDMA(int duration);
+void crushPalette(int duration);
+
 void initStart();
 
 void animateStart();
