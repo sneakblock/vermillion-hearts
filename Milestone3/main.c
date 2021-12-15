@@ -1,9 +1,12 @@
-// Milestone 4 update
-// For milestone 4, I added a dialogue system, multiple NPCs, animated sprites, an entirely new level, and
-// sound, along with animated menus, and backgrounds for all states. Multiple realtime glitches play throughout
-// the game to set the mood, and I have refocused my goals to focus on dialogue instead of glitch puzzle 
-// mechanics, so that dialogue flags allow the player to progress to the ending. Notice the glitched palettes,
-// sound work, and dialogue characters!
+// ====================== FINAL SUBMISSION =======================
+// Hello! This is my final submission for Vermillion Hearts, a game about a game not working right.
+// (But I promise it is working right)
+// Check out the debug commands in both pause and instructions, you will need to use them to win.
+// Talk to characters with A, move with directional input. Experiment with the debug commands, and be
+// willing to explore. The cheat (press L on Start instead of A) allows you to play as the Dutchess from the
+// beginning, more or less circumventing the entire game. 
+// ENJOY THE GAME!
+// ===============================================================
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -286,7 +289,7 @@ void goToDialogue() {
 
     waitForVBlank();
 
-    stopSound(soundB);
+    stopSound();
     
     //Turns off display controller
     REG_DISPCTL = 0;
