@@ -1490,6 +1490,7 @@ typedef struct {
 
     int levelSize;
     unsigned char* collisionMap;
+    int BPP;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -1692,6 +1693,7 @@ void initPause();
 void initLevel0();
 void initLevel1();
 void initLevel2();
+void animateLevel2();
 # 30 "main.c" 2
 
 # 1 "seerscreen.h" 1

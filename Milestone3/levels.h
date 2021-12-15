@@ -22,3 +22,4 @@ void initPause();
 void initLevel0();
 void initLevel1();
 void initLevel2();
+void animateLevel2();

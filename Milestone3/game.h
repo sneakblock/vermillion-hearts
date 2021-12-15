@@ -180,6 +180,7 @@ typedef struct {
 
     int levelSize;
     unsigned char* collisionMap;
+    int BPP;
 
     int worldPixelWidth;
     int worldPixelHeight;

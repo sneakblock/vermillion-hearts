@@ -1481,6 +1481,7 @@ typedef struct {
 
     int levelSize;
     unsigned char* collisionMap;
+    int BPP;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -1662,6 +1663,7 @@ void initPause();
 void initLevel0();
 void initLevel1();
 void initLevel2();
+void animateLevel2();
 # 14 "game.c" 2
 # 1 "npcs.h" 1
 extern NPC cloud;
@@ -1718,6 +1720,16 @@ void updateGame() {
             currentLevel->npcs[i]->hide = 1;
         }
         currentLevel = &level2;
+        goToGame();
+        loadLevel(currentLevel, 1);
+    }
+
+    if (player.worldCol == 0 && player.worldRow >= 136 && player.worldRow <= 156 && currentLevel == &level2) {
+        for (int i = 0; i < 5; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level1;
         goToGame();
         loadLevel(currentLevel, 1);
     }
@@ -1801,7 +1813,7 @@ void initPlayer() {
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 12) | (1 << 8);
-    (*(volatile unsigned short *)0x4000008) = level->levelSize | (0 << 7) | ((0) << 2) | ((30) << 8);
+    (*(volatile unsigned short *)0x4000008) = level->levelSize | level->BPP | ((0) << 2) | ((30) << 8);
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
     DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
@@ -1809,20 +1821,24 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     if (level->midgroundTiles) {
         (*(volatile unsigned short *)0x4000000) |= (1 << 9);
-        (*(volatile unsigned short *)0x400000A) = level->levelSize | (0 << 7) | ((1) << 2) | ((28) << 8);
+        (*(volatile unsigned short *)0x400000A) = level->levelSize | level->BPP | ((1) << 2) | ((28) << 8);
         DMANow(3, level->midgroundTiles, &((charblock *)0x6000000)[1], level->midgroundTilesLen / 2);
         DMANow(3, level->midgroundMap, &((screenblock *)0x6000000)[28], level->midgroundMapLen / 2);
-        DMANow(3, level->midgroundPal, &((unsigned short *)0x5000000)[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+        if (level->midgroundPal) {
+            DMANow(3, level->midgroundPal, &((unsigned short *)0x5000000)[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+        }
     }
 
     if (level->backgroundTiles) {
         (*(volatile unsigned short *)0x4000000) |= (1 << 10);
-        (*(volatile unsigned short *)0x400000C) = level->levelSize | (0 << 7) | ((2) << 2) | ((26) << 8);
+        (*(volatile unsigned short *)0x400000C) = level->levelSize | level->BPP | ((2) << 2) | ((26) << 8);
         DMANow(3, level->backgroundTiles, &((charblock *)0x6000000)[2], level->backgroundTilesLen / 2);
         DMANow(3, level->backgroundMap, &((screenblock *)0x6000000)[26], level->backgroundMapLen / 2);
-        DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+        if (level->backgroundPal) {
+            DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+        }
     }
-# 171 "game.c"
+# 185 "game.c"
     if (resetsPlayerPos) {
         player.worldCol = level->playerWorldSpawnCol;
         player.worldRow = level->playerWorldSpawnRow;
@@ -1830,8 +1846,10 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         vOff = level->initVOff;
     }
 
-    for (int i = 0; i < 5; i++) {
-        loadNPC(level->npcs[i]);
+    if (level->numNPCS) {
+        for (int i = 0; i < 5; i++) {
+            loadNPC(level->npcs[i]);
+        }
     }
 
 }
@@ -1916,7 +1934,7 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 272 "game.c"
+# 288 "game.c"
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {

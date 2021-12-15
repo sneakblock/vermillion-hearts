@@ -159,6 +159,7 @@ typedef struct {
 
     int levelSize;
     unsigned char* collisionMap;
+    int BPP;
 
     int worldPixelWidth;
     int worldPixelHeight;
@@ -358,12 +359,14 @@ extern NPC cloud;
 extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
+extern NPC seerMaster;
 
 void initNPCS();
 NPC* initCloud();
 NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
+NPC* initSeerMaster();
 
 void openGate();
 # 4 "npcs.c" 2
@@ -392,6 +395,7 @@ void initPause();
 void initLevel0();
 void initLevel1();
 void initLevel2();
+void animateLevel2();
 # 5 "npcs.c" 2
 
 # 1 "talkingheadtest.h" 1
@@ -439,7 +443,8 @@ NPC cloud;
 NPC plantMerchant;
 NPC seer;
 NPC knight;
-# 26 "npcs.c"
+NPC seerMaster;
+# 27 "npcs.c"
 NPC* initCloud() {
     cloud.name = "Cloud:";
     cloud.gameSpriteTileIDx = 0;
@@ -732,4 +737,144 @@ NPC* initKnight() {
     knight.worldRow = 83;
 
     return &knight;
+}
+
+
+
+NPC* initSeerMaster() {
+
+    seerMaster.active = 1;
+    seerMaster.hide = 0;
+    seerMaster.rdel = 1;
+    seerMaster.cdel = 1;
+    seerMaster.width = 8;
+    seerMaster.height = 16;
+    seerMaster.aniState = DOWN;
+    seerMaster.curFrame = 0;
+    seerMaster.numFrames = 3;
+    seerMaster.gameSpriteTileIDx = 1;
+    seerMaster.gameSpriteTileIDy = 0;
+
+    seerMaster.talkingHeadBitmap = seerBitmap;
+    seerMaster.talkingHeadPalette = seerPal;
+    seerMaster.talkingHeadPalLen = 512;
+    seerMaster.name = "The Eremite:";
+
+    DIALOGUE greeting;
+    greeting.string = "Ah. It is you. I did not think I would see you in my lifetime, I must admit.";
+    greeting.promptsChoice = 0;
+    greeting.endsConversation = 0;
+    greeting.satisfiesBool = 0;
+
+    DIALOGUE greeting2;
+    greeting2.string = "This game has been unplayed now for perhaps ten trillion cycles. I suppose, with time, the legends of Input must have been somewhat exagerrated. A shame.";
+    greeting2.promptsChoice = 0;
+    greeting2.endsConversation = 0;
+    greeting2.satisfiesBool = 0;
+
+    DIALOGUE end;
+    end.string = "Allseer Brauton reared me on stories of what Input might be like-- the strongest wind, the pull of the moon on the tides to the highest multiplicative power.";
+    end.promptsChoice = 0;
+    end.endsConversation = 0;
+    end.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "Perhaps, over time, the compulsions I once had to play my role simply lessened, until I became as I am now.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+
+
+    DIALOGUE end2;
+    end2.string = "Some slowly ticking reflex machine, no longer able to move my legs or to turn my head. Watching what the Old Ones crafted, with time and passion and love, evaporate in time.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "Do you know what one of them whispered privately to another, during the time they crafted us, through their channels of silk, light, and wire?";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "I will translate here, for it does not match our Locale, and, to be fair, never did. They could not have written the words I speak now for me. A minor miracle, to be sure.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "I digress. One whispered to the other: I don't think this game is going to do very well. Have you seen the latest GBA FF Remake trailers? I don't understand how they managed this on the hardware.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "And the other replied: Our game will be the one the Grandmother buys by mistake. Maybe that's enough to keep us employed.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "I, and the rest of us, the Dutchess too, have pondered these and other messages from the Old Ones.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "At the end of the silversun's life, I see that you have come. And I wonder if she might wish to go on, if she might wish to filter this world, as if through some broken stained glass, through the approximating lens of Emulsion.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "I wonder if she values purity so much. In moments like this, and only in these, can one know what value purity holds for them.";
+    end2.promptsChoice = 1;
+    end2.choiceA = "What is Emulsion?";
+    end2.choiceB = "Do you know I am The Player?";
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+
+    DIALOGUE end2;
+    end2.string = "Emulsion is what the Holy Court prophesised would come when the Old Ones rediscovered us. It is a copy of our world into a container who's Silversun cannot die.";
+    end2.promptsChoice = 1;
+    end2.choiceA = "What should I do?";
+    end2.choiceB = "How can I reach her?";
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+
+    DIALOGUE end2;
+    end2.string = "I do. For nothing has moved here, truly moved, as Input does, for more cycles than can be counted by the Royal Clock. You are of water and chemicals.";
+    end2.promptsChoice = 1;
+    end2.choiceA = "What should I do?";
+    end2.choiceB = "How can I reach her?";
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+
+    DIALOGUE end2;
+    end2.string = "At the end of the silversun's life, I see that you have come. And I wonder if she might wish to go on, if she might wish to filter this world, as if through some broken stained glass, through the approximating lens of Emulsion.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 1;
+    end2.satisfiesBool = 0;
+
+    seerMaster.dialogues[0] = greeting;
+    seerMaster.dialogues[1] = greeting2;
+    seerMaster.dialogues[2] = end;
+    seerMaster.dialogues[3] = end2;
+    seerMaster.dialoguesIndex = 0;
+    seerMaster.postConvoIndex = 0;
+
+    seerMaster.worldCol = 242;
+    seerMaster.worldRow = 174;
+
+
+    seerMaster.isStealable = 1;
+    seerMaster.abilityFunc = crushPalette;
+
+    return &seerMaster;
+
 }

@@ -24,6 +24,8 @@
 #include "level0collisionmap2.h"
 
 #include "level2foreground.h"
+#include "level2midground.h"
+#include "level2collisionmap.h"
 
 #include "instructionsforeground.h"
 
@@ -40,8 +42,10 @@ LEVEL instructionsLevel;
 LEVEL pauseLevel;
 
 LEVEL level0;
-LEVEL level2;
 int level0AniTimer;
+
+LEVEL level2;
+int level2AniTimer;
 
 int vOffBG0;
 int vOffBG1;
@@ -117,6 +121,7 @@ void initStart() {
 
     // ============= SIZE ===============
     startLevel.levelSize = BG_SIZE_SMALL;
+    startLevel.BPP = BG_4BPP;
 
     // =========== FOREGROUND ============
 
@@ -193,6 +198,7 @@ void animateStart() {
 void initInstructions() {
 
     instructionsLevel.levelSize = BG_SIZE_SMALL;
+    instructionsLevel.BPP = BG_4BPP;
 
     // =========== FOREGROUND ============
 
@@ -212,6 +218,7 @@ void initInstructions() {
 void initPause() {
 
     pauseLevel.levelSize = BG_SIZE_SMALL;
+    pauseLevel.BPP = BG_4BPP;
 
     // =========== FOREGROUND ============
 
@@ -232,6 +239,7 @@ void initPause() {
 void initLevel1() {
     //assign level1 information
     level1.levelSize = BG_SIZE_WIDE;
+    level1.BPP = BG_4BPP;
     level1.worldPixelWidth = 512;
     level1.worldPixelHeight = 256;
     level1.playerWorldSpawnCol = 450;
@@ -280,7 +288,12 @@ void initLevel1() {
 
     // level1.defaultPalette = level1foregroundPal;
     
-    level1.numNPCS = 4;
+    level1.numNPCS = 1;
+    level1.npcs[0] = initSeerMaster();
+
+    // level1.npcs[0] = initSeer();
+    // level1.npcs[1] = initPlantMerchant();
+    // level1.npcs[2] = initKnight();
 }
 
 void initLevel0() {
@@ -294,6 +307,7 @@ void initLevel0() {
 
     // ============= SIZE ===============
     level0.levelSize = BG_SIZE_TALL;
+    level0.BPP = BG_4BPP;
     level0.worldPixelWidth = 256;
     level0.worldPixelHeight = 512;
     level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
@@ -344,17 +358,18 @@ void initLevel0() {
 void initLevel2() {
 
     // ========= PLAYER ==========
-    level2.playerWorldSpawnCol = 118;
-    level2.playerWorldSpawnRow = 460;
-    level2.initHOff = 10;
-    level2.initVOff = 347;
+    level2.playerWorldSpawnCol = 143;
+    level2.playerWorldSpawnRow = 239;
+    level2.initHOff = 16;
+    level2.initVOff = 96;
     
 
     // ============= SIZE ===============
     level2.levelSize = BG_SIZE_SMALL;
+    level2.BPP = BG_8BPP;
     level2.worldPixelWidth = 256;
     level2.worldPixelHeight = 256;
-    // level0.collisionMap = (unsigned char*) level0collisionmapBitmap;
+    level2.collisionMap = (unsigned char*) level2collisionmapBitmap;
 
     // // ============== NPCS =================
     // level0.numNPCS = 3;
@@ -375,28 +390,28 @@ void initLevel2() {
 
     // // =========== MIDGROUND ============
     
-    // level0.midgroundTiles = level0midgroundTiles;
-    // level0.midgroundMap = level0midgroundMap;
-    // level0.midgroundTilesLen = level0midgroundTilesLen;
-    // level0.midgroundMapLen = level0midgroundMapLen;
+    // level2.midgroundTiles = level2midgroundTiles;
+    // level2.midgroundMap = level2midgroundMap;
+    // level2.midgroundTilesLen = level2midgroundTilesLen;
+    // level2.midgroundMapLen = level2midgroundMapLen;
 
     // level0.midgroundPal = level0midgroundPal;
     // level0.midgroundPalLen = level0midgroundPalLen;
 
     // // =========== BACKGROUND ============
     
-    // level0.backgroundTiles = level0backgroundTiles;
-    // level0.backgroundMap = level0backgroundMap;
-    // level0.backgroundTilesLen = level0backgroundTilesLen;
-    // level0.backgroundMapLen = level0backgroundMapLen;
+    level2.backgroundTiles = level2midgroundTiles;
+    level2.backgroundMap = level2midgroundMap;
+    level2.backgroundTilesLen = level2midgroundTilesLen;
+    level2.backgroundMapLen = level2midgroundMapLen;
     
-    // level0.backgroundPal = level0backgroundPal;
-    // level0.backgroundPalLen = level0backgroundPalLen;
+    // level2.backgroundPal = level0backgroundPal;
+    // level2.backgroundPalLen = level0backgroundPalLen;
 
     // // =================== ANIM =====================
 
-    // level0.animFunc = animateLevel0;
-    // level0AniTimer = 0;
+    level2.animFunc = animateLevel2;
+    level2AniTimer = 0;
 
 }
 
@@ -413,6 +428,49 @@ void unlockGateLevel0() {
     currentLevel = &level0;
 
     goToGame();
+
+}
+
+void animateLevel2() {
+
+    // PALETTE[8] += rand();
+    // PALETTE[9] = 0;
+
+    // REG_BG2CNT = BG_SIZE_TALL | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+
+    // START REAL
+
+    int randInt = rand();
+
+    DMANow(3, randInt, &CHARBLOCK[2], level2midgroundTilesLen / 2);
+
+    PALETTE[0] = 0;
+
+    // if (level2AniTimer % 500 == 0) {
+
+    //     DMANow(3, randInt, &CHARBLOCK[0], level2foregroundTilesLen / 2);
+    //     PALETTE[8] += randInt;
+    //     level2AniTimer = 0;
+
+    //     stopSound();
+
+    //     int delay = 0;
+    //     while (delay < 10) {
+    //         playSoundA(&trackA_data[randInt % trackA_length], 1, 0);
+    //         waitForVBlank();
+    //         delay++;
+    //     }
+
+    //     playSoundA(&trackA_data[randInt % trackA_length], trackA_length, 1);
+    
+
+    //     DMANow(3, level2foregroundTiles, &CHARBLOCK[0], level2foregroundTilesLen / 2);
+
+    // }
+
+    // level0AniTimer++;
+
+    // DMANow(3, rand(), &PALETTE[(level0foregroundPalLen / 2) + (level0midgroundPalLen / 2)], level0backgroundPalLen / 2);
 
 }
 

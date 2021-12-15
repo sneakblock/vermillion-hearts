@@ -57,6 +57,16 @@ void updateGame() {
         loadLevel(currentLevel, 1);
     }
 
+    if (player.worldCol == 0 && player.worldRow >= 136 && player.worldRow <= 156 && currentLevel == &level2) {
+        for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level1;
+        goToGame();
+        loadLevel(currentLevel, 1);
+    }
+
 }
 
 void checkForConvoBools() {
@@ -136,7 +146,7 @@ void initPlayer() {
 void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     REG_DISPCTL = MODE0 | SPRITE_ENABLE | BG0_ENABLE;
-    REG_BG0CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
+    REG_BG0CNT = level->levelSize | level->BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
     DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
@@ -144,18 +154,22 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
 
     if (level->midgroundTiles) {
         REG_DISPCTL |= BG1_ENABLE;
-        REG_BG1CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
+        REG_BG1CNT = level->levelSize | level->BPP | BG_CHARBLOCK(1) | BG_SCREENBLOCK(28);
         DMANow(3, level->midgroundTiles, &CHARBLOCK[1], level->midgroundTilesLen / 2);
         DMANow(3, level->midgroundMap, &SCREENBLOCK[28], level->midgroundMapLen / 2);
-        DMANow(3, level->midgroundPal, &PALETTE[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+        if (level->midgroundPal) {
+            DMANow(3, level->midgroundPal, &PALETTE[level->foregroundPalLen / 2], level->midgroundPalLen / 2);
+        }
     }
 
     if (level->backgroundTiles) {
         REG_DISPCTL |= BG2_ENABLE;
-        REG_BG2CNT = level->levelSize | BG_4BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
+        REG_BG2CNT = level->levelSize | level->BPP | BG_CHARBLOCK(2) | BG_SCREENBLOCK(26);
         DMANow(3, level->backgroundTiles, &CHARBLOCK[2], level->backgroundTilesLen / 2);
         DMANow(3, level->backgroundMap, &SCREENBLOCK[26], level->backgroundMapLen / 2);
-        DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+        if (level->backgroundPal) {
+            DMANow(3, level->backgroundPal, &PALETTE[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
+        }
     }
     
 
@@ -175,8 +189,10 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
         vOff = level->initVOff;
     }
 
-    for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
-        loadNPC(level->npcs[i]);
+    if (level->numNPCS) {
+        for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+            loadNPC(level->npcs[i]);
+        }
     }
 
 }
