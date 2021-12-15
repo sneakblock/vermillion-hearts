@@ -1652,7 +1652,9 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+extern LEVEL level1;
 extern LEVEL level2;
+extern LEVEL level3;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
@@ -1672,6 +1674,8 @@ void initLevel0();
 void initLevel1();
 void initLevel2();
 void animateLevel2();
+
+void initLevel3();
 # 14 "levels.c" 2
 
 # 1 "startforeground.h" 1
@@ -1785,27 +1789,45 @@ extern const unsigned short level2collisionmapBitmap[32768];
 extern const unsigned short level2collisionmapPal[256];
 # 29 "levels.c" 2
 
+# 1 "level3foreground.h" 1
+# 22 "level3foreground.h"
+extern const unsigned short level3foregroundTiles[14448];
+
+
+extern const unsigned short level3foregroundMap[1024];
+
+
+extern const unsigned short level3foregroundPal[16];
+# 31 "levels.c" 2
+# 1 "level3collisionmap.h" 1
+# 21 "level3collisionmap.h"
+extern const unsigned short level3collisionmapBitmap[32768];
+
+
+extern const unsigned short level3collisionmapPal[256];
+# 32 "levels.c" 2
+
 # 1 "instructionsforeground.h" 1
 # 22 "instructionsforeground.h"
-extern const unsigned short instructionsforegroundTiles[9968];
+extern const unsigned short instructionsforegroundTiles[9536];
 
 
 extern const unsigned short instructionsforegroundMap[1024];
 
 
-extern const unsigned short instructionsforegroundPal[16];
-# 31 "levels.c" 2
+extern const unsigned short instructionsforegroundPal[256];
+# 34 "levels.c" 2
 
 # 1 "pause.h" 1
 # 22 "pause.h"
-extern const unsigned short pauseTiles[5408];
+extern const unsigned short pauseTiles[2944];
 
 
 extern const unsigned short pauseMap[1024];
 
 
-extern const unsigned short pausePal[16];
-# 33 "levels.c" 2
+extern const unsigned short pausePal[256];
+# 36 "levels.c" 2
 
 # 1 "sound.h" 1
 void setupSounds();
@@ -1832,21 +1854,21 @@ typedef struct{
 
 SOUND soundA;
 SOUND soundB;
-# 35 "levels.c" 2
+# 38 "levels.c" 2
 # 1 "trackA.h" 1
 
 
 extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
-# 36 "levels.c" 2
+# 39 "levels.c" 2
 # 1 "trackB.h" 1
 
 
 extern const unsigned int trackB_sampleRate;
 extern const unsigned int trackB_length;
 extern const signed char trackB_data[];
-# 37 "levels.c" 2
+# 40 "levels.c" 2
 
 # 1 "npcs.h" 1
 extern NPC cloud;
@@ -1855,6 +1877,7 @@ extern NPC seer;
 extern NPC knight;
 extern NPC seerMaster;
 extern NPC finalDoor;
+extern NPC dutchess;
 
 void initNPCS();
 NPC* initCloud();
@@ -1863,9 +1886,12 @@ NPC* initSeer();
 NPC* initKnight();
 NPC* initSeerMaster();
 NPC* initFinalDoor();
+NPC* initDutchess();
 
+void unlockDutchess();
 void openGate();
-# 39 "levels.c" 2
+void destroyWorld();
+# 42 "levels.c" 2
 
 LEVEL startLevel;
 LEVEL instructionsLevel;
@@ -1874,8 +1900,12 @@ LEVEL pauseLevel;
 LEVEL level0;
 int level0AniTimer;
 
+LEVEL level1;
+
 LEVEL level2;
 int level2AniTimer;
+
+LEVEL level3;
 
 int vOffBG0;
 int vOffBG1;
@@ -1932,12 +1962,25 @@ void glitchDMA(int duration) {
 void crushPalette() {
 
     waitForVBlank();
+# 122 "levels.c"
+    int randIndex = rand() % 32;
 
-    ((unsigned short *)0x5000000)[rand() % 32] = ((unsigned short *)0x5000000)[rand() % 32];
+    for (int i = 0; i < 32; i++) {
+        if (((unsigned short *)0x5000000)[randIndex] != ((unsigned short *)0x5000000)[i]) {
+            ((unsigned short *)0x5000000)[i] = ((unsigned short *)0x5000000)[randIndex];
+            for (int j = 0; j < 32; j++) {
+                if (((unsigned short *)0x5000000)[randIndex] != ((unsigned short *)0x5000000)[j]) {
+                    ((unsigned short *)0x5000000)[j] = ((unsigned short *)0x5000000)[randIndex];
+                    break;
+                }
+            }
+            break;
+        }
+    }
 
     if (!soundB.isPlaying) {
 
-        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+        playSoundB(&trackB_data[rand() % trackB_length], 1000, 0, rand() % 11025);
 
     }
 
@@ -2030,11 +2073,11 @@ void initInstructions() {
 
     instructionsLevel.foregroundTiles = instructionsforegroundTiles;
     instructionsLevel.foregroundMap = instructionsforegroundMap;
-    instructionsLevel.foregroundTilesLen = 19936;
+    instructionsLevel.foregroundTilesLen = 19072;
     instructionsLevel.foregroundMapLen = 2048;
 
     instructionsLevel.foregroundPal = instructionsforegroundPal;
-    instructionsLevel.foregroundPalLen = 32;
+    instructionsLevel.foregroundPalLen = 512;
 
     (*(volatile unsigned short *)0x04000012) = 0;
     (*(volatile unsigned short *)0x04000010) = 0;
@@ -2050,11 +2093,11 @@ void initPause() {
 
     pauseLevel.foregroundTiles = pauseTiles;
     pauseLevel.foregroundMap = pauseMap;
-    pauseLevel.foregroundTilesLen = 10816;
+    pauseLevel.foregroundTilesLen = 5888;
     pauseLevel.foregroundMapLen = 2048;
 
     pauseLevel.foregroundPal = pausePal;
-    pauseLevel.foregroundPalLen = 32;
+    pauseLevel.foregroundPalLen = 512;
 
     (*(volatile unsigned short *)0x04000012) = 0;
     (*(volatile unsigned short *)0x04000010) = 0;
@@ -2096,7 +2139,7 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 287 "levels.c"
+# 316 "levels.c"
     level1.numNPCS = 1;
     level1.npcs[0] = initSeerMaster();
 
@@ -2200,7 +2243,7 @@ void initLevel2() {
 
     level2.foregroundPal = level2foregroundPal;
     level2.foregroundPalLen = 64;
-# 403 "levels.c"
+# 432 "levels.c"
     level2.backgroundTiles = level2midgroundTiles;
     level2.backgroundMap = level2midgroundMap;
     level2.backgroundTilesLen = 3840;
@@ -2233,7 +2276,7 @@ void unlockGateLevel0() {
 }
 
 void animateLevel2() {
-# 443 "levels.c"
+# 472 "levels.c"
     if (player.currentSprite != &seerMaster) {
 
         int randInt = rand();
@@ -2243,7 +2286,7 @@ void animateLevel2() {
         ((unsigned short *)0x5000000)[0] = 0;
 
     }
-# 479 "levels.c"
+# 508 "levels.c"
 }
 
 void animateLevel0() {
@@ -2285,4 +2328,37 @@ void animateLevel0() {
 
 
 
+}
+
+void initLevel3() {
+
+
+    level3.playerWorldSpawnCol = 121;
+    level3.playerWorldSpawnRow = 233;
+    level3.initHOff = 16;
+    level3.initVOff = 96;
+
+
+
+    level3.levelSize = (0 << 14);
+    level3.BPP = (0 << 7);
+    level3.worldPixelWidth = 256;
+    level3.worldPixelHeight = 256;
+    level3.collisionMap = (unsigned char*) level3collisionmapBitmap;
+
+
+    level3.numNPCS = 1;
+    level3.npcs[0] = initDutchess();
+
+
+
+
+    level3.foregroundTiles = level3foregroundTiles;
+    level3.foregroundMap = level3foregroundMap;
+    level3.foregroundTilesLen = 28896;
+    level3.foregroundMapLen = 2048;
+
+    level3.foregroundPal = level3foregroundPal;
+    level3.foregroundPalLen = 32;
+# 607 "levels.c"
 }

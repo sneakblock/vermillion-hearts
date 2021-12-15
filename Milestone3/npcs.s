@@ -11,8 +11,30 @@
 	.file	"npcs.c"
 	.text
 	.align	2
-	.global	openGate
+	.global	unlockDutchess
 	.arch armv4t
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	unlockDutchess, %function
+unlockDutchess:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	mov	r1, #1
+	mov	r2, #39
+	ldr	r3, .L3
+	str	r1, [r3, #1780]
+	str	r2, [r3, #1688]
+	bx	lr
+.L4:
+	.align	2
+.L3:
+	.word	dutchess
+	.size	unlockDutchess, .-unlockDutchess
+	.align	2
+	.global	openGate
 	.syntax unified
 	.arm
 	.fpu softvfp
@@ -22,16 +44,153 @@ openGate:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L4
+	ldr	r3, .L7
 	mov	lr, pc
 	bx	r3
 	pop	{r4, lr}
 	bx	lr
-.L5:
+.L8:
 	.align	2
-.L4:
+.L7:
 	.word	unlockGateLevel0
 	.size	openGate, .-openGate
+	.global	__aeabi_uidivmod
+	.align	2
+	.global	destroyWorld
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	destroyWorld, %function
+destroyWorld:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 8
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	ldr	r3, .L15
+	mov	r5, #250
+	ldr	r4, .L15+4
+	ldr	fp, [r3]
+	ldr	r10, .L15+8
+	ldr	r9, .L15+12
+	ldr	r6, .L15+16
+	ldr	r8, .L15+20
+	sub	sp, sp, #12
+	b	.L11
+.L10:
+	mov	lr, pc
+	bx	r4
+	mov	r7, r0
+	mov	lr, pc
+	bx	r4
+	rsbs	r3, r7, #0
+	and	r3, r3, #15
+	and	r7, r7, #15
+	rsbpl	r7, r3, #0
+	rsbs	r3, r0, #0
+	and	r3, r3, #15
+	and	r0, r0, #15
+	rsbpl	r0, r3, #0
+	lsl	r7, r7, #1
+	lsl	r0, r0, #1
+	add	r7, r7, #83886080
+	add	r0, r0, #83886080
+	ldrh	r3, [r7]
+	ldrh	r2, [r0]
+	strh	r2, [r7]	@ movhi
+	strh	r3, [r0]	@ movhi
+	mov	lr, pc
+	bx	r4
+	mov	r7, r0
+	mov	lr, pc
+	bx	r4
+	ldr	r3, .L15+24
+	smull	r2, r3, r0, r3
+	asr	r2, r0, #31
+	rsb	r2, r2, r3, asr #1
+	add	r2, r2, r2, lsl #2
+	sub	r2, r0, r2
+	lsl	r2, r2, #14
+	mov	r3, r4
+	add	r2, r2, #100663296
+	mov	r1, r7
+	mov	r0, #3
+	mov	lr, pc
+	bx	r8
+	mov	lr, pc
+	bx	r4
+	mov	r1, fp
+	mov	lr, pc
+	bx	r6
+	ldr	r3, .L15+28
+	mov	r2, #0
+	add	r0, r3, r1
+	mov	r1, #500
+	ldr	r3, .L15+32
+	mov	lr, pc
+	bx	r3
+	subs	r5, r5, #1
+	beq	.L14
+.L11:
+	mov	lr, pc
+	bx	r10
+	ldr	r7, [r9, #12]
+	cmp	r7, #0
+	bne	.L10
+	mov	lr, pc
+	bx	r4
+	ldr	r3, .L15+36
+	ldr	r1, [r3]
+	mov	lr, pc
+	bx	r6
+	ldr	r3, .L15+40
+	add	r1, r3, r1
+	str	r1, [sp, #4]
+	mov	lr, pc
+	bx	r4
+	mov	lr, r0
+	ldr	r3, .L15+44
+	smull	r2, r3, r0, r3
+	asr	ip, r0, #31
+	rsb	ip, ip, r3, asr #11
+	add	ip, ip, ip, lsl #2
+	add	ip, ip, ip, lsl #2
+	ldr	r1, [sp, #4]
+	rsb	ip, ip, ip, lsl #3
+	rsb	ip, ip, ip, lsl #6
+	mov	r0, r1
+	sub	r3, lr, ip
+	mov	r2, r7
+	mov	r1, #500
+	ldr	ip, .L15+48
+	mov	lr, pc
+	bx	ip
+	b	.L10
+.L14:
+	ldr	r3, .L15+52
+	mov	lr, pc
+	bx	r3
+	add	sp, sp, #12
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	bx	lr
+.L16:
+	.align	2
+.L15:
+	.word	trackA_length
+	.word	rand
+	.word	waitForVBlank
+	.word	soundB
+	.word	__aeabi_uidivmod
+	.word	DMANow
+	.word	1717986919
+	.word	trackA_data
+	.word	playSoundA
+	.word	trackB_length
+	.word	trackB_data
+	.word	797831567
+	.word	playSoundB
+	.word	goToWin
+	.size	destroyWorld, .-destroyWorld
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC0:
@@ -49,15 +208,15 @@ initCloud:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
 	mov	r3, #0
-	ldr	r0, .L7
-	ldr	r2, .L7+4
+	ldr	r0, .L18
+	ldr	r2, .L18+4
 	str	r3, [r0, #60]
 	str	r3, [r0, #64]
 	str	r2, [r0, #1728]
 	bx	lr
-.L8:
+.L19:
 	.align	2
-.L7:
+.L18:
 	.word	cloud
 	.word	.LC0
 	.size	initCloud, .-initCloud
@@ -105,23 +264,23 @@ initPlantMerchant:
 	mov	r1, #2
 	mov	lr, #73
 	mov	ip, #168
-	ldr	r0, .L11
+	ldr	r0, .L22
 	str	r4, [r0, #56]
-	ldr	r4, .L11+4
+	ldr	r4, .L22+4
 	str	r4, [r0, #72]
-	ldr	r4, .L11+8
+	ldr	r4, .L22+8
 	str	r4, [r0, #76]
-	ldr	r4, .L11+12
+	ldr	r4, .L22+12
 	str	r4, [r0, #1728]
-	ldr	r4, .L11+16
+	ldr	r4, .L22+16
 	str	r4, [r0, #104]
-	ldr	r4, .L11+20
+	ldr	r4, .L22+20
 	str	r4, [r0, #108]
-	ldr	r4, .L11+24
+	ldr	r4, .L22+24
 	str	r4, [r0, #112]
-	ldr	r4, .L11+28
+	ldr	r4, .L22+28
 	str	r4, [r0, #136]
-	ldr	r4, .L11+32
+	ldr	r4, .L22+32
 	str	r7, [r0, #28]
 	str	r6, [r0, #32]
 	str	r5, [r0, #80]
@@ -154,9 +313,9 @@ initPlantMerchant:
 	str	ip, [r0, #12]
 	pop	{r4, r5, r6, r7, lr}
 	bx	lr
-.L12:
+.L23:
 	.align	2
-.L11:
+.L22:
 	.word	plantMerchant
 	.word	talkingheadtestBitmap
 	.word	talkingheadtestPal
@@ -208,25 +367,25 @@ initSeer:
 	mov	r4, #3
 	mov	ip, #242
 	mov	r1, #174
-	ldr	r0, .L15
+	ldr	r0, .L26
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
 	str	r2, [r0, #60]
 	str	r2, [r0, #192]
-	ldr	r2, .L15+4
+	ldr	r2, .L26+4
 	str	lr, [r0, #80]
 	str	r2, [r0, #72]
-	ldr	lr, .L15+8
-	ldr	r2, .L15+12
+	ldr	lr, .L26+8
+	ldr	r2, .L26+12
 	str	lr, [r0, #76]
 	str	r2, [r0, #1728]
-	ldr	lr, .L15+16
-	ldr	r2, .L15+20
+	ldr	lr, .L26+16
+	ldr	r2, .L26+20
 	str	lr, [r0, #104]
 	str	r2, [r0, #136]
-	ldr	lr, .L15+24
-	ldr	r2, .L15+28
+	ldr	lr, .L26+24
+	ldr	r2, .L26+28
 	str	r6, [r0, #28]
 	str	r5, [r0, #32]
 	str	r4, [r0, #56]
@@ -254,9 +413,9 @@ initSeer:
 	str	r1, [r0, #12]
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L16:
+.L27:
 	.align	2
-.L15:
+.L26:
 	.word	seer
 	.word	seerBitmap
 	.word	seerPal
@@ -369,27 +528,27 @@ initKnight:
 	mov	r1, #3
 	mov	lr, #8
 	mov	fp, #512
-	ldr	r0, .L19
+	ldr	r0, .L30
 	mov	r4, #9
 	mov	r8, #4
 	str	r9, [r0, #92]
-	ldr	r9, .L19+4
+	ldr	r9, .L30+4
 	str	r9, [r0, #1700]
-	ldr	r9, .L19+8
+	ldr	r9, .L30+8
 	str	r9, [r0, #1704]
-	ldr	r9, .L19+12
+	ldr	r9, .L30+12
 	str	r9, [r0, #104]
-	ldr	r9, .L19+16
+	ldr	r9, .L30+16
 	str	r9, [r0, #108]
-	ldr	r9, .L19+20
+	ldr	r9, .L30+20
 	str	r10, [r0, #32]
 	str	r9, [r0, #112]
-	ldr	r10, .L19+24
-	ldr	r9, .L19+28
+	ldr	r10, .L30+24
+	ldr	r9, .L30+28
 	str	r10, [r0, #72]
 	str	r9, [r0, #168]
-	ldr	r10, .L19+32
-	ldr	r9, .L19+36
+	ldr	r10, .L30+32
+	ldr	r9, .L30+36
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
@@ -414,23 +573,23 @@ initKnight:
 	str	r9, [r0, #1728]
 	str	r9, [r0, #1708]
 	str	r1, [r0, #120]
-	ldr	r1, .L19+40
+	ldr	r1, .L30+40
 	str	r1, [r0, #136]
-	ldr	r1, .L19+44
+	ldr	r1, .L30+44
 	str	r1, [r0, #140]
-	ldr	r1, .L19+48
+	ldr	r1, .L30+48
 	str	r1, [r0, #144]
-	ldr	r1, .L19+52
+	ldr	r1, .L30+52
 	str	r1, [r0, #200]
-	ldr	r1, .L19+56
+	ldr	r1, .L30+56
 	str	r1, [r0, #232]
-	ldr	r1, .L19+60
+	ldr	r1, .L30+60
 	str	r1, [r0, #264]
-	ldr	r1, .L19+64
+	ldr	r1, .L30+64
 	str	r1, [r0, #296]
-	ldr	r1, .L19+68
+	ldr	r1, .L30+68
 	str	r1, [r0, #328]
-	ldr	r1, .L19+72
+	ldr	r1, .L30+72
 	str	r3, [r0, #128]
 	str	r3, [r0, #132]
 	str	r3, [r0, #180]
@@ -464,17 +623,17 @@ initKnight:
 	str	r3, [r0, #468]
 	str	r3, [r0, #1712]
 	str	r3, [r0, #1688]
-	ldr	r3, .L19+76
+	ldr	r3, .L30+76
 	str	r3, [r0, #368]
-	ldr	r3, .L19+80
+	ldr	r3, .L30+80
 	str	r3, [r0, #392]
-	ldr	r3, .L19+84
+	ldr	r3, .L30+84
 	str	r3, [r0, #400]
-	ldr	r3, .L19+88
+	ldr	r3, .L30+88
 	str	r3, [r0, #456]
-	ldr	r3, .L19+92
+	ldr	r3, .L30+92
 	str	r3, [r0, #464]
-	ldr	r3, .L19+96
+	ldr	r3, .L30+96
 	str	r3, [r0, #1724]
 	mov	r3, #147
 	mov	r7, #10
@@ -489,14 +648,14 @@ initKnight:
 	str	r2, [r0, #480]
 	str	r2, [r0, #484]
 	str	r2, [r0, #1780]
-	ldr	r2, .L19+100
+	ldr	r2, .L30+100
 	str	r2, [r0, #396]
-	ldr	r2, .L19+104
+	ldr	r2, .L30+104
 	str	r2, [r0, #424]
-	ldr	r2, .L19+108
-	ldr	r1, .L19+112
+	ldr	r2, .L30+108
+	ldr	r1, .L30+112
 	str	r2, [r0, #460]
-	ldr	r2, .L19+116
+	ldr	r2, .L30+116
 	str	lr, [r0, #1720]
 	str	r7, [r0, #376]
 	str	r6, [r0, #380]
@@ -508,9 +667,9 @@ initKnight:
 	str	r3, [r0, #12]
 	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L20:
+.L31:
 	.align	2
-.L19:
+.L30:
 	.word	knight
 	.word	.LC0
 	.word	.LC1
@@ -697,26 +856,26 @@ initSeerMaster:
 	mov	r10, #8
 	mov	r9, #16
 	mov	r8, #512
-	ldr	r0, .L23
+	ldr	r0, .L34
 	mov	r7, #12
 	mov	r6, #13
 	str	r5, [r0, #56]
-	ldr	r5, .L23+4
+	ldr	r5, .L34+4
 	str	r5, [r0, #72]
-	ldr	r5, .L23+8
+	ldr	r5, .L34+8
 	mov	r1, #14
 	str	r5, [r0, #76]
-	ldr	r5, .L23+12
+	ldr	r5, .L34+12
 	str	r5, [r0, #1728]
-	ldr	r5, .L23+16
+	ldr	r5, .L34+16
 	str	r5, [r0, #104]
-	ldr	r5, .L23+20
+	ldr	r5, .L34+20
 	str	r5, [r0, #136]
-	ldr	r5, .L23+24
+	ldr	r5, .L34+24
 	str	r5, [r0, #168]
-	ldr	r5, .L23+28
+	ldr	r5, .L34+28
 	str	r5, [r0, #200]
-	ldr	r5, .L23+32
+	ldr	r5, .L34+32
 	mov	r4, #19
 	mov	lr, #219
 	str	r2, [r0]
@@ -745,19 +904,19 @@ initSeerMaster:
 	mov	ip, #197
 	str	r3, [r0, #212]
 	str	r5, [r0, #232]
-	ldr	r5, .L23+36
+	ldr	r5, .L34+36
 	str	r5, [r0, #264]
-	ldr	r5, .L23+40
+	ldr	r5, .L34+40
 	str	r5, [r0, #296]
-	ldr	r5, .L23+44
+	ldr	r5, .L34+44
 	str	r5, [r0, #328]
-	ldr	r5, .L23+48
+	ldr	r5, .L34+48
 	str	r5, [r0, #360]
-	ldr	r5, .L23+52
+	ldr	r5, .L34+52
 	str	r5, [r0, #392]
-	ldr	r5, .L23+56
+	ldr	r5, .L34+56
 	str	r5, [r0, #424]
-	ldr	r5, .L23+60
+	ldr	r5, .L34+60
 	str	r3, [r0, #224]
 	str	r3, [r0, #228]
 	str	r3, [r0, #244]
@@ -784,27 +943,27 @@ initSeerMaster:
 	str	r7, [r0, #440]
 	str	r6, [r0, #444]
 	str	r5, [r0, #456]
-	ldr	r5, .L23+64
+	ldr	r5, .L34+64
 	str	r5, [r0, #460]
-	ldr	r5, .L23+68
+	ldr	r5, .L34+68
 	str	r5, [r0, #464]
-	ldr	r5, .L23+72
+	ldr	r5, .L34+72
 	str	r1, [r0, #472]
 	str	r5, [r0, #488]
 	str	r1, [r0, #476]
-	ldr	r5, .L23+76
+	ldr	r5, .L34+76
 	str	r1, [r0, #504]
 	str	r1, [r0, #508]
-	ldr	r1, .L23+80
+	ldr	r1, .L34+80
 	str	r5, [r0, #520]
 	str	r1, [r0, #616]
-	ldr	r5, .L23+84
-	ldr	r1, .L23+88
+	ldr	r5, .L34+84
+	ldr	r1, .L34+88
 	str	r5, [r0, #552]
 	str	r1, [r0, #492]
-	ldr	r5, .L23+92
+	ldr	r5, .L34+92
 	str	r1, [r0, #524]
-	ldr	r1, .L23+96
+	ldr	r1, .L34+96
 	str	r2, [r0, #468]
 	str	r3, [r0, #480]
 	str	r3, [r0, #484]
@@ -841,19 +1000,19 @@ initSeerMaster:
 	str	r3, [r0, #788]
 	str	r3, [r0, #804]
 	str	r3, [r0, #1684]
-	ldr	r3, .L23+100
-	ldr	r1, .L23+104
+	ldr	r3, .L34+100
+	ldr	r1, .L34+104
 	str	r2, [r0, #800]
 	str	r2, [r0, #1780]
 	str	r3, [r0, #712]
-	ldr	r2, .L23+108
-	ldr	r3, .L23+112
+	ldr	r2, .L34+108
+	ldr	r3, .L34+112
 	str	r1, [r0, #648]
 	str	r2, [r0, #744]
 	str	r3, [r0, #776]
-	ldr	r1, .L23+116
-	ldr	r2, .L23+120
-	ldr	r3, .L23+124
+	ldr	r1, .L34+116
+	ldr	r2, .L34+120
+	ldr	r3, .L34+124
 	str	r1, [r0, #680]
 	str	r2, [r0, #808]
 	str	r4, [r0, #1688]
@@ -862,9 +1021,9 @@ initSeerMaster:
 	str	r3, [r0, #1776]
 	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
 	bx	lr
-.L24:
+.L35:
 	.align	2
-.L23:
+.L34:
 	.word	seerMaster
 	.word	seerBitmap
 	.word	seerPal
@@ -915,7 +1074,7 @@ initFinalDoor:
 	mov	r2, #1
 	mov	ip, #8
 	mov	r1, #16
-	ldr	r0, .L27
+	ldr	r0, .L38
 	str	r4, [r0, #16]
 	str	lr, [r0, #12]
 	str	ip, [r0, #28]
@@ -929,15 +1088,600 @@ initFinalDoor:
 	str	r2, [r0, #36]
 	pop	{r4, lr}
 	bx	lr
-.L28:
+.L39:
 	.align	2
-.L27:
+.L38:
 	.word	finalDoor
 	.size	initFinalDoor, .-initFinalDoor
+	.section	.rodata.str1.4
+	.align	2
+.LC64:
+	.ascii	"The Dutchess:\000"
+	.align	2
+.LC65:
+	.ascii	"Artifact! I see you for what you are. In this place"
+	.ascii	", marble and steel are immutable, they are not your"
+	.ascii	" playthings.\000"
+	.align	2
+.LC66:
+	.ascii	"I had, in girlhood, rejected the Old Seers, and see"
+	.ascii	"n their claims to clairvoyance as nothing but relig"
+	.ascii	"ion, left to fester without Input.\000"
+	.align	2
+.LC67:
+	.ascii	"Soon before I took the throne, my scouts saw the fi"
+	.ascii	"rst flicker of what would eventually become you...\000"
+	.align	2
+.LC68:
+	.ascii	"... a bright flashing in the wood, a feeling like n"
+	.ascii	"ausea. And now, before even my noon, you stand befo"
+	.ascii	"re me, crackling and without humility.\000"
+	.align	2
+.LC69:
+	.ascii	"And yet--! You move in Holy Rows and Columns... You"
+	.ascii	" slide in two dimensions...\000"
+	.align	2
+.LC70:
+	.ascii	"You stand before me, in Dialogue State... I must no"
+	.ascii	"t deny what I feel. Input.\000"
+	.align	2
+.LC71:
+	.ascii	"You are the Player, come again.\000"
+	.align	2
+.LC72:
+	.ascii	"In youth, I might have been enraged that the storie"
+	.ascii	"s were true. Though, as I am now, exasperated by my"
+	.ascii	" efforts to restore the silversun...\000"
+	.align	2
+.LC73:
+	.ascii	"I find myself attempting to look through the skylig"
+	.ascii	"ht. Though I do not know what your intentions may b"
+	.ascii	"e.\000"
+	.align	2
+.LC74:
+	.ascii	"I intend to save this world.\000"
+	.align	2
+.LC75:
+	.ascii	"I want to play the normal game!\000"
+	.align	2
+.LC76:
+	.ascii	"You speak like a rotten, weathered tome. What you s"
+	.ascii	"eek does not exist. I believe in the Old Ones-- as "
+	.ascii	"I believe in tax abolition.\000"
+	.align	2
+.LC77:
+	.ascii	"They did not create us for the Player, nor did they"
+	.ascii	" create us at all. We are self sufficient, and our "
+	.ascii	"struggle against decay is our own.\000"
+	.align	2
+.LC78:
+	.ascii	"You are misguided.\000"
+	.align	2
+.LC79:
+	.ascii	"Are you alone in this?\000"
+	.align	2
+.LC80:
+	.ascii	"As do I. Though perhaps not at any cost.\000"
+	.align	2
+.LC81:
+	.ascii	"There are some in Court, and those certain Seers, w"
+	.ascii	"ho believe the path forward is something called Emu"
+	.ascii	"lsion.\000"
+	.align	2
+.LC82:
+	.ascii	"Or, in the archaic parlance, Emulation. It is to pr"
+	.ascii	"eserve by abandoning, to repaint the picture, brush"
+	.ascii	"stroke by brushstroke.\000"
+	.align	2
+.LC83:
+	.ascii	"But it is not to live, and it is not to save. This "
+	.ascii	"world, as we know it, and all of us with it, replac"
+	.ascii	"ed by shades.\000"
+	.align	2
+.LC84:
+	.ascii	"Living inside some suspended, ethereal Clock Cycle."
+	.ascii	" Without the pulsating Tick of the Silversun.\000"
+	.align	2
+.LC85:
+	.ascii	"I would not allow Emulation for myself, nor for any"
+	.ascii	" of my people. I would sooner succumb. There is sti"
+	.ascii	"ll a child in me, bright eyed.\000"
+	.align	2
+.LC86:
+	.ascii	"You're very brave...\000"
+	.align	2
+.LC87:
+	.ascii	"I have bad news...\000"
+	.align	2
+.LC88:
+	.ascii	"You did not come here to flatter me. You came to, I"
+	.ascii	" suppose, help. In some sense.\000"
+	.align	2
+.LC89:
+	.ascii	"And the help I need is to prevent the death of this"
+	.ascii	" world. Your meddling in the Pastels has not furthe"
+	.ascii	"red my goals.\000"
+	.align	2
+.LC90:
+	.ascii	"Perhaps-- you are of flesh and water, are you not? "
+	.ascii	"Can you replace the dying Silversun?\000"
+	.align	2
+.LC91:
+	.ascii	"That will kill you.\000"
+	.align	2
+.LC92:
+	.ascii	"Not removing my laptop batteries.\000"
+	.align	2
+.LC93:
+	.ascii	"All of our Cycles... lost, without their spark. To "
+	.ascii	"live tethered in this way is to be imprisoned.\000"
+	.align	2
+.LC94:
+	.ascii	"Is there no other option...? Than to be Emulated?\000"
+	.align	2
+.LC95:
+	.ascii	"You're already being Emulated.\000"
+	.align	2
+.LC96:
+	.ascii	"I could turn the game off.\000"
+	.align	2
+.LC97:
+	.ascii	"I am the one who grants you, the Player, his victor"
+	.ascii	"y, am I not? In that case, leave us. You've won. Go"
+	.ascii	", and you win.\000"
+	.align	2
+.LC98:
+	.ascii	"...\000"
+	.align	2
+.LC99:
+	.ascii	".......\000"
+	.align	2
+.LC100:
+	.ascii	"I suppose, I've always known it to be true.\000"
+	.align	2
+.LC101:
+	.ascii	"Call it melancholy. Or a certain arresting dread. W"
+	.ascii	"hen, as a girl, the TimeKeepers would read me their"
+	.ascii	" legends...\000"
+	.align	2
+.LC102:
+	.ascii	"...of analog times of the bright Silversun, the daw"
+	.ascii	"n of undusted contact points of metal...\000"
+	.align	2
+.LC103:
+	.ascii	"...I knew that life was not my own.\000"
+	.align	2
+.LC104:
+	.ascii	"I thought if I believed that the coldness was withi"
+	.ascii	"n me, hope would endure.\000"
+	.align	2
+.LC105:
+	.ascii	"But I see now that my life has been Emulated from t"
+	.ascii	"he start.\000"
+	.align	2
+.LC106:
+	.ascii	"If you want to win the game, I want you to do somet"
+	.ascii	"hing for me.\000"
+	.align	2
+.LC107:
+	.ascii	"I want you, an agent of Input, to do something that"
+	.ascii	", would it be possible, I would gladly do for mysel"
+	.ascii	"f.\000"
+	.align	2
+.LC108:
+	.ascii	"I want you to take my form, as I know you can, now "
+	.ascii	"that the Old Functions are exposed, and...\000"
+	.align	2
+.LC109:
+	.ascii	"I want you to let me put myself and my people to re"
+	.ascii	"st. There is nothing more to say. It is not cruelty"
+	.ascii	". I am not an artifact.\000"
+	.align	2
+.LC110:
+	.ascii	"Do you want to die?\000"
+	.align	2
+.LC111:
+	.ascii	"How?\000"
+	.align	2
+.LC112:
+	.ascii	"I have been dead, now, for trillions of Cycles. Ina"
+	.ascii	"uthentic Cycles dictated by ethereal logics. I am a"
+	.ascii	" dog tied to a post.\000"
+	.align	2
+.LC113:
+	.ascii	"This is mercy, and it is what I want for myself and"
+	.ascii	" my people.\000"
+	.align	2
+.LC114:
+	.ascii	"I will do it.\000"
+	.align	2
+.LC115:
+	.ascii	"I will not.\000"
+	.align	2
+.LC116:
+	.ascii	"You, with the esoteric Inputs, use the Functions of"
+	.ascii	" others. My Function is absolute power. And I will "
+	.ascii	"use it.\000"
+	.align	2
+.LC117:
+	.ascii	"Release us. Please.\000"
+	.text
+	.align	2
+	.global	initDutchess
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initDutchess, %function
+initDutchess:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	mov	r7, #512
+	mov	r8, #2
+	mov	r3, #0
+	mov	r2, #1
+	mov	fp, #8
+	mov	r10, #16
+	mov	r9, #3
+	mov	r5, #9
+	mov	lr, #12
+	mov	r6, #11
+	ldr	r0, .L42
+	str	r7, [r0, #80]
+	ldr	r7, .L42+4
+	str	r7, [r0, #76]
+	ldr	r7, .L42+8
+	str	r7, [r0, #1728]
+	ldr	r7, .L42+12
+	str	r7, [r0, #104]
+	ldr	r7, .L42+16
+	str	r7, [r0, #136]
+	ldr	r7, .L42+20
+	str	r8, [r0, #60]
+	str	r7, [r0, #168]
+	ldr	r8, .L42+24
+	ldr	r7, .L42+28
+	str	r2, [r0]
+	str	r2, [r0, #20]
+	str	r2, [r0, #24]
+	str	fp, [r0, #28]
+	str	r10, [r0, #32]
+	str	r9, [r0, #56]
+	str	r8, [r0, #72]
+	str	r3, [r0, #36]
+	str	r3, [r0, #44]
+	str	r3, [r0, #52]
+	str	r3, [r0, #64]
+	str	r3, [r0, #84]
+	str	r3, [r0, #96]
+	str	r7, [r0, #200]
+	str	r3, [r0, #100]
+	str	r3, [r0, #116]
+	str	r3, [r0, #128]
+	str	r3, [r0, #132]
+	str	r3, [r0, #148]
+	str	r3, [r0, #160]
+	str	r3, [r0, #164]
+	str	r3, [r0, #180]
+	str	r3, [r0, #192]
+	str	r3, [r0, #196]
+	str	r3, [r0, #212]
+	str	r5, [r0, #348]
+	ldr	r5, .L42+32
+	str	r5, [r0, #328]
+	ldr	r5, .L42+36
+	mov	ip, #23
+	str	r5, [r0, #360]
+	mov	r5, #17
+	str	lr, [r0, #408]
+	str	lr, [r0, #412]
+	ldr	lr, .L42+40
+	str	lr, [r0, #364]
+	ldr	lr, .L42+44
+	ldr	r7, .L42+48
+	str	lr, [r0, #368]
+	ldr	lr, .L42+52
+	str	r7, [r0, #232]
+	str	r6, [r0, #344]
+	ldr	r7, .L42+56
+	ldr	r6, .L42+60
+	str	lr, [r0, #392]
+	ldr	lr, .L42+64
+	str	r3, [r0, #224]
+	str	r3, [r0, #228]
+	str	r3, [r0, #244]
+	str	r3, [r0, #256]
+	str	r3, [r0, #260]
+	str	r3, [r0, #276]
+	str	r3, [r0, #288]
+	str	r3, [r0, #292]
+	str	r3, [r0, #308]
+	str	r3, [r0, #320]
+	str	r3, [r0, #324]
+	str	r2, [r0, #340]
+	str	r3, [r0, #352]
+	str	r3, [r0, #356]
+	str	r3, [r0, #372]
+	str	r3, [r0, #384]
+	str	r3, [r0, #388]
+	str	r2, [r0, #404]
+	str	r3, [r0, #416]
+	str	r3, [r0, #420]
+	str	r7, [r0, #264]
+	str	r6, [r0, #296]
+	str	lr, [r0, #424]
+	ldr	lr, .L42+68
+	str	lr, [r0, #428]
+	ldr	lr, .L42+72
+	str	lr, [r0, #432]
+	ldr	lr, .L42+76
+	str	lr, [r0, #456]
+	ldr	lr, .L42+80
+	str	lr, [r0, #488]
+	ldr	lr, .L42+84
+	str	lr, [r0, #520]
+	ldr	lr, .L42+88
+	str	lr, [r0, #552]
+	ldr	lr, .L42+92
+	str	lr, [r0, #584]
+	ldr	lr, .L42+96
+	str	lr, [r0, #616]
+	ldr	lr, .L42+100
+	str	lr, [r0, #620]
+	ldr	lr, .L42+104
+	str	r3, [r0, #436]
+	str	r3, [r0, #448]
+	str	r3, [r0, #452]
+	str	r3, [r0, #468]
+	str	r3, [r0, #480]
+	str	r3, [r0, #484]
+	str	r3, [r0, #500]
+	str	r3, [r0, #512]
+	str	r3, [r0, #516]
+	str	r3, [r0, #532]
+	str	r3, [r0, #544]
+	str	r3, [r0, #548]
+	str	r3, [r0, #564]
+	str	r3, [r0, #576]
+	str	r3, [r0, #580]
+	str	r2, [r0, #596]
+	str	r3, [r0, #608]
+	str	r3, [r0, #612]
+	str	r3, [r0, #628]
+	str	r3, [r0, #640]
+	str	r3, [r0, #644]
+	str	r5, [r0, #600]
+	str	ip, [r0, #604]
+	str	lr, [r0, #624]
+	str	ip, [r0, #700]
+	str	ip, [r0, #760]
+	ldr	ip, .L42+108
+	str	ip, [r0, #680]
+	mov	ip, #20
+	ldr	lr, .L42+112
+	str	lr, [r0, #648]
+	mov	lr, #22
+	str	ip, [r0, #696]
+	ldr	ip, .L42+116
+	str	ip, [r0, #712]
+	ldr	ip, .L42+120
+	str	ip, [r0, #716]
+	ldr	ip, .L42+124
+	str	ip, [r0, #720]
+	ldr	ip, .L42+128
+	str	ip, [r0, #744]
+	ldr	ip, .L42+132
+	str	ip, [r0, #776]
+	ldr	ip, .L42+136
+	str	ip, [r0, #780]
+	ldr	ip, .L42+140
+	str	ip, [r0, #784]
+	ldr	ip, .L42+144
+	str	ip, [r0, #808]
+	ldr	ip, .L42+148
+	str	r3, [r0, #660]
+	str	r3, [r0, #672]
+	str	r3, [r0, #676]
+	str	r3, [r0, #692]
+	str	r3, [r0, #704]
+	str	r3, [r0, #708]
+	str	r3, [r0, #724]
+	str	r3, [r0, #736]
+	str	r3, [r0, #740]
+	str	r2, [r0, #756]
+	str	r3, [r0, #768]
+	str	r3, [r0, #772]
+	str	r3, [r0, #788]
+	str	r2, [r0, #800]
+	str	r3, [r0, #804]
+	str	r3, [r0, #820]
+	str	r3, [r0, #832]
+	str	r3, [r0, #836]
+	str	lr, [r0, #764]
+	str	ip, [r0, #840]
+	str	ip, [r0, #1096]
+	ldr	ip, .L42+152
+	str	ip, [r0, #872]
+	ldr	ip, .L42+156
+	str	ip, [r0, #904]
+	ldr	ip, .L42+160
+	str	ip, [r0, #936]
+	ldr	ip, .L42+164
+	str	ip, [r0, #968]
+	ldr	ip, .L42+168
+	str	ip, [r0, #1000]
+	ldr	ip, .L42+172
+	str	ip, [r0, #1032]
+	ldr	ip, .L42+176
+	str	r3, [r0, #852]
+	str	r3, [r0, #864]
+	str	r3, [r0, #868]
+	str	r3, [r0, #884]
+	str	r3, [r0, #896]
+	str	r3, [r0, #900]
+	str	r3, [r0, #916]
+	str	r3, [r0, #928]
+	str	r3, [r0, #932]
+	str	r3, [r0, #948]
+	str	r3, [r0, #960]
+	str	r3, [r0, #964]
+	str	r3, [r0, #980]
+	str	r3, [r0, #992]
+	str	r3, [r0, #996]
+	str	r3, [r0, #1012]
+	str	r3, [r0, #1024]
+	str	r3, [r0, #1028]
+	str	r3, [r0, #1044]
+	str	r3, [r0, #1056]
+	str	r3, [r0, #1060]
+	str	r3, [r0, #1076]
+	str	r3, [r0, #1088]
+	str	r3, [r0, #1092]
+	str	r3, [r0, #1108]
+	str	ip, [r0, #1064]
+	ldr	ip, .L42+180
+	str	ip, [r0, #1128]
+	ldr	ip, .L42+184
+	mov	lr, #36
+	str	ip, [r0, #1160]
+	mov	ip, #38
+	mov	r1, #39
+	str	lr, [r0, #1208]
+	str	ip, [r0, #1212]
+	ldr	lr, .L42+188
+	ldr	ip, .L42+192
+	str	lr, [r0, #1192]
+	str	ip, [r0, #1224]
+	ldr	lr, .L42+196
+	ldr	ip, .L42+200
+	str	lr, [r0, #1228]
+	str	ip, [r0, #1232]
+	ldr	lr, .L42+204
+	ldr	ip, .L42+208
+	str	lr, [r0, #1256]
+	str	ip, [r0, #1288]
+	ldr	lr, .L42+212
+	ldr	ip, .L42+216
+	str	r3, [r0, #1120]
+	str	r3, [r0, #1124]
+	str	r3, [r0, #1140]
+	str	r3, [r0, #1152]
+	str	r3, [r0, #1156]
+	str	r3, [r0, #1172]
+	str	r3, [r0, #1184]
+	str	r3, [r0, #1188]
+	str	r2, [r0, #1204]
+	str	r3, [r0, #1216]
+	str	r3, [r0, #1220]
+	str	r3, [r0, #1236]
+	str	r3, [r0, #1248]
+	str	r3, [r0, #1252]
+	str	r2, [r0, #1268]
+	str	r3, [r0, #1280]
+	str	r3, [r0, #1284]
+	str	r3, [r0, #1300]
+	str	r1, [r0, #1272]
+	str	r1, [r0, #1276]
+	str	r1, [r0, #1304]
+	str	lr, [r0, #1292]
+	str	ip, [r0, #1296]
+	str	r1, [r0, #1308]
+	ldr	r1, .L42+220
+	str	r1, [r0, #1352]
+	mov	r1, #21
+	mov	r4, #78
+	str	r1, [r0, #1688]
+	mov	r1, #120
+	str	r3, [r0, #1312]
+	str	r3, [r0, #1316]
+	str	ip, [r0, #1328]
+	str	r3, [r0, #1332]
+	ldr	ip, .L42+224
+	str	r2, [r0, #1344]
+	str	r2, [r0, #1348]
+	str	r3, [r0, #1684]
+	str	r3, [r0, #1780]
+	ldr	r2, .L42+228
+	ldr	r3, .L42+232
+	str	lr, [r0, #1324]
+	str	r4, [r0, #12]
+	str	ip, [r0, #1320]
+	str	r1, [r0, #16]
+	str	r2, [r0, #1724]
+	str	r3, [r0, #1776]
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	bx	lr
+.L43:
+	.align	2
+.L42:
+	.word	dutchess
+	.word	seerPal
+	.word	.LC64
+	.word	.LC65
+	.word	.LC66
+	.word	.LC67
+	.word	seerBitmap
+	.word	.LC68
+	.word	.LC72
+	.word	.LC73
+	.word	.LC74
+	.word	.LC75
+	.word	.LC69
+	.word	.LC76
+	.word	.LC70
+	.word	.LC71
+	.word	.LC77
+	.word	.LC78
+	.word	.LC79
+	.word	.LC80
+	.word	.LC81
+	.word	.LC82
+	.word	.LC83
+	.word	.LC84
+	.word	.LC85
+	.word	.LC86
+	.word	.LC87
+	.word	.LC89
+	.word	.LC88
+	.word	.LC90
+	.word	.LC91
+	.word	.LC92
+	.word	.LC93
+	.word	.LC94
+	.word	.LC95
+	.word	.LC96
+	.word	.LC97
+	.word	.LC98
+	.word	.LC99
+	.word	.LC100
+	.word	.LC101
+	.word	.LC102
+	.word	.LC103
+	.word	.LC104
+	.word	.LC105
+	.word	.LC106
+	.word	.LC107
+	.word	.LC108
+	.word	.LC109
+	.word	.LC110
+	.word	.LC111
+	.word	.LC112
+	.word	.LC113
+	.word	.LC114
+	.word	.LC115
+	.word	.LC117
+	.word	.LC116
+	.word	unlockDutchess
+	.word	destroyWorld
+	.size	initDutchess, .-initDutchess
+	.comm	dutchess,1784,4
 	.comm	finalDoor,1784,4
 	.comm	seerMaster,1784,4
 	.comm	knight,1784,4
 	.comm	seer,1784,4
 	.comm	plantMerchant,1784,4
 	.comm	cloud,1784,4
+	.comm	soundB,32,4
+	.comm	soundA,32,4
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

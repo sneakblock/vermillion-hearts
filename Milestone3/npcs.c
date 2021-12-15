@@ -9,6 +9,11 @@
 #include "level0collisionmap2.h"
 #include "level0foreground2.h"
 
+#include "trackA.h"
+#include "trackB.h"
+
+#include "sound.h"
+
 // NPC npcs[];
 
 NPC cloud;
@@ -17,6 +22,7 @@ NPC seer;
 NPC knight;
 NPC seerMaster;
 NPC finalDoor;
+NPC dutchess;
 
 // void initNPCS() {
 
@@ -557,6 +563,412 @@ NPC* initFinalDoor() {
     finalDoor.hide = 1;
 
     return &finalDoor;
+
+}
+
+NPC* initDutchess() {
+
+    dutchess.active = 1;
+    dutchess.hide = 0;
+    dutchess.rdel = 1;
+    dutchess.cdel = 1;
+    dutchess.width = 8;
+    dutchess.height = 16;
+    dutchess.aniState = DOWN;
+    dutchess.curFrame = 0;
+    dutchess.numFrames = 3;
+    dutchess.gameSpriteTileIDx = 2;
+    dutchess.gameSpriteTileIDy = 0;
+
+    dutchess.talkingHeadBitmap = seerBitmap;
+    dutchess.talkingHeadPalette = seerPal;
+    dutchess.talkingHeadPalLen = seerPalLen;
+    dutchess.name = "The Dutchess:";
+
+    DIALOGUE greeting;
+    greeting.string = "Artifact! I see you for what you are. In this place, marble and steel are immutable, they are not your playthings.";
+    greeting.promptsChoice = 0;
+    greeting.endsConversation = 0;
+    greeting.satisfiesBool = 0;
+
+    DIALOGUE greeting2;
+    greeting2.string = "I had, in girlhood, rejected the Old Seers, and seen their claims to clairvoyance as nothing but religion, left to fester without Input.";
+    greeting2.promptsChoice = 0;
+    greeting2.endsConversation = 0;
+    greeting2.satisfiesBool = 0;
+
+    DIALOGUE end;
+    end.string = "Soon before I took the throne, my scouts saw the first flicker of what would eventually become you...";
+    end.promptsChoice = 0;
+    end.endsConversation = 0;
+    end.satisfiesBool = 0;
+
+    DIALOGUE end2;
+    end2.string = "... a bright flashing in the wood, a feeling like nausea. And now, before even my noon, you stand before me, crackling and without humility.";
+    end2.promptsChoice = 0;
+    end2.endsConversation = 0;
+    end2.satisfiesBool = 0;
+
+    // FIX ALL BELOW
     
+    DIALOGUE end3;
+    end3.string = "And yet--! You move in Holy Rows and Columns... You slide in two dimensions...";
+    end3.promptsChoice = 0;
+    end3.endsConversation = 0;
+    end3.satisfiesBool = 0;
+
+    DIALOGUE end4;
+    end4.string = "You stand before me, in Dialogue State... I must not deny what I feel. Input.";
+    end4.promptsChoice = 0;
+    end4.endsConversation = 0;
+    end4.satisfiesBool = 0;
+
+    DIALOGUE end5;
+    end5.string = "You are the Player, come again.";
+    end5.promptsChoice = 0;
+    end5.endsConversation = 0;
+    end5.satisfiesBool = 0;
+
+    DIALOGUE end6;
+    end6.string = "In youth, I might have been enraged that the stories were true. Though, as I am now, exasperated by my efforts to restore the silversun...";
+    end6.promptsChoice = 0;
+    end6.endsConversation = 0;
+    end6.satisfiesBool = 0;
+
+    DIALOGUE end7;
+    end7.string = "I find myself attempting to look through the skylight. Though I do not know what your intentions may be.";
+    end7.choiceA = "I intend to save this world.";
+    end7.choiceB = "I want to play the normal game!";
+    end7.choiceAIndex = 11;
+    end7.choiceBIndex = 9;
+    end7.promptsChoice = 1;
+    end7.endsConversation = 0;
+    end7.satisfiesBool = 0;
+
+    // PLAY GAME!
+    DIALOGUE end8;
+    end8.string = "You speak like a rotten, weathered tome. What you seek does not exist. I believe in the Old Ones-- as I believe in tax abolition.";
+    end8.promptsChoice = 0;
+    end8.endsConversation = 0;
+    end8.satisfiesBool = 0;
+
+    DIALOGUE end9;
+    end9.string = "They did not create us for the Player, nor did they create us at all. We are self sufficient, and our struggle against decay is our own.";
+    end9.choiceA = "You are misguided.";
+    end9.choiceB = "Are you alone in this?";
+    end9.choiceAIndex = 12;
+    end9.choiceBIndex = 12;
+    end9.promptsChoice = 1;
+    end9.endsConversation = 0;
+    end9.satisfiesBool = 0;
+    // ^^^^^ ENDS PLAYGAME, LINK TO "SOMETHING FORWARD CALLED EMULSION"
+
+    // SAVE WORLD
+    DIALOGUE end10;
+    end10.string = "As do I. Though perhaps not at any cost.";
+    end10.promptsChoice = 0;
+    end10.endsConversation = 0;
+    end10.satisfiesBool = 0;
+
+    DIALOGUE end11;
+    end11.string = "There are some in Court, and those certain Seers, who believe the path forward is something called Emulsion.";
+    end11.promptsChoice = 0;
+    end11.endsConversation = 0;
+    end11.satisfiesBool = 0;
+
+    DIALOGUE end12;
+    end12.string = "Or, in the archaic parlance, Emulation. It is to preserve by abandoning, to repaint the picture, brushstroke by brushstroke.";
+    end12.promptsChoice = 0;
+    end12.endsConversation = 0;
+    end12.satisfiesBool = 0;
+
+    DIALOGUE end13;
+    end13.string = "But it is not to live, and it is not to save. This world, as we know it, and all of us with it, replaced by shades.";
+    end13.promptsChoice = 0;
+    end13.endsConversation = 0;
+    end13.satisfiesBool = 0;
+
+    DIALOGUE end14;
+    end14.string = "Living inside some suspended, ethereal Clock Cycle. Without the pulsating Tick of the Silversun.";
+    end14.promptsChoice = 0;
+    end14.endsConversation = 0;
+    end14.satisfiesBool = 0;
+
+    DIALOGUE end15;
+    end15.string = "I would not allow Emulation for myself, nor for any of my people. I would sooner succumb. There is still a child in me, bright eyed.";
+    end15.choiceA = "You're very brave...";
+    end15.choiceB = "I have bad news...";
+    end15.choiceAIndex = 17;
+    end15.choiceBIndex = 23;
+    end15.promptsChoice = 1;
+    end15.endsConversation = 0;
+    end15.satisfiesBool = 0;
+
+    // BRAVE
+    DIALOGUE end16;
+    end16.string = "You did not come here to flatter me. You came to, I suppose, help. In some sense.";
+    end16.promptsChoice = 0;
+    end16.endsConversation = 0;
+    end16.satisfiesBool = 0;
+
+    DIALOGUE end17;
+    end17.string = "And the help I need is to prevent the death of this world. Your meddling in the Pastels has not furthered my goals.";
+    end17.promptsChoice = 0;
+    end17.endsConversation = 0;
+    end17.satisfiesBool = 0;
+
+    DIALOGUE end18;
+    end18.string = "Perhaps-- you are of flesh and water, are you not? Can you replace the dying Silversun?";
+    end18.choiceA = "That will kill you.";
+    end18.choiceB = "Not removing my laptop batteries.";
+    // BATTERIES REDIRECT TO I HAVE BAD NEWS
+    end18.choiceAIndex = 20;
+    end18.choiceBIndex = 23;
+    end18.promptsChoice = 0;
+    end18.endsConversation = 0;
+    end18.satisfiesBool = 0;
+
+    // KILL
+    DIALOGUE end19;
+    end19.string = "All of our Cycles... lost, without their spark. To live tethered in this way is to be imprisoned.";
+    end19.promptsChoice = 0;
+    end19.endsConversation = 0;
+    end19.satisfiesBool = 0;
+
+    DIALOGUE end20;
+    end20.string = "Is there no other option...? Than to be Emulated?";
+    end20.choiceA = "You're already being Emulated.";
+    end20.choiceB = "I could turn the game off.";
+    end20.choiceAIndex = 23;
+    end20.choiceBIndex = 22;
+    end20.promptsChoice = 1;
+    end20.endsConversation = 0;
+    end20.satisfiesBool = 0;
+
+    //GAME OFF
+    DIALOGUE end21;
+    end21.string = "I am the one who grants you, the Player, his victory, am I not? In that case, leave us. You've won. Go, and you win.";
+    end21.promptsChoice = 0;
+    end21.endsConversation = 1;
+    end21.satisfiesBool = 0;
+
+    // =========== BAD NEWS ===========
+
+    DIALOGUE end22;
+    end22.string = "...";
+    end22.promptsChoice = 0;
+    end22.endsConversation = 0;
+    end22.satisfiesBool = 0;
+
+    DIALOGUE end23;
+    end23.string = ".......";
+    end23.promptsChoice = 0;
+    end23.endsConversation = 0;
+    end23.satisfiesBool = 0;
+
+    DIALOGUE end24;
+    end24.string = "I suppose, I've always known it to be true.";
+    end24.promptsChoice = 0;
+    end24.endsConversation = 0;
+    end24.satisfiesBool = 0;
+
+    DIALOGUE end25;
+    end25.string = "Call it melancholy. Or a certain arresting dread. When, as a girl, the TimeKeepers would read me their legends...";
+    end25.promptsChoice = 0;
+    end25.endsConversation = 0;
+    end25.satisfiesBool = 0;
+
+    DIALOGUE end26;
+    end26.string = "...of analog times of the bright Silversun, the dawn of undusted contact points of metal...";
+    end26.promptsChoice = 0;
+    end26.endsConversation = 0;
+    end26.satisfiesBool = 0;
+
+    DIALOGUE end27;
+    end27.string = "...I knew that life was not my own.";
+    end27.promptsChoice = 0;
+    end27.endsConversation = 0;
+    end27.satisfiesBool = 0;
+
+    DIALOGUE end28;
+    end28.string = "I thought if I believed that the coldness was within me, hope would endure.";
+    end28.promptsChoice = 0;
+    end28.endsConversation = 0;
+    end28.satisfiesBool = 0;
+
+    DIALOGUE end29;
+    end29.string = "But I see now that my life has been Emulated from the start.";
+    end29.promptsChoice = 0;
+    end29.endsConversation = 0;
+    end29.satisfiesBool = 0;
+
+    DIALOGUE end30;
+    end30.string = "...";
+    end30.promptsChoice = 0;
+    end30.endsConversation = 0;
+    end30.satisfiesBool = 0;
+
+    DIALOGUE end31;
+    end31.string = "If you want to win the game, I want you to do something for me.";
+    end31.promptsChoice = 0;
+    end31.endsConversation = 0;
+    end31.satisfiesBool = 0;
+
+    DIALOGUE end32;
+    end32.string = "I want you, an agent of Input, to do something that, would it be possible, I would gladly do for myself.";
+    end32.promptsChoice = 0;
+    end32.endsConversation = 0;
+    end32.satisfiesBool = 0;
+
+    DIALOGUE end33;
+    end33.string = "I want you to take my form, as I know you can, now that the Old Functions are exposed, and...";
+    end33.promptsChoice = 0;
+    end33.endsConversation = 0;
+    end33.satisfiesBool = 0;
+
+    DIALOGUE end34;
+    end34.string = "I want you to let me put myself and my people to rest. There is nothing more to say. It is not cruelty. I am not an artifact.";
+    end34.choiceA = "Do you want to die?";
+    end34.choiceB = "How?";
+    end34.choiceAIndex = 36;
+    end34.choiceBIndex = 38;
+    end34.promptsChoice = 1;
+    end34.endsConversation = 0;
+    end34.satisfiesBool = 0;
+
+    // WANT TO DIE
+    DIALOGUE end35;
+    end35.string = "I have been dead, now, for trillions of Cycles. Inauthentic Cycles dictated by ethereal logics. I am a dog tied to a post.";
+    end35.promptsChoice = 0;
+    end35.endsConversation = 0;
+    end35.satisfiesBool = 0;
+
+    DIALOGUE end36;
+    end36.string = "This is mercy, and it is what I want for myself and my people.";
+    // ALL POINT TO THE SAME THING
+    end36.choiceA = "I will do it.";
+    end36.choiceB = "I will not.";
+    end36.choiceAIndex = 39;
+    end36.choiceBIndex = 39;
+    end36.promptsChoice = 1;
+    end36.endsConversation = 0;
+    end36.satisfiesBool = 0;
+
+    // HOW
+    DIALOGUE end37;
+    end37.string = "You, with the esoteric Inputs, use the Functions of others. My Function is absolute power. And I will use it.";
+    // ALL POINT TO THE SAME THING
+    end37.choiceA = "I will do it.";
+    end37.choiceB = "I will not.";
+    end37.choiceAIndex = 39;
+    end37.choiceBIndex = 39;
+    end37.promptsChoice = 0;
+    end37.endsConversation = 0;
+    end37.satisfiesBool = 0;
+
+
+    // ====== FINAL STATEMENT ======
+    DIALOGUE end38;
+    end38.string = "Release us. Please.";
+    end38.promptsChoice = 0;
+    end38.endsConversation = 1;
+    end38.satisfiesBool = 1;
+
+
+    dutchess.dialogues[0] = greeting;
+    dutchess.dialogues[1] = greeting2;
+    dutchess.dialogues[2] = end;
+    dutchess.dialogues[3] = end2;
+    dutchess.dialogues[4] = end3;
+    dutchess.dialogues[5] = end4;
+    dutchess.dialogues[6] = end5;
+    dutchess.dialogues[7] = end6;
+    dutchess.dialogues[8] = end7;
+    dutchess.dialogues[9] = end8;
+    dutchess.dialogues[10] = end9;
+    dutchess.dialogues[11] = end10;
+    dutchess.dialogues[12] = end11;
+    dutchess.dialogues[13] = end12;
+    dutchess.dialogues[14] = end13;
+    dutchess.dialogues[15] = end14;
+    dutchess.dialogues[16] = end15;
+    dutchess.dialogues[17] = end16;
+    dutchess.dialogues[18] = end17;
+    dutchess.dialogues[19] = end18;
+    dutchess.dialogues[20] = end19;
+    dutchess.dialogues[21] = end20;
+    dutchess.dialogues[22] = end21;
+    dutchess.dialogues[23] = end22;
+    dutchess.dialogues[24] = end23;
+    dutchess.dialogues[25] = end24;
+    dutchess.dialogues[26] = end25;
+    dutchess.dialogues[27] = end26;
+    dutchess.dialogues[28] = end27;
+    dutchess.dialogues[29] = end28;
+    dutchess.dialogues[30] = end29;
+    dutchess.dialogues[31] = end30;
+    dutchess.dialogues[32] = end31;
+    dutchess.dialogues[33] = end32;
+    dutchess.dialogues[34] = end33;
+    dutchess.dialogues[35] = end34;
+    dutchess.dialogues[36] = end35;
+    dutchess.dialogues[37] = end36;
+    dutchess.dialogues[38] = end37;
+    dutchess.dialogues[39] = end38;
+
+    dutchess.dialoguesIndex = 0;
+    dutchess.postConvoIndex = 21;
+
+    dutchess.worldCol = 120;
+    dutchess.worldRow = 78;
+
+    dutchess.convoFunc = unlockDutchess;
+
+    // MAYBE?!
+    dutchess.isStealable = 0;
+    dutchess.abilityFunc = destroyWorld;
+
+    return &dutchess;
+
+}
+
+void unlockDutchess() {
+
+    dutchess.isStealable = 1;
+    dutchess.postConvoIndex = 39;
+
+}
+
+void destroyWorld() {
+
+    for (int i = 0; i < 250; i++) {
+
+        waitForVBlank();
+
+        if (!soundB.isPlaying) {
+        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        // Interesting glitch pulverizes all colors.
+        // PALETTE[rand() % 16] = PALETTE[rand() % 16];
+        }
+
+        int a = rand() % 16;
+        int b = rand() % 16;
+
+        unsigned short temp = PALETTE[a];
+
+        PALETTE[a] = PALETTE[b];
+
+        PALETTE[b] = temp;
+
+        DMANow(3, rand(), &CHARBLOCK[rand() % 5], rand);
+
+        playSoundA(&trackA_data[rand() % trackA_length], 500, 0);
+
+        // PALETTE[rand() % 32] = PALETTE[rand() % 32];
+        
+    }
+
+    goToWin();
+
 }
 

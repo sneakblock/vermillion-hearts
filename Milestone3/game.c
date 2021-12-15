@@ -21,6 +21,7 @@ LEVEL* currentLevel;
 LEVEL level0;
 LEVEL level1;
 LEVEL level2;
+LEVEL level3;
 PLAYER player;
 
 //NPC stuff Milestone 3
@@ -160,6 +161,7 @@ void initLevels() {
     initLevel0();
     initLevel1();
     initLevel2();
+    initLevel3();
 
 }
 
@@ -193,7 +195,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     REG_BG0CNT = level->levelSize | level->BPP | BG_CHARBLOCK(0) | BG_SCREENBLOCK(30);
     DMANow(3, level->foregroundTiles, &CHARBLOCK[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &SCREENBLOCK[30], (level->foregroundMapLen) / 2);
-    DMANow(3, level->foregroundPal, PALETTE, level->foregroundPalLen / 2);
+    DMANow(3, level->foregroundPal, &PALETTE[0], level->foregroundPalLen / 2);
     
 
     if (level->midgroundTiles) {
@@ -336,6 +338,13 @@ void updatePlayer() {
 
     if (BUTTON_HELD(BUTTON_R)) {
         if (player.currentSprite->abilityFunc && player.currentSprite == &seerMaster) {
+            player.currentSprite->abilityFunc();
+            return;
+        }
+    }
+
+    if (BUTTON_PRESSED(BUTTON_R)) {
+        if (player.currentSprite->abilityFunc && player.currentSprite == &dutchess) {
             player.currentSprite->abilityFunc();
             return;
         }

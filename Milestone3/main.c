@@ -30,6 +30,8 @@
 
 #include "seerscreen.h"
 
+#include "winImage.h"
+
 // Prototypes
 void initialize();
 
@@ -320,6 +322,7 @@ void goToPause() {
     // PALETTE[0] = WHITE;
     // PALETTE[1] = BLACK;
 
+    REG_DISPCTL = 0;
     REG_DISPCTL = MODE0 | BG0_ENABLE;
 
     loadLevel(&pauseLevel, 0);
@@ -333,6 +336,10 @@ void pause() {
 
     REG_BG0HOFF = 0;
     REG_BG0VOFF = 0;
+
+    hideSprites();
+    waitForVBlank();
+    DMANow(3, shadowOAM, OAM, 512);
 
     if (BUTTON_PRESSED(BUTTON_START)) {
 
@@ -349,9 +356,7 @@ void goToWin() {
 
     REG_DISPCTL = MODE4 | BG2_ENABLE | DISP_BACKBUFFER;
 
-    PALETTE[0] = WHITE;
-    PALETTE[1] = BLUE;
-
+    DMANow(3, winImagePal, &PALETTE[0], winImagePalLen / 2);
 
     state = WIN;
 
@@ -360,13 +365,7 @@ void goToWin() {
 // Runs every frame of the win state
 void win() {
 
-    fillScreen4(1);
-
-    char* string = "YOU REACH AETHER.";
-    char* string1 = "PRESS START TO REPLAY.";
-
-    drawString4(20, 60, string, 0);
-    drawString4(20, 70, string1, 0);
+    drawFullscreenImage4(winImageBitmap);
 
     waitForVBlank();
     flipPage();

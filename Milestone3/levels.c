@@ -27,6 +27,9 @@
 #include "level2midground.h"
 #include "level2collisionmap.h"
 
+#include "level3foreground.h"
+#include "level3collisionmap.h"
+
 #include "instructionsforeground.h"
 
 #include "pause.h"
@@ -107,11 +110,33 @@ void crushPalette() {
     
     waitForVBlank();
 
-    PALETTE[rand() % 32] = PALETTE[rand() % 32];
+    // int a = rand() % 32;
+    // int b = rand() % 32;
+
+    // while (PALETTE[a] == PALETTE[b]) {
+    //     b = rand() % 32;
+    // }
+
+    // PALETTE[a] = PALETTE[b];
+
+    int randIndex = rand() % 32;
+
+    for (int i = 0; i < 32; i++) {
+        if (PALETTE[randIndex] != PALETTE[i]) {
+            PALETTE[i] = PALETTE[randIndex];
+            for (int j = 0; j < 32; j++) {
+                if (PALETTE[randIndex] != PALETTE[j]) {
+                    PALETTE[j] = PALETTE[randIndex];
+                    break;
+                }
+            }
+            break;
+        }
+    }
 
     if (!soundB.isPlaying) {
 
-        playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
+        playSoundB(&trackB_data[rand() % trackB_length], 1000, 0, rand() % SOUND_FREQ);
     
     }
     
@@ -525,6 +550,58 @@ void animateLevel0() {
 
 void initLevel3() {
 
+    // ========= PLAYER ==========
+    level3.playerWorldSpawnCol = 121;
+    level3.playerWorldSpawnRow = 233;
+    level3.initHOff = 16;
+    level3.initVOff = 96;
     
+
+    // ============= SIZE ===============
+    level3.levelSize = BG_SIZE_SMALL;
+    level3.BPP = BG_4BPP;
+    level3.worldPixelWidth = 256;
+    level3.worldPixelHeight = 256;
+    level3.collisionMap = (unsigned char*) level3collisionmapBitmap;
+
+    // ============== NPCS =================
+    level3.numNPCS = 1;
+    level3.npcs[0] = initDutchess();
+
+
+    // =========== FOREGROUND ============
+
+    level3.foregroundTiles = level3foregroundTiles;
+    level3.foregroundMap = level3foregroundMap;
+    level3.foregroundTilesLen = level3foregroundTilesLen;
+    level3.foregroundMapLen = level3foregroundMapLen;
+
+    level3.foregroundPal = level3foregroundPal;
+    level3.foregroundPalLen = level3foregroundPalLen;
+
+    // =========== MIDGROUND ============
+    
+    // level0.midgroundTiles = level0midgroundTiles;
+    // level0.midgroundMap = level0midgroundMap;
+    // level0.midgroundTilesLen = level0midgroundTilesLen;
+    // level0.midgroundMapLen = level0midgroundMapLen;
+
+    // level0.midgroundPal = level0midgroundPal;
+    // level0.midgroundPalLen = level0midgroundPalLen;
+
+    // =========== BACKGROUND ============
+    
+    // level0.backgroundTiles = level0backgroundTiles;
+    // level0.backgroundMap = level0backgroundMap;
+    // level0.backgroundTilesLen = level0backgroundTilesLen;
+    // level0.backgroundMapLen = level0backgroundMapLen;
+    
+    // level0.backgroundPal = level0backgroundPal;
+    // level0.backgroundPalLen = level0backgroundPalLen;
+
+    // =================== ANIM =====================
+
+    // level0.animFunc = animateLevel0;
+    // level0AniTimer = 0;
 
 }

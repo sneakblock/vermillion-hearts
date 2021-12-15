@@ -1652,7 +1652,9 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+extern LEVEL level1;
 extern LEVEL level2;
+extern LEVEL level3;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
@@ -1672,6 +1674,8 @@ void initLevel0();
 void initLevel1();
 void initLevel2();
 void animateLevel2();
+
+void initLevel3();
 # 14 "game.c" 2
 # 1 "npcs.h" 1
 extern NPC cloud;
@@ -1680,6 +1684,7 @@ extern NPC seer;
 extern NPC knight;
 extern NPC seerMaster;
 extern NPC finalDoor;
+extern NPC dutchess;
 
 void initNPCS();
 NPC* initCloud();
@@ -1688,8 +1693,11 @@ NPC* initSeer();
 NPC* initKnight();
 NPC* initSeerMaster();
 NPC* initFinalDoor();
+NPC* initDutchess();
 
+void unlockDutchess();
 void openGate();
+void destroyWorld();
 # 15 "game.c" 2
 # 1 "level2collisionmap2.h" 1
 # 21 "level2collisionmap2.h"
@@ -1706,6 +1714,7 @@ LEVEL* currentLevel;
 LEVEL level0;
 LEVEL level1;
 LEVEL level2;
+LEVEL level3;
 PLAYER player;
 
 
@@ -1795,7 +1804,7 @@ void updateGame() {
             }
 
 
-            currentLevel = &level0;
+            currentLevel = &level3;
             goToGame();
             loadLevel(currentLevel, 1);
 
@@ -1845,6 +1854,7 @@ void initLevels() {
     initLevel0();
     initLevel1();
     initLevel2();
+    initLevel3();
 
 }
 
@@ -1878,7 +1888,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     (*(volatile unsigned short *)0x4000008) = level->levelSize | level->BPP | ((0) << 2) | ((30) << 8);
     DMANow(3, level->foregroundTiles, &((charblock *)0x6000000)[0], (level->foregroundTilesLen) / 2);
     DMANow(3, level->foregroundMap, &((screenblock *)0x6000000)[30], (level->foregroundMapLen) / 2);
-    DMANow(3, level->foregroundPal, ((unsigned short *)0x5000000), level->foregroundPalLen / 2);
+    DMANow(3, level->foregroundPal, &((unsigned short *)0x5000000)[0], level->foregroundPalLen / 2);
 
 
     if (level->midgroundTiles) {
@@ -1900,7 +1910,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
             DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
         }
     }
-# 229 "game.c"
+# 231 "game.c"
     if (resetsPlayerPos) {
         if (level->useSecondarySpawn) {
             player.worldCol = level->secondaryPlayerWorldSpawnCol;
@@ -2011,6 +2021,13 @@ void updatePlayer() {
 
     if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 8)))) {
         if (player.currentSprite->abilityFunc && player.currentSprite == &seerMaster) {
+            player.currentSprite->abilityFunc();
+            return;
+        }
+    }
+
+    if ((!(~(oldButtons) & ((1 << 8))) && (~buttons & ((1 << 8))))) {
+        if (player.currentSprite->abilityFunc && player.currentSprite == &dutchess) {
             player.currentSprite->abilityFunc();
             return;
         }

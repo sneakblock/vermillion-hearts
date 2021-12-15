@@ -1682,7 +1682,9 @@ extern LEVEL instructionsLevel;
 extern LEVEL pauseLevel;
 
 extern LEVEL level0;
+extern LEVEL level1;
 extern LEVEL level2;
+extern LEVEL level3;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
@@ -1702,6 +1704,8 @@ void initLevel0();
 void initLevel1();
 void initLevel2();
 void animateLevel2();
+
+void initLevel3();
 # 30 "main.c" 2
 
 # 1 "seerscreen.h" 1
@@ -1711,6 +1715,14 @@ extern const unsigned short seerscreenTiles[1616];
 
 extern const unsigned short seerscreenMap[1024];
 # 32 "main.c" 2
+
+# 1 "winImage.h" 1
+# 21 "winImage.h"
+extern const unsigned short winImageBitmap[19200];
+
+
+extern const unsigned short winImagePal[256];
+# 34 "main.c" 2
 
 
 void initialize();
@@ -1994,7 +2006,8 @@ void dialogue() {
 
 
 void goToPause() {
-# 323 "main.c"
+# 325 "main.c"
+    (*(volatile unsigned short *)0x4000000) = 0;
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
     loadLevel(&pauseLevel, 0);
@@ -2008,6 +2021,10 @@ void pause() {
 
     (*(volatile unsigned short *)0x04000010) = 0;
     (*(volatile unsigned short *)0x04000012) = 0;
+
+    hideSprites();
+    waitForVBlank();
+    DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
 
@@ -2024,9 +2041,7 @@ void goToWin() {
 
     (*(volatile unsigned short *)0x4000000) = 4 | (1 << 10) | (1 << 4);
 
-    ((unsigned short *)0x5000000)[0] = ((31) | (31) << 5 | (31) << 10);
-    ((unsigned short *)0x5000000)[1] = ((0) | (0) << 5 | (31) << 10);
-
+    DMANow(3, winImagePal, &((unsigned short *)0x5000000)[0], 512 / 2);
 
     state = WIN;
 
@@ -2035,13 +2050,7 @@ void goToWin() {
 
 void win() {
 
-    fillScreen4(1);
-
-    char* string = "YOU REACH AETHER.";
-    char* string1 = "PRESS START TO REPLAY.";
-
-    drawString4(20, 60, string, 0);
-    drawString4(20, 70, string1, 0);
+    drawFullscreenImage4(winImageBitmap);
 
     waitForVBlank();
     flipPage();
