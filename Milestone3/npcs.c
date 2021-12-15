@@ -6,6 +6,8 @@
 #include "talkingheadtest.h"
 #include "seer.h"
 #include "knight.h"
+#include "dutchess.h"
+#include "masterseer.h"
 #include "level0collisionmap2.h"
 #include "level0foreground2.h"
 
@@ -335,16 +337,16 @@ NPC* initSeerMaster() {
     seerMaster.cdel = 1;
     seerMaster.width = 8;
     seerMaster.height = 16;
-    seerMaster.aniState = DOWN;
+    seerMaster.aniState = LEFT;
     seerMaster.curFrame = 0;
-    seerMaster.numFrames = 3;
-    seerMaster.gameSpriteTileIDx = 1;
+    seerMaster.numFrames = 2;
+    seerMaster.gameSpriteTileIDx = 4;
     seerMaster.gameSpriteTileIDy = 0;
 
-    seerMaster.talkingHeadBitmap = seerBitmap;
-    seerMaster.talkingHeadPalette = seerPal;
-    seerMaster.talkingHeadPalLen = seerPalLen;
-    seerMaster.name = "The Eremite:";
+    seerMaster.talkingHeadBitmap = masterseerBitmap;
+    seerMaster.talkingHeadPalette = masterseerPal;
+    seerMaster.talkingHeadPalLen = masterseerPalLen;
+    seerMaster.name = "The Allseer:";
 
     DIALOGUE greeting;
     greeting.string = "Ah. It is you. I did not think I would see you in my lifetime, I must admit.";
@@ -550,7 +552,7 @@ NPC* initFinalDoor() {
     finalDoor.worldRow = 40;
 
     finalDoor.gameSpriteTileIDx = 0;
-    finalDoor.gameSpriteTileIDy = 0;
+    finalDoor.gameSpriteTileIDy = 7;
 
     finalDoor.width = 8;
     finalDoor.height = 16;
@@ -577,12 +579,12 @@ NPC* initDutchess() {
     dutchess.aniState = DOWN;
     dutchess.curFrame = 0;
     dutchess.numFrames = 3;
-    dutchess.gameSpriteTileIDx = 2;
+    dutchess.gameSpriteTileIDx = 9;
     dutchess.gameSpriteTileIDy = 0;
 
-    dutchess.talkingHeadBitmap = seerBitmap;
-    dutchess.talkingHeadPalette = seerPal;
-    dutchess.talkingHeadPalLen = seerPalLen;
+    dutchess.talkingHeadBitmap = dutchessBitmap;
+    dutchess.talkingHeadPalette = dutchessPal;
+    dutchess.talkingHeadPalLen = dutchessPalLen;
     dutchess.name = "The Dutchess:";
 
     DIALOGUE greeting;
@@ -724,7 +726,7 @@ NPC* initDutchess() {
     // BATTERIES REDIRECT TO I HAVE BAD NEWS
     end18.choiceAIndex = 20;
     end18.choiceBIndex = 23;
-    end18.promptsChoice = 0;
+    end18.promptsChoice = 1;
     end18.endsConversation = 0;
     end18.satisfiesBool = 0;
 

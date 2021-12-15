@@ -704,7 +704,7 @@ initKnight:
 	.section	.rodata.str1.4
 	.align	2
 .LC36:
-	.ascii	"The Eremite:\000"
+	.ascii	"The Allseer:\000"
 	.align	2
 .LC37:
 	.ascii	"Ah. It is you. I did not think I would see you in m"
@@ -849,49 +849,45 @@ initSeerMaster:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, r9, r10, lr}
-	mov	r5, #3
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	mov	r8, #4
 	mov	r3, #0
 	mov	r2, #1
-	mov	r10, #8
-	mov	r9, #16
-	mov	r8, #512
+	mov	ip, #2
+	mov	fp, #8
+	mov	r10, #16
+	mov	r9, #32
 	ldr	r0, .L34
 	mov	r7, #12
 	mov	r6, #13
-	str	r5, [r0, #56]
-	ldr	r5, .L34+4
-	str	r5, [r0, #72]
-	ldr	r5, .L34+8
+	str	r8, [r0, #60]
+	ldr	r8, .L34+4
+	str	r8, [r0, #72]
+	ldr	r8, .L34+8
 	mov	r1, #14
-	str	r5, [r0, #76]
-	ldr	r5, .L34+12
-	str	r5, [r0, #1728]
-	ldr	r5, .L34+16
-	str	r5, [r0, #104]
-	ldr	r5, .L34+20
-	str	r5, [r0, #136]
-	ldr	r5, .L34+24
-	str	r5, [r0, #168]
-	ldr	r5, .L34+28
-	str	r5, [r0, #200]
-	ldr	r5, .L34+32
-	mov	r4, #19
-	mov	lr, #219
+	str	r8, [r0, #76]
+	ldr	r8, .L34+12
+	str	r8, [r0, #1728]
+	ldr	r8, .L34+16
+	str	r8, [r0, #104]
+	ldr	r8, .L34+20
+	str	r8, [r0, #136]
+	ldr	r8, .L34+24
+	str	r8, [r0, #168]
+	ldr	r8, .L34+28
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
-	str	r2, [r0, #60]
-	str	r10, [r0, #28]
-	str	r9, [r0, #32]
-	str	r8, [r0, #80]
+	str	fp, [r0, #28]
+	str	r10, [r0, #32]
+	str	r9, [r0, #80]
 	str	r3, [r0, #36]
-	str	r3, [r0, #44]
 	str	r3, [r0, #52]
 	str	r3, [r0, #64]
 	str	r3, [r0, #84]
 	str	r3, [r0, #96]
 	str	r3, [r0, #100]
+	str	r8, [r0, #200]
 	str	r3, [r0, #116]
 	str	r3, [r0, #128]
 	str	r3, [r0, #132]
@@ -901,22 +897,27 @@ initSeerMaster:
 	str	r3, [r0, #180]
 	str	r3, [r0, #192]
 	str	r3, [r0, #196]
-	mov	ip, #197
 	str	r3, [r0, #212]
-	str	r5, [r0, #232]
-	ldr	r5, .L34+36
-	str	r5, [r0, #264]
-	ldr	r5, .L34+40
-	str	r5, [r0, #296]
-	ldr	r5, .L34+44
-	str	r5, [r0, #328]
-	ldr	r5, .L34+48
-	str	r5, [r0, #360]
-	ldr	r5, .L34+52
-	str	r5, [r0, #392]
-	ldr	r5, .L34+56
-	str	r5, [r0, #424]
-	ldr	r5, .L34+60
+	str	ip, [r0, #44]
+	str	ip, [r0, #56]
+	ldr	ip, .L34+32
+	mov	r5, #19
+	mov	r4, #219
+	mov	lr, #197
+	str	ip, [r0, #232]
+	ldr	ip, .L34+36
+	str	ip, [r0, #264]
+	ldr	ip, .L34+40
+	str	ip, [r0, #296]
+	ldr	ip, .L34+44
+	str	ip, [r0, #328]
+	ldr	ip, .L34+48
+	str	ip, [r0, #360]
+	ldr	ip, .L34+52
+	str	ip, [r0, #392]
+	ldr	ip, .L34+56
+	str	ip, [r0, #424]
+	ldr	ip, .L34+60
 	str	r3, [r0, #224]
 	str	r3, [r0, #228]
 	str	r3, [r0, #244]
@@ -942,27 +943,27 @@ initSeerMaster:
 	str	r3, [r0, #452]
 	str	r7, [r0, #440]
 	str	r6, [r0, #444]
-	str	r5, [r0, #456]
-	ldr	r5, .L34+64
-	str	r5, [r0, #460]
-	ldr	r5, .L34+68
-	str	r5, [r0, #464]
-	ldr	r5, .L34+72
+	str	ip, [r0, #456]
+	ldr	ip, .L34+64
+	str	ip, [r0, #460]
+	ldr	ip, .L34+68
+	str	ip, [r0, #464]
+	ldr	ip, .L34+72
 	str	r1, [r0, #472]
-	str	r5, [r0, #488]
+	str	ip, [r0, #488]
 	str	r1, [r0, #476]
-	ldr	r5, .L34+76
+	ldr	ip, .L34+76
 	str	r1, [r0, #504]
 	str	r1, [r0, #508]
 	ldr	r1, .L34+80
-	str	r5, [r0, #520]
+	str	ip, [r0, #520]
 	str	r1, [r0, #616]
-	ldr	r5, .L34+84
+	ldr	ip, .L34+84
 	ldr	r1, .L34+88
-	str	r5, [r0, #552]
+	str	ip, [r0, #552]
 	str	r1, [r0, #492]
-	ldr	r5, .L34+92
 	str	r1, [r0, #524]
+	ldr	ip, .L34+92
 	ldr	r1, .L34+96
 	str	r2, [r0, #468]
 	str	r3, [r0, #480]
@@ -982,8 +983,8 @@ initSeerMaster:
 	str	r3, [r0, #628]
 	str	r3, [r0, #640]
 	str	r3, [r0, #644]
-	str	r5, [r0, #584]
 	str	r1, [r0, #496]
+	str	ip, [r0, #584]
 	str	r1, [r0, #528]
 	str	r3, [r0, #660]
 	str	r3, [r0, #672]
@@ -1015,18 +1016,18 @@ initSeerMaster:
 	ldr	r3, .L34+124
 	str	r1, [r0, #680]
 	str	r2, [r0, #808]
-	str	r4, [r0, #1688]
-	str	lr, [r0, #16]
-	str	ip, [r0, #12]
+	str	r5, [r0, #1688]
+	str	r4, [r0, #16]
+	str	lr, [r0, #12]
 	str	r3, [r0, #1776]
-	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
 .L35:
 	.align	2
 .L34:
 	.word	seerMaster
-	.word	seerBitmap
-	.word	seerPal
+	.word	masterseerBitmap
+	.word	masterseerPal
 	.word	.LC36
 	.word	.LC37
 	.word	.LC38
@@ -1067,26 +1068,27 @@ initFinalDoor:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
+	push	{r4, r5, lr}
 	mov	r3, #0
-	mov	r4, #128
-	mov	lr, #40
+	mov	r5, #128
+	mov	r4, #40
+	mov	lr, #7
 	mov	r2, #1
 	mov	ip, #8
 	mov	r1, #16
 	ldr	r0, .L38
-	str	r4, [r0, #16]
-	str	lr, [r0, #12]
+	str	r5, [r0, #16]
+	str	r4, [r0, #12]
+	str	lr, [r0, #64]
 	str	ip, [r0, #28]
 	str	r1, [r0, #32]
 	str	r3, [r0, #60]
-	str	r3, [r0, #64]
 	str	r3, [r0, #44]
 	str	r3, [r0, #52]
 	str	r3, [r0]
 	str	r2, [r0, #56]
 	str	r2, [r0, #36]
-	pop	{r4, lr}
+	pop	{r4, r5, lr}
 	bx	lr
 .L39:
 	.align	2
@@ -1317,45 +1319,43 @@ initDutchess:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	mov	r7, #512
-	mov	r8, #2
+	mov	r8, #32
+	mov	r9, #3
 	mov	r3, #0
 	mov	r2, #1
+	mov	r4, #9
 	mov	fp, #8
 	mov	r10, #16
-	mov	r9, #3
-	mov	r5, #9
 	mov	lr, #12
-	mov	r6, #11
 	ldr	r0, .L42
-	str	r7, [r0, #80]
-	ldr	r7, .L42+4
-	str	r7, [r0, #76]
-	ldr	r7, .L42+8
-	str	r7, [r0, #1728]
-	ldr	r7, .L42+12
-	str	r7, [r0, #104]
-	ldr	r7, .L42+16
-	str	r7, [r0, #136]
-	ldr	r7, .L42+20
-	str	r8, [r0, #60]
-	str	r7, [r0, #168]
-	ldr	r8, .L42+24
-	ldr	r7, .L42+28
+	mov	r7, #11
+	str	r8, [r0, #80]
+	ldr	r8, .L42+4
+	str	r8, [r0, #76]
+	ldr	r8, .L42+8
+	str	r8, [r0, #1728]
+	ldr	r8, .L42+12
+	str	r8, [r0, #104]
+	ldr	r8, .L42+16
+	str	r8, [r0, #136]
+	ldr	r8, .L42+20
+	str	r9, [r0, #56]
+	str	r8, [r0, #168]
+	ldr	r9, .L42+24
+	ldr	r8, .L42+28
 	str	r2, [r0]
 	str	r2, [r0, #20]
 	str	r2, [r0, #24]
 	str	fp, [r0, #28]
 	str	r10, [r0, #32]
-	str	r9, [r0, #56]
-	str	r8, [r0, #72]
+	str	r9, [r0, #72]
 	str	r3, [r0, #36]
 	str	r3, [r0, #44]
 	str	r3, [r0, #52]
 	str	r3, [r0, #64]
 	str	r3, [r0, #84]
 	str	r3, [r0, #96]
-	str	r7, [r0, #200]
+	str	r8, [r0, #200]
 	str	r3, [r0, #100]
 	str	r3, [r0, #116]
 	str	r3, [r0, #128]
@@ -1367,25 +1367,27 @@ initDutchess:
 	str	r3, [r0, #192]
 	str	r3, [r0, #196]
 	str	r3, [r0, #212]
-	str	r5, [r0, #348]
-	ldr	r5, .L42+32
-	str	r5, [r0, #328]
-	ldr	r5, .L42+36
+	str	r4, [r0, #60]
+	str	r4, [r0, #348]
+	ldr	r4, .L42+32
+	str	r4, [r0, #232]
+	ldr	r4, .L42+36
+	str	r4, [r0, #264]
+	ldr	r4, .L42+40
+	str	r4, [r0, #296]
+	ldr	r4, .L42+44
 	mov	ip, #23
-	str	r5, [r0, #360]
-	mov	r5, #17
+	str	r4, [r0, #328]
+	mov	r4, #17
 	str	lr, [r0, #408]
 	str	lr, [r0, #412]
-	ldr	lr, .L42+40
-	str	lr, [r0, #364]
-	ldr	lr, .L42+44
-	ldr	r7, .L42+48
-	str	lr, [r0, #368]
+	ldr	lr, .L42+48
+	str	lr, [r0, #360]
 	ldr	lr, .L42+52
-	str	r7, [r0, #232]
-	str	r6, [r0, #344]
-	ldr	r7, .L42+56
-	ldr	r6, .L42+60
+	str	lr, [r0, #364]
+	ldr	lr, .L42+56
+	str	lr, [r0, #368]
+	ldr	lr, .L42+60
 	str	lr, [r0, #392]
 	ldr	lr, .L42+64
 	str	r3, [r0, #224]
@@ -1408,8 +1410,7 @@ initDutchess:
 	str	r2, [r0, #404]
 	str	r3, [r0, #416]
 	str	r3, [r0, #420]
-	str	r7, [r0, #264]
-	str	r6, [r0, #296]
+	str	r7, [r0, #344]
 	str	lr, [r0, #424]
 	ldr	lr, .L42+68
 	str	lr, [r0, #428]
@@ -1451,7 +1452,7 @@ initDutchess:
 	str	r3, [r0, #628]
 	str	r3, [r0, #640]
 	str	r3, [r0, #644]
-	str	r5, [r0, #600]
+	str	r4, [r0, #600]
 	str	ip, [r0, #604]
 	str	lr, [r0, #624]
 	str	ip, [r0, #700]
@@ -1588,11 +1589,10 @@ initDutchess:
 	str	ip, [r0, #1296]
 	str	r1, [r0, #1308]
 	ldr	r1, .L42+220
+	mov	r6, #120
+	mov	r5, #78
 	str	r1, [r0, #1352]
 	mov	r1, #21
-	mov	r4, #78
-	str	r1, [r0, #1688]
-	mov	r1, #120
 	str	r3, [r0, #1312]
 	str	r3, [r0, #1316]
 	str	ip, [r0, #1328]
@@ -1605,9 +1605,10 @@ initDutchess:
 	ldr	r2, .L42+228
 	ldr	r3, .L42+232
 	str	lr, [r0, #1324]
-	str	r4, [r0, #12]
+	str	r6, [r0, #16]
+	str	r5, [r0, #12]
 	str	ip, [r0, #1320]
-	str	r1, [r0, #16]
+	str	r1, [r0, #1688]
 	str	r2, [r0, #1724]
 	str	r3, [r0, #1776]
 	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
@@ -1616,21 +1617,21 @@ initDutchess:
 	.align	2
 .L42:
 	.word	dutchess
-	.word	seerPal
+	.word	dutchessPal
 	.word	.LC64
 	.word	.LC65
 	.word	.LC66
 	.word	.LC67
-	.word	seerBitmap
+	.word	dutchessBitmap
 	.word	.LC68
+	.word	.LC69
+	.word	.LC70
+	.word	.LC71
 	.word	.LC72
 	.word	.LC73
 	.word	.LC74
 	.word	.LC75
-	.word	.LC69
 	.word	.LC76
-	.word	.LC70
-	.word	.LC71
 	.word	.LC77
 	.word	.LC78
 	.word	.LC79

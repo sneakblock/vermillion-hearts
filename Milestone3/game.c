@@ -14,6 +14,8 @@
 #include "npcs.h"
 #include "level2collisionmap2.h"
 
+int cheat;
+
 int gateUnlocked;
 
 NPC* currentTarget;
@@ -119,12 +121,17 @@ void updateGame() {
 
     }
 
+    if (cheat) {
+
+        player.currentSprite = &dutchess;
+
+    }
+
 }
 
 void checkForConvoBools() {
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
-
         if (currentLevel->npcs[i]->convoBoolSatisfied) {
             if (currentLevel->npcs[i]->convoFunc) {
                 currentLevel->npcs[i]->convoFunc();
@@ -277,6 +284,12 @@ void updatePlayer() {
                 
                 player.worldRow = player.worldRow - player.rdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = UP;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             if (vOff > 0 && (player.worldRow - vOff) <= SCREENHEIGHT / 2) {
                 // Update background offset variable if the above is true
@@ -289,6 +302,12 @@ void updatePlayer() {
             currentLevel->collisionMap[OFFSET(player.worldCol + player.width - 1, player.worldRow + player.height - 1 + player.rdel, currentLevel->worldPixelWidth)]) {
                 player.worldRow = player.worldRow + player.rdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = DOWN;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             // Update player's world position if the above is true
 
@@ -306,6 +325,12 @@ void updatePlayer() {
             currentLevel->collisionMap[OFFSET(player.worldCol - player.cdel, player.worldRow + player.height - 1, currentLevel->worldPixelWidth)]) {
                 player.worldCol = player.worldCol - player.cdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = LEFT;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             // Update player's world position if the above is true
 
@@ -321,6 +346,12 @@ void updatePlayer() {
 
             player.worldCol = player.worldCol + player.cdel;
             player.isMoving = 1;
+            if (player.currentSprite == &seerMaster) {
+                    player.aniState = RIGHT;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             if (hOff < currentLevel->worldPixelWidth - SCREENWIDTH && (player.worldCol - hOff) > SCREENWIDTH / 2) {
 

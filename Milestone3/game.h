@@ -237,6 +237,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 // +++++++++++++++++++++ METHOD HEADERS OR STUBS OR WHATEVER :) ++++++++++++++++++++++++++
 
 void initGame();

@@ -1538,6 +1538,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 
 
 void initGame();
@@ -1630,7 +1632,7 @@ extern const unsigned short level1collisionmapPal[256];
 extern const unsigned short SPRITESHEETTiles[16384];
 
 
-extern const unsigned short SPRITESHEETPal[256];
+extern const unsigned short SPRITESHEETPal[16];
 # 11 "levels.c" 2
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"

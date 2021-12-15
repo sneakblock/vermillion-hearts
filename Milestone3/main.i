@@ -1547,6 +1547,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 
 
 void initGame();
@@ -1600,7 +1602,7 @@ void rotateCollisionMap();
 extern const unsigned short SPRITESHEETTiles[16384];
 
 
-extern const unsigned short SPRITESHEETPal[256];
+extern const unsigned short SPRITESHEETPal[16];
 # 17 "main.c" 2
 
 
@@ -1843,6 +1845,43 @@ void start() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         srand(seed);
 
+        cheat = 0;
+
+        for (int i = 0; i < 1000; i++) {
+
+            waitForVBlank();
+
+            if (!soundB.isPlaying) {
+            playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
+
+
+
+            int a = rand() % 16;
+            int b = rand() % 16;
+
+            unsigned short temp = ((unsigned short *)0x5000000)[a];
+
+            ((unsigned short *)0x5000000)[a] = ((unsigned short *)0x5000000)[b];
+
+            ((unsigned short *)0x5000000)[b] = temp;
+
+            }
+
+        }
+
+        initGame();
+        loadLevel(currentLevel, 1);
+        stopSound();
+        playSoundA(trackA_data, trackA_length, 1);
+        glitchDMA(100);
+
+    }
+
+    if ((!(~(oldButtons) & ((1 << 9))) && (~buttons & ((1 << 9))))) {
+        srand(seed);
+
+        cheat = 1;
+
         for (int i = 0; i < 1000; i++) {
 
             waitForVBlank();
@@ -1891,7 +1930,7 @@ void goToGame() {
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 9) | (1 << 10) | (1 << 12);
 
     DMANow(3, SPRITESHEETTiles, &((charblock *)0x6000000)[4], 32768 / 2);
-    DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 512 / 2);
+    DMANow(3, SPRITESHEETPal, ((unsigned short *)0x5000200), 32 / 2);
     hideSprites();
     DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
 
@@ -1940,6 +1979,8 @@ void game() {
 void goToDialogue() {
 
     waitForVBlank();
+
+    stopSound(soundB);
 
 
     (*(volatile unsigned short *)0x4000000) = 0;
@@ -2006,7 +2047,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 325 "main.c"
+# 364 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0;
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 

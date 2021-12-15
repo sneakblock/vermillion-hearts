@@ -5,6 +5,8 @@
 #include "selector.h"
 #include "sound.h"
 #include "talksounds.h"
+#include "npcs.h"
+#include "trackB.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -74,10 +76,14 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
             drawChar4(col, row, *string, colorIndex);
         }
 
-        
-
-        if (!soundB.isPlaying) {
-            playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, rand() % SOUND_FREQ);
+        if (currentTarget == &dutchess) {
+            if (!soundB.isPlaying) {
+                playSoundB(&trackB_data[rand() % trackB_length], (rand() % (1000 - 100 + 1) + 1000), 0, (rand() % (SOUND_FREQ - 50 + 1)) + SOUND_FREQ);
+            }
+        } else {
+            if (!soundB.isPlaying) {
+                playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, (rand() % (2000 - 50 + 1)) + 2000);
+            }
         }
 
         // prev = *string;

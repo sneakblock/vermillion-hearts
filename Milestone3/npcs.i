@@ -216,6 +216,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 
 
 void initGame();
@@ -437,13 +439,27 @@ extern const unsigned short knightBitmap[5336];
 
 extern const unsigned short knightPal[256];
 # 9 "npcs.c" 2
+# 1 "dutchess.h" 1
+# 21 "dutchess.h"
+extern const unsigned short dutchessBitmap[5336];
+
+
+extern const unsigned short dutchessPal[16];
+# 10 "npcs.c" 2
+# 1 "masterseer.h" 1
+# 21 "masterseer.h"
+extern const unsigned short masterseerBitmap[5336];
+
+
+extern const unsigned short masterseerPal[16];
+# 11 "npcs.c" 2
 # 1 "level0collisionmap2.h" 1
 # 21 "level0collisionmap2.h"
 extern const unsigned short level0collisionmap2Bitmap[65536];
 
 
 extern const unsigned short level0collisionmap2Pal[256];
-# 10 "npcs.c" 2
+# 12 "npcs.c" 2
 # 1 "level0foreground2.h" 1
 # 22 "level0foreground2.h"
 extern const unsigned short level0foreground2Tiles[3680];
@@ -453,7 +469,7 @@ extern const unsigned short level0foreground2Map[2048];
 
 
 extern const unsigned short level0foreground2Pal[6];
-# 11 "npcs.c" 2
+# 13 "npcs.c" 2
 
 # 1 "trackA.h" 1
 
@@ -461,14 +477,14 @@ extern const unsigned short level0foreground2Pal[6];
 extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
-# 13 "npcs.c" 2
+# 15 "npcs.c" 2
 # 1 "trackB.h" 1
 
 
 extern const unsigned int trackB_sampleRate;
 extern const unsigned int trackB_length;
 extern const signed char trackB_data[];
-# 14 "npcs.c" 2
+# 16 "npcs.c" 2
 
 # 1 "sound.h" 1
 void setupSounds();
@@ -495,7 +511,7 @@ typedef struct{
 
 SOUND soundA;
 SOUND soundB;
-# 16 "npcs.c" 2
+# 18 "npcs.c" 2
 
 
 
@@ -506,7 +522,7 @@ NPC knight;
 NPC seerMaster;
 NPC finalDoor;
 NPC dutchess;
-# 34 "npcs.c"
+# 36 "npcs.c"
 NPC* initCloud() {
     cloud.name = "Cloud:";
     cloud.gameSpriteTileIDx = 0;
@@ -811,16 +827,16 @@ NPC* initSeerMaster() {
     seerMaster.cdel = 1;
     seerMaster.width = 8;
     seerMaster.height = 16;
-    seerMaster.aniState = DOWN;
+    seerMaster.aniState = LEFT;
     seerMaster.curFrame = 0;
-    seerMaster.numFrames = 3;
-    seerMaster.gameSpriteTileIDx = 1;
+    seerMaster.numFrames = 2;
+    seerMaster.gameSpriteTileIDx = 4;
     seerMaster.gameSpriteTileIDy = 0;
 
-    seerMaster.talkingHeadBitmap = seerBitmap;
-    seerMaster.talkingHeadPalette = seerPal;
-    seerMaster.talkingHeadPalLen = 512;
-    seerMaster.name = "The Eremite:";
+    seerMaster.talkingHeadBitmap = masterseerBitmap;
+    seerMaster.talkingHeadPalette = masterseerPal;
+    seerMaster.talkingHeadPalLen = 32;
+    seerMaster.name = "The Allseer:";
 
     DIALOGUE greeting;
     greeting.string = "Ah. It is you. I did not think I would see you in my lifetime, I must admit.";
@@ -1026,7 +1042,7 @@ NPC* initFinalDoor() {
     finalDoor.worldRow = 40;
 
     finalDoor.gameSpriteTileIDx = 0;
-    finalDoor.gameSpriteTileIDy = 0;
+    finalDoor.gameSpriteTileIDy = 7;
 
     finalDoor.width = 8;
     finalDoor.height = 16;
@@ -1053,12 +1069,12 @@ NPC* initDutchess() {
     dutchess.aniState = DOWN;
     dutchess.curFrame = 0;
     dutchess.numFrames = 3;
-    dutchess.gameSpriteTileIDx = 2;
+    dutchess.gameSpriteTileIDx = 9;
     dutchess.gameSpriteTileIDy = 0;
 
-    dutchess.talkingHeadBitmap = seerBitmap;
-    dutchess.talkingHeadPalette = seerPal;
-    dutchess.talkingHeadPalLen = 512;
+    dutchess.talkingHeadBitmap = dutchessBitmap;
+    dutchess.talkingHeadPalette = dutchessPal;
+    dutchess.talkingHeadPalLen = 32;
     dutchess.name = "The Dutchess:";
 
     DIALOGUE greeting;

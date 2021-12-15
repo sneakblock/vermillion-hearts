@@ -1538,6 +1538,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 
 
 void initGame();
@@ -1630,7 +1632,7 @@ extern const unsigned short level1collisionmapPal[256];
 extern const unsigned short SPRITESHEETTiles[16384];
 
 
-extern const unsigned short SPRITESHEETPal[256];
+extern const unsigned short SPRITESHEETPal[16];
 # 11 "game.c" 2
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
@@ -1706,6 +1708,8 @@ extern const unsigned short level2collisionmap2Bitmap[32768];
 
 extern const unsigned short level2collisionmap2Pal[256];
 # 16 "game.c" 2
+
+int cheat;
 
 int gateUnlocked;
 
@@ -1812,12 +1816,17 @@ void updateGame() {
 
     }
 
+    if (cheat) {
+
+        player.currentSprite = &dutchess;
+
+    }
+
 }
 
 void checkForConvoBools() {
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
-
         if (currentLevel->npcs[i]->convoBoolSatisfied) {
             if (currentLevel->npcs[i]->convoFunc) {
                 currentLevel->npcs[i]->convoFunc();
@@ -1910,7 +1919,7 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
             DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
         }
     }
-# 231 "game.c"
+# 238 "game.c"
     if (resetsPlayerPos) {
         if (level->useSecondarySpawn) {
             player.worldCol = level->secondaryPlayerWorldSpawnCol;
@@ -1960,6 +1969,12 @@ void updatePlayer() {
 
                 player.worldRow = player.worldRow - player.rdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = UP;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             if (vOff > 0 && (player.worldRow - vOff) <= 160 / 2) {
 
@@ -1972,6 +1987,12 @@ void updatePlayer() {
             currentLevel->collisionMap[((player.worldRow + player.height - 1 + player.rdel) * (currentLevel->worldPixelWidth) + (player.worldCol + player.width - 1))]) {
                 player.worldRow = player.worldRow + player.rdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = DOWN;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
 
 
@@ -1989,6 +2010,12 @@ void updatePlayer() {
             currentLevel->collisionMap[((player.worldRow + player.height - 1) * (currentLevel->worldPixelWidth) + (player.worldCol - player.cdel))]) {
                 player.worldCol = player.worldCol - player.cdel;
                 player.isMoving = 1;
+                if (player.currentSprite == &seerMaster) {
+                    player.aniState = LEFT;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
 
 
@@ -2004,6 +2031,12 @@ void updatePlayer() {
 
             player.worldCol = player.worldCol + player.cdel;
             player.isMoving = 1;
+            if (player.currentSprite == &seerMaster) {
+                    player.aniState = RIGHT;
+                    player.numFrames = 2;
+                } else {
+                    player.aniState = DOWN;
+                }
 
             if (hOff < currentLevel->worldPixelWidth - 240 && (player.worldCol - hOff) > 240 / 2) {
 

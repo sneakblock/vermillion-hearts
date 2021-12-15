@@ -216,6 +216,8 @@ extern PLAYER player;
 
 extern int paletteCrushed;
 
+extern int cheat;
+
 
 
 void initGame();
@@ -420,6 +422,35 @@ extern const unsigned int talksounds_sampleRate;
 extern const unsigned int talksounds_length;
 extern const signed char talksounds_data[];
 # 8 "dialogue.c" 2
+# 1 "npcs.h" 1
+extern NPC cloud;
+extern NPC plantMerchant;
+extern NPC seer;
+extern NPC knight;
+extern NPC seerMaster;
+extern NPC finalDoor;
+extern NPC dutchess;
+
+void initNPCS();
+NPC* initCloud();
+NPC* initPlantMerchant();
+NPC* initSeer();
+NPC* initKnight();
+NPC* initSeerMaster();
+NPC* initFinalDoor();
+NPC* initDutchess();
+
+void unlockDutchess();
+void openGate();
+void destroyWorld();
+# 9 "dialogue.c" 2
+# 1 "trackB.h" 1
+
+
+extern const unsigned int trackB_sampleRate;
+extern const unsigned int trackB_length;
+extern const signed char trackB_data[];
+# 10 "dialogue.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 29 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/_ansi.h" 1 3
@@ -1462,7 +1493,7 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 9 "dialogue.c" 2
+# 11 "dialogue.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -1647,10 +1678,10 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 10 "dialogue.c" 2
+# 12 "dialogue.c" 2
 
 
-# 11 "dialogue.c"
+# 13 "dialogue.c"
 int selectedChoice;
 
 void drawDialogueUI() {
@@ -1717,10 +1748,14 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
             drawChar4(col, row, *string, colorIndex);
         }
 
-
-
-        if (!soundB.isPlaying) {
-            playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, rand() % 11025);
+        if (currentTarget == &dutchess) {
+            if (!soundB.isPlaying) {
+                playSoundB(&trackB_data[rand() % trackB_length], (rand() % (1000 - 100 + 1) + 1000), 0, (rand() % (11025 - 50 + 1)) + 11025);
+            }
+        } else {
+            if (!soundB.isPlaying) {
+                playSoundB(&talksounds_data[rand() % talksounds_length], 250, 0, (rand() % (2000 - 50 + 1)) + 2000);
+            }
         }
 
 
