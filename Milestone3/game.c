@@ -12,6 +12,7 @@
 #include "talkingheadtest2.h"
 #include "levels.h"
 #include "npcs.h"
+#include "level2collisionmap2.h"
 
 int gateUnlocked;
 
@@ -28,6 +29,9 @@ PLAYER player;
 int hOff;
 int vOff;
 
+// ====== FINAL DOOR SPAWN =======
+int paletteCrushed;
+
 // unsigned char* level1collisionmap = level1collisionmapBitmap;
 
 void initGame() {
@@ -36,6 +40,7 @@ void initGame() {
     currentLevel = &level0;
     initPlayer();
 
+    paletteCrushed = 0;
 }
 
 void updateGame() {
@@ -48,7 +53,7 @@ void updateGame() {
     checkForConvoBools();
 
     if (player.worldRow < 60 && currentLevel == &level0) {
-        for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
             currentLevel->npcs[i]->active = 0;
             currentLevel->npcs[i]->hide = 1;
         }
@@ -58,13 +63,59 @@ void updateGame() {
     }
 
     if (player.worldCol == 0 && player.worldRow >= 136 && player.worldRow <= 156 && currentLevel == &level2) {
-        for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
             currentLevel->npcs[i]->active = 0;
             currentLevel->npcs[i]->hide = 1;
         }
+        level2.useSecondarySpawn = 1;
         currentLevel = &level1;
         goToGame();
         loadLevel(currentLevel, 1);
+    }
+
+    if (player.worldCol == (level1.worldPixelWidth - player.width - 1) && currentLevel == &level1) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level2;
+        goToGame();
+        loadLevel(currentLevel, 1);
+    }
+
+    if (currentLevel == &level2) {
+        for (int i = 0; i < 32; i++) {
+            for (int j = 31; j > 0; j--) {
+                if (PALETTE[i] == PALETTE[j]) {
+                    paletteCrushed = 1;
+                } else {
+                    paletteCrushed = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (currentLevel == &level2 && paletteCrushed) {
+
+        finalDoor.active = 1;
+        finalDoor.hide = 0;
+        level2.collisionMap = level2collisionmap2Bitmap;
+
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, finalDoor.worldCol, finalDoor.worldRow, finalDoor.width, finalDoor.height)) {
+
+            for (int i = 0; i < currentLevel->numNPCS; i++) {
+                currentLevel->npcs[i]->active = 0;
+                currentLevel->npcs[i]->hide = 1;
+            }
+
+            // TEST!
+            currentLevel = &level3;
+            goToGame();
+            loadLevel(currentLevel, 1);
+
+        }
+
     }
 
 }
@@ -74,16 +125,12 @@ void checkForConvoBools() {
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (currentLevel->npcs[i]->convoBoolSatisfied) {
-
             if (currentLevel->npcs[i]->convoFunc) {
                 currentLevel->npcs[i]->convoFunc();
                 currentLevel->npcs[i]->convoBoolSatisfied = 0;
             }
-
         }
-
     }
-
 }
 
 void drawGame() {
@@ -91,7 +138,6 @@ void drawGame() {
     drawPlayer();
     drawNPCS();
 
-    //Maybe don't do this during a glitch?
     waitForVBlank();
 
     DMANow(3, shadowOAM, OAM, 128 * 4);
@@ -104,8 +150,6 @@ void drawGame() {
 
     REG_BG2HOFF = hOff / 3;
     REG_BG2VOFF = vOff / 3;
-
-
 }
 
 
@@ -183,15 +227,27 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
     
 
     if (resetsPlayerPos) {
-        player.worldCol = level->playerWorldSpawnCol;
-        player.worldRow = level->playerWorldSpawnRow;
-        hOff = level->initHOff;
-        vOff = level->initVOff;
+        if (level->useSecondarySpawn) {
+            player.worldCol = level->secondaryPlayerWorldSpawnCol;
+            player.worldRow = level->secondaryPlayerWorldSpawnRow;
+            hOff = level->secondaryInitHOff;
+            vOff = level->secondaryInitVOff;
+        } else {
+            player.worldCol = level->playerWorldSpawnCol;
+            player.worldRow = level->playerWorldSpawnRow;
+            hOff = level->initHOff;
+            vOff = level->initVOff;
+        }
     }
 
     if (level->numNPCS) {
         for (int i = 0; i < MAX_NPCS_PER_LEVEL; i++) {
-            loadNPC(level->npcs[i]);
+            if (level->npcs[i] != &finalDoor) {
+                loadNPC(level->npcs[i]);
+            } else if (level->npcs[i] == &finalDoor) {
+                level->npcs[i]->active = 0;
+                level->npcs[i]->hide = 1;
+            }
         }
     }
 
@@ -286,7 +342,6 @@ void updatePlayer() {
     }
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
-        //Temp solution
         if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {
             playerCollidingWithNPC = 1;
             if (BUTTON_PRESSED(BUTTON_L)) {
@@ -395,15 +450,15 @@ void drawPlayer() {
 }
 
 void drawNPCS() {
-    for (int i = 0; i < currentLevel->numNPCS; i++) {
-        if (currentLevel->npcs[i]->hide) {
-        shadowOAM[i + 1].attr0 |= ATTR0_HIDE;
-        } else {
-        shadowOAM[i + 1].attr0 = (currentLevel->npcs[i]->worldRow - vOff) | ATTR0_TALL | ATTR0_4BPP;
-        shadowOAM[i + 1].attr1 = (currentLevel->npcs[i]->worldCol - hOff) | ATTR1_TINY;
-        shadowOAM[i + 1].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8)), (currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)));
-        // shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
-    }
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+            if (currentLevel->npcs[i]->hide) {
+            shadowOAM[i + 1].attr0 |= ATTR0_HIDE;
+            } else {
+            shadowOAM[i + 1].attr0 = ((currentLevel->npcs[i]->worldRow - vOff)) | ATTR0_TALL | ATTR0_4BPP;
+            shadowOAM[i + 1].attr1 = ((currentLevel->npcs[i]->worldCol - hOff)) | ATTR1_TINY;
+            shadowOAM[i + 1].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8)), (currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)));
+            // shadowOAM[0].attr2 = ATTR2_PALROW(0) | ATTR2_TILEID(0, 0);
+        }
     }
 }
 

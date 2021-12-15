@@ -1500,6 +1500,12 @@ typedef struct {
     int initHOff;
     int initVOff;
 
+    int useSecondarySpawn;
+    int secondaryPlayerWorldSpawnCol;
+    int secondaryPlayerWorldSpawnRow;
+    int secondaryInitHOff;
+    int secondaryInitVOff;
+
     int foregroundTilesLen;
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
@@ -1538,6 +1544,8 @@ extern LEVEL* currentLevel;
 
 extern LEVEL level1;
 extern PLAYER player;
+
+extern int paletteCrushed;
 
 
 

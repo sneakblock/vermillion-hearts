@@ -44,8 +44,12 @@ LEVEL pauseLevel;
 LEVEL level0;
 int level0AniTimer;
 
+LEVEL level1;
+
 LEVEL level2;
 int level2AniTimer;
+
+LEVEL level3;
 
 int vOffBG0;
 int vOffBG1;
@@ -103,15 +107,13 @@ void crushPalette() {
     
     waitForVBlank();
 
-    PALETTE[rand() % 16] = PALETTE[rand() % 16];
+    PALETTE[rand() % 32] = PALETTE[rand() % 32];
 
     if (!soundB.isPlaying) {
 
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
     
     }
-
-    // loadLevel(currentLevel, 0);
     
 }
 
@@ -360,6 +362,12 @@ void initLevel2() {
     level2.playerWorldSpawnRow = 239;
     level2.initHOff = 16;
     level2.initVOff = 96;
+
+    level2.useSecondarySpawn = 0;
+    level2.secondaryPlayerWorldSpawnCol = 5;
+    level2.secondaryPlayerWorldSpawnRow = 146;
+    level2.secondaryInitHOff = 0;
+    level2.secondaryInitVOff = 97;
     
 
     // ============= SIZE ===============
@@ -370,10 +378,8 @@ void initLevel2() {
     level2.collisionMap = (unsigned char*) level2collisionmapBitmap;
 
     // // ============== NPCS =================
-    // level0.numNPCS = 3;
-    // level0.npcs[0] = initSeer();
-    // level0.npcs[1] = initPlantMerchant();
-    // level0.npcs[2] = initKnight();
+    level2.numNPCS = 1;
+    level2.npcs[0] = initFinalDoor();
 
 
     // =========== FOREGROUND ============
@@ -438,11 +444,15 @@ void animateLevel2() {
 
     // START REAL
 
-    int randInt = rand();
+    if (player.currentSprite != &seerMaster) {
 
-    DMANow(3, randInt, &CHARBLOCK[2], level2midgroundTilesLen / 2);
+        int randInt = rand();
 
-    PALETTE[0] = 0;
+        DMANow(3, randInt, &CHARBLOCK[2], level2midgroundTilesLen / 2);
+
+        PALETTE[0] = 0;
+
+    }
 
     // if (level2AniTimer % 500 == 0) {
 
@@ -510,5 +520,11 @@ void animateLevel0() {
     level0AniTimer++;
 
     // DMANow(3, rand(), &PALETTE[(level0foregroundPalLen / 2) + (level0midgroundPalLen / 2)], level0backgroundPalLen / 2);
+
+}
+
+void initLevel3() {
+
+    
 
 }

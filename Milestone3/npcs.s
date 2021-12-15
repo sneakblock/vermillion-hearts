@@ -898,6 +898,43 @@ initSeerMaster:
 	.word	.LC63
 	.word	crushPalette
 	.size	initSeerMaster, .-initSeerMaster
+	.align	2
+	.global	initFinalDoor
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	initFinalDoor, %function
+initFinalDoor:
+	@ Function supports interworking.
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	mov	r3, #0
+	mov	r4, #128
+	mov	lr, #40
+	mov	r2, #1
+	mov	ip, #8
+	mov	r1, #16
+	ldr	r0, .L27
+	str	r4, [r0, #16]
+	str	lr, [r0, #12]
+	str	ip, [r0, #28]
+	str	r1, [r0, #32]
+	str	r3, [r0, #60]
+	str	r3, [r0, #64]
+	str	r3, [r0, #44]
+	str	r3, [r0, #52]
+	str	r3, [r0]
+	str	r2, [r0, #56]
+	str	r2, [r0, #36]
+	pop	{r4, lr}
+	bx	lr
+.L28:
+	.align	2
+.L27:
+	.word	finalDoor
+	.size	initFinalDoor, .-initFinalDoor
+	.comm	finalDoor,1784,4
 	.comm	seerMaster,1784,4
 	.comm	knight,1784,4
 	.comm	seer,1784,4

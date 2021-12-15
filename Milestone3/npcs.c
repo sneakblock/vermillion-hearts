@@ -16,6 +16,7 @@ NPC plantMerchant;
 NPC seer;
 NPC knight;
 NPC seerMaster;
+NPC finalDoor;
 
 // void initNPCS() {
 
@@ -535,5 +536,27 @@ NPC* initSeerMaster() {
 
     return &seerMaster;
 
+}
+
+NPC* initFinalDoor() {
+
+    finalDoor.worldCol = 128;
+    finalDoor.worldRow = 40;
+
+    finalDoor.gameSpriteTileIDx = 0;
+    finalDoor.gameSpriteTileIDy = 0;
+
+    finalDoor.width = 8;
+    finalDoor.height = 16;
+
+    finalDoor.aniState = DOWN;
+    finalDoor.numFrames = 1;
+    finalDoor.curFrame = 0;
+
+    finalDoor.active = 0;
+    finalDoor.hide = 1;
+
+    return &finalDoor;
+    
 }
 

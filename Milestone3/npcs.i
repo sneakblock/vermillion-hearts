@@ -169,6 +169,12 @@ typedef struct {
     int initHOff;
     int initVOff;
 
+    int useSecondarySpawn;
+    int secondaryPlayerWorldSpawnCol;
+    int secondaryPlayerWorldSpawnRow;
+    int secondaryInitHOff;
+    int secondaryInitVOff;
+
     int foregroundTilesLen;
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
@@ -207,6 +213,8 @@ extern LEVEL* currentLevel;
 
 extern LEVEL level1;
 extern PLAYER player;
+
+extern int paletteCrushed;
 
 
 
@@ -360,6 +368,7 @@ extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 extern NPC seerMaster;
+extern NPC finalDoor;
 
 void initNPCS();
 NPC* initCloud();
@@ -367,6 +376,7 @@ NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
 NPC* initSeerMaster();
+NPC* initFinalDoor();
 
 void openGate();
 # 4 "npcs.c" 2
@@ -444,7 +454,8 @@ NPC plantMerchant;
 NPC seer;
 NPC knight;
 NPC seerMaster;
-# 27 "npcs.c"
+NPC finalDoor;
+# 28 "npcs.c"
 NPC* initCloud() {
     cloud.name = "Cloud:";
     cloud.gameSpriteTileIDx = 0;
@@ -955,5 +966,27 @@ NPC* initSeerMaster() {
     seerMaster.abilityFunc = crushPalette;
 
     return &seerMaster;
+
+}
+
+NPC* initFinalDoor() {
+
+    finalDoor.worldCol = 128;
+    finalDoor.worldRow = 40;
+
+    finalDoor.gameSpriteTileIDx = 0;
+    finalDoor.gameSpriteTileIDy = 0;
+
+    finalDoor.width = 8;
+    finalDoor.height = 16;
+
+    finalDoor.aniState = DOWN;
+    finalDoor.numFrames = 1;
+    finalDoor.curFrame = 0;
+
+    finalDoor.active = 0;
+    finalDoor.hide = 1;
+
+    return &finalDoor;
 
 }

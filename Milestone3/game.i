@@ -1491,6 +1491,12 @@ typedef struct {
     int initHOff;
     int initVOff;
 
+    int useSecondarySpawn;
+    int secondaryPlayerWorldSpawnCol;
+    int secondaryPlayerWorldSpawnRow;
+    int secondaryInitHOff;
+    int secondaryInitVOff;
+
     int foregroundTilesLen;
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
@@ -1529,6 +1535,8 @@ extern LEVEL* currentLevel;
 
 extern LEVEL level1;
 extern PLAYER player;
+
+extern int paletteCrushed;
 
 
 
@@ -1648,7 +1656,7 @@ extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
-void crushPalette(int duration);
+void crushPalette();
 
 void initStart();
 
@@ -1671,6 +1679,7 @@ extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 extern NPC seerMaster;
+extern NPC finalDoor;
 
 void initNPCS();
 NPC* initCloud();
@@ -1678,9 +1687,17 @@ NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
 NPC* initSeerMaster();
+NPC* initFinalDoor();
 
 void openGate();
 # 15 "game.c" 2
+# 1 "level2collisionmap2.h" 1
+# 21 "level2collisionmap2.h"
+extern const unsigned short level2collisionmap2Bitmap[32768];
+
+
+extern const unsigned short level2collisionmap2Pal[256];
+# 16 "game.c" 2
 
 int gateUnlocked;
 
@@ -1698,6 +1715,9 @@ int hOff;
 int vOff;
 
 
+int paletteCrushed;
+
+
 
 void initGame() {
 
@@ -1705,6 +1725,7 @@ void initGame() {
     currentLevel = &level0;
     initPlayer();
 
+    paletteCrushed = 0;
 }
 
 void updateGame() {
@@ -1717,7 +1738,7 @@ void updateGame() {
     checkForConvoBools();
 
     if (player.worldRow < 60 && currentLevel == &level0) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
             currentLevel->npcs[i]->active = 0;
             currentLevel->npcs[i]->hide = 1;
         }
@@ -1727,13 +1748,59 @@ void updateGame() {
     }
 
     if (player.worldCol == 0 && player.worldRow >= 136 && player.worldRow <= 156 && currentLevel == &level2) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
             currentLevel->npcs[i]->active = 0;
             currentLevel->npcs[i]->hide = 1;
         }
+        level2.useSecondarySpawn = 1;
         currentLevel = &level1;
         goToGame();
         loadLevel(currentLevel, 1);
+    }
+
+    if (player.worldCol == (level1.worldPixelWidth - player.width - 1) && currentLevel == &level1) {
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+            currentLevel->npcs[i]->active = 0;
+            currentLevel->npcs[i]->hide = 1;
+        }
+        currentLevel = &level2;
+        goToGame();
+        loadLevel(currentLevel, 1);
+    }
+
+    if (currentLevel == &level2) {
+        for (int i = 0; i < 32; i++) {
+            for (int j = 31; j > 0; j--) {
+                if (((unsigned short *)0x5000000)[i] == ((unsigned short *)0x5000000)[j]) {
+                    paletteCrushed = 1;
+                } else {
+                    paletteCrushed = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (currentLevel == &level2 && paletteCrushed) {
+
+        finalDoor.active = 1;
+        finalDoor.hide = 0;
+        level2.collisionMap = level2collisionmap2Bitmap;
+
+        if (collision(player.worldCol, player.worldRow, player.width, player.height, finalDoor.worldCol, finalDoor.worldRow, finalDoor.width, finalDoor.height)) {
+
+            for (int i = 0; i < currentLevel->numNPCS; i++) {
+                currentLevel->npcs[i]->active = 0;
+                currentLevel->npcs[i]->hide = 1;
+            }
+
+
+            currentLevel = &level0;
+            goToGame();
+            loadLevel(currentLevel, 1);
+
+        }
+
     }
 
 }
@@ -1743,23 +1810,18 @@ void checkForConvoBools() {
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (currentLevel->npcs[i]->convoBoolSatisfied) {
-
             if (currentLevel->npcs[i]->convoFunc) {
                 currentLevel->npcs[i]->convoFunc();
                 currentLevel->npcs[i]->convoBoolSatisfied = 0;
             }
-
         }
-
     }
-
 }
 
 void drawGame() {
 
     drawPlayer();
     drawNPCS();
-
 
     waitForVBlank();
 
@@ -1773,8 +1835,6 @@ void drawGame() {
 
     (*(volatile unsigned short *)0x04000018) = hOff / 3;
     (*(volatile unsigned short *)0x0400001A) = vOff / 3;
-
-
 }
 
 
@@ -1840,17 +1900,29 @@ void loadLevel(LEVEL* level, int resetsPlayerPos) {
             DMANow(3, level->backgroundPal, &((unsigned short *)0x5000000)[(level->foregroundPalLen / 2) + (level->midgroundPalLen / 2)], level->backgroundPalLen / 2);
         }
     }
-# 185 "game.c"
+# 229 "game.c"
     if (resetsPlayerPos) {
-        player.worldCol = level->playerWorldSpawnCol;
-        player.worldRow = level->playerWorldSpawnRow;
-        hOff = level->initHOff;
-        vOff = level->initVOff;
+        if (level->useSecondarySpawn) {
+            player.worldCol = level->secondaryPlayerWorldSpawnCol;
+            player.worldRow = level->secondaryPlayerWorldSpawnRow;
+            hOff = level->secondaryInitHOff;
+            vOff = level->secondaryInitVOff;
+        } else {
+            player.worldCol = level->playerWorldSpawnCol;
+            player.worldRow = level->playerWorldSpawnRow;
+            hOff = level->initHOff;
+            vOff = level->initVOff;
+        }
     }
 
     if (level->numNPCS) {
         for (int i = 0; i < 5; i++) {
-            loadNPC(level->npcs[i]);
+            if (level->npcs[i] != &finalDoor) {
+                loadNPC(level->npcs[i]);
+            } else if (level->npcs[i] == &finalDoor) {
+                level->npcs[i]->active = 0;
+                level->npcs[i]->hide = 1;
+            }
         }
     }
 
@@ -1937,7 +2009,7 @@ void updatePlayer() {
         goToPause();
     }
 
-    if ((!(~(oldButtons) & ((1 << 8))) && (~buttons & ((1 << 8))))) {
+    if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 8)))) {
         if (player.currentSprite->abilityFunc && player.currentSprite == &seerMaster) {
             player.currentSprite->abilityFunc();
             return;
@@ -1945,7 +2017,6 @@ void updatePlayer() {
     }
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
-
         if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {
             playerCollidingWithNPC = 1;
             if ((!(~(oldButtons) & ((1 << 9))) && (~buttons & ((1 << 9))))) {
@@ -2054,14 +2125,14 @@ void drawPlayer() {
 }
 
 void drawNPCS() {
-    for (int i = 0; i < currentLevel->numNPCS; i++) {
-        if (currentLevel->npcs[i]->hide) {
-        shadowOAM[i + 1].attr0 |= (2 << 8);
-        } else {
-        shadowOAM[i + 1].attr0 = (currentLevel->npcs[i]->worldRow - vOff) | (2 << 14) | (0 << 13);
-        shadowOAM[i + 1].attr1 = (currentLevel->npcs[i]->worldCol - hOff) | (0 << 14);
-        shadowOAM[i + 1].attr2 = ((0) << 12) | (((currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)))*32 + ((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8))));
+        for (int i = 0; i < currentLevel->numNPCS; i++) {
+            if (currentLevel->npcs[i]->hide) {
+            shadowOAM[i + 1].attr0 |= (2 << 8);
+            } else {
+            shadowOAM[i + 1].attr0 = ((currentLevel->npcs[i]->worldRow - vOff)) | (2 << 14) | (0 << 13);
+            shadowOAM[i + 1].attr1 = ((currentLevel->npcs[i]->worldCol - hOff)) | (0 << 14);
+            shadowOAM[i + 1].attr2 = ((0) << 12) | (((currentLevel->npcs[i]->gameSpriteTileIDy) + (currentLevel->npcs[i]->curFrame * (currentLevel->npcs[i]->height / 8)))*32 + ((currentLevel->npcs[i]->gameSpriteTileIDx) + (currentLevel->npcs[i]->aniState * (currentLevel->npcs[i]->width / 8))));
 
-    }
+        }
     }
 }

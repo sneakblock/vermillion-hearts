@@ -1491,6 +1491,12 @@ typedef struct {
     int initHOff;
     int initVOff;
 
+    int useSecondarySpawn;
+    int secondaryPlayerWorldSpawnCol;
+    int secondaryPlayerWorldSpawnRow;
+    int secondaryInitHOff;
+    int secondaryInitVOff;
+
     int foregroundTilesLen;
     int foregroundMapLen;
     const unsigned short* foregroundTiles;
@@ -1529,6 +1535,8 @@ extern LEVEL* currentLevel;
 
 extern LEVEL level1;
 extern PLAYER player;
+
+extern int paletteCrushed;
 
 
 
@@ -1846,6 +1854,7 @@ extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
 extern NPC seerMaster;
+extern NPC finalDoor;
 
 void initNPCS();
 NPC* initCloud();
@@ -1853,6 +1862,7 @@ NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
 NPC* initSeerMaster();
+NPC* initFinalDoor();
 
 void openGate();
 # 39 "levels.c" 2
@@ -1923,15 +1933,13 @@ void crushPalette() {
 
     waitForVBlank();
 
-    ((unsigned short *)0x5000000)[rand() % 16] = ((unsigned short *)0x5000000)[rand() % 16];
+    ((unsigned short *)0x5000000)[rand() % 32] = ((unsigned short *)0x5000000)[rand() % 32];
 
     if (!soundB.isPlaying) {
 
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
 
     }
-
-
 
 }
 
@@ -2088,7 +2096,7 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 289 "levels.c"
+# 287 "levels.c"
     level1.numNPCS = 1;
     level1.npcs[0] = initSeerMaster();
 
@@ -2164,6 +2172,12 @@ void initLevel2() {
     level2.initHOff = 16;
     level2.initVOff = 96;
 
+    level2.useSecondarySpawn = 0;
+    level2.secondaryPlayerWorldSpawnCol = 5;
+    level2.secondaryPlayerWorldSpawnRow = 146;
+    level2.secondaryInitHOff = 0;
+    level2.secondaryInitVOff = 97;
+
 
 
     level2.levelSize = (0 << 14);
@@ -2171,7 +2185,14 @@ void initLevel2() {
     level2.worldPixelWidth = 256;
     level2.worldPixelHeight = 256;
     level2.collisionMap = (unsigned char*) level2collisionmapBitmap;
-# 381 "levels.c"
+
+
+    level2.numNPCS = 1;
+    level2.npcs[0] = initFinalDoor();
+
+
+
+
     level2.foregroundTiles = level2foregroundTiles;
     level2.foregroundMap = level2foregroundMap;
     level2.foregroundTilesLen = 49728;
@@ -2179,7 +2200,7 @@ void initLevel2() {
 
     level2.foregroundPal = level2foregroundPal;
     level2.foregroundPalLen = 64;
-# 401 "levels.c"
+# 403 "levels.c"
     level2.backgroundTiles = level2midgroundTiles;
     level2.backgroundMap = level2midgroundMap;
     level2.backgroundTilesLen = 3840;
@@ -2212,13 +2233,17 @@ void unlockGateLevel0() {
 }
 
 void animateLevel2() {
-# 441 "levels.c"
-    int randInt = rand();
+# 443 "levels.c"
+    if (player.currentSprite != &seerMaster) {
 
-    DMANow(3, randInt, &((charblock *)0x6000000)[2], 3840 / 2);
+        int randInt = rand();
 
-    ((unsigned short *)0x5000000)[0] = 0;
-# 473 "levels.c"
+        DMANow(3, randInt, &((charblock *)0x6000000)[2], 3840 / 2);
+
+        ((unsigned short *)0x5000000)[0] = 0;
+
+    }
+# 479 "levels.c"
 }
 
 void animateLevel0() {
