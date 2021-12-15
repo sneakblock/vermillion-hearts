@@ -7,7 +7,7 @@ extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
-void crushPalette(int duration);
+void crushPalette();
 
 void initStart();
 

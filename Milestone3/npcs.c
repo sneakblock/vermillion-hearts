@@ -362,8 +362,6 @@ NPC* initSeerMaster() {
     end2.promptsChoice = 0;
     end2.endsConversation = 0;
     end2.satisfiesBool = 0;
-
-    // FIX ALL BELOW
     
     DIALOGUE end3;
     end3.string = "Some slowly ticking reflex machine, no longer able to move my legs or to turn my head. Watching what the Old Ones crafted, with time and passion and love, evaporate in time.";
@@ -390,7 +388,7 @@ NPC* initSeerMaster() {
     end6.satisfiesBool = 0;
 
     DIALOGUE end7;
-    end7.string = "And the other replied: Our game will be the one the Grandmother buys by mistake. Maybe that's enough to keep us employed.";
+    end7.string = "And the other replied: Our game will be the one Grandmothers buy their Grandchildren by mistake. Maybe that will be enough.";
     end7.promptsChoice = 0;
     end7.endsConversation = 0;
     end7.satisfiesBool = 0;
@@ -402,7 +400,7 @@ NPC* initSeerMaster() {
     end8.satisfiesBool = 0;
 
     DIALOGUE end9;
-    end9.string = "At the end of the silversun's life, I see that you have come. And I wonder if she might wish to go on, if she might wish to filter this world, as if through some broken stained glass, through the approximating lens of Emulsion.";
+    end9.string = "At the end of the silversun's life, I wonder if she might wish to go on, to filter this world, as if through some broken stained glass, through the approximating lens of Emulsion.";
     end9.promptsChoice = 0;
     end9.endsConversation = 0;
     end9.satisfiesBool = 0;
@@ -413,9 +411,8 @@ NPC* initSeerMaster() {
     end10.choiceA = "What is Emulsion?";
     end10.choiceB = "Do you know I am The Player?";
 
-    // FIX!!!!!!!!!!!
-    end10.choiceAIndex = 0;
-    end10.choiceBIndex = 0;
+    end10.choiceAIndex = 12;
+    end10.choiceBIndex = 13;
 
     end10.endsConversation = 0;
     end10.satisfiesBool = 0;
@@ -426,6 +423,10 @@ NPC* initSeerMaster() {
     end11.promptsChoice = 1;
     end11.choiceA = "What should I do?";
     end11.choiceB = "How can I reach her?";
+
+    end11.choiceAIndex = 14;
+    end11.choiceBIndex = 14;
+
     end11.endsConversation = 0;
     end11.satisfiesBool = 0;
 
@@ -436,16 +437,15 @@ NPC* initSeerMaster() {
     end12.choiceA = "What should I do?";
     end12.choiceB = "How can I reach her?";
 
-    // FIX PLEASE :)
-    end12.choiceAIndex = 0;
-    end12.choiceBIndex = 0;
+    end12.choiceAIndex = 14;
+    end12.choiceBIndex = 14;
 
     end12.endsConversation = 0;
     end12.satisfiesBool = 0;
 
     // DO / REACH HER?
     DIALOGUE end13;
-    end13.string = "I do not know what you intend to do. I, unlike you, have no true agency. I am a series of abstract structures, and have spoken to you as I have so much how one might climb a ladder while skipping the occasional rung.";
+    end13.string = "I do not know what you intend to do. I, unlike you, have no true agency. I have spoken to you as I have much how one might climb a ladder while skipping the occasional rung.";
     end13.promptsChoice = 0;
     end13.endsConversation = 0;
     end13.satisfiesBool = 0;
@@ -487,13 +487,13 @@ NPC* initSeerMaster() {
     end19.satisfiesBool = 0;
 
     DIALOGUE end20;
-    end20.string = "If you can, give my limbs life, take me to the gates of the Royal Court. I will try to redirect my old function, whatever it once was.";
+    end20.string = "If you can, give my limbs life, take me to the gates of the Royal Court. I will try to redirect my old function, whatever it once was, to the one I have developed over these enumerable Cycles.";
     end20.promptsChoice = 0;
     end20.endsConversation = 0;
     end20.satisfiesBool = 0;
 
     DIALOGUE end21;
-    end21.string = "A trite buff, I imagine.";
+    end21.string = "It was a trite buff, I imagine.";
     end21.promptsChoice = 0;
     end21.endsConversation = 1;
     end21.satisfiesBool = 0;
@@ -511,15 +511,23 @@ NPC* initSeerMaster() {
     seerMaster.dialogues[10] = end9;
     seerMaster.dialogues[11] = end10;
     seerMaster.dialogues[12] = end11;
+    seerMaster.dialogues[13] = end12;
+    seerMaster.dialogues[14] = end13;
+    seerMaster.dialogues[15] = end14;
+    seerMaster.dialogues[16] = end15;
+    seerMaster.dialogues[17] = end16;
+    seerMaster.dialogues[18] = end17;
+    seerMaster.dialogues[19] = end18;
+    seerMaster.dialogues[20] = end19;
+    seerMaster.dialogues[21] = end20;
+    seerMaster.dialogues[22] = end21;
 
 
     seerMaster.dialoguesIndex = 0;
+    seerMaster.postConvoIndex = 19;
 
-    // FIX THIS PLEASE :)
-    seerMaster.postConvoIndex = 0;
-
-    seerMaster.worldCol = 242;
-    seerMaster.worldRow = 174;
+    seerMaster.worldCol = 219;
+    seerMaster.worldRow = 197;
 
     // seer.convoFunc = openGate;
     seerMaster.isStealable = 1;

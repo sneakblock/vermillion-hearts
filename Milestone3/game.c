@@ -278,12 +278,12 @@ void updatePlayer() {
         goToPause();
     }
 
-    // if (BUTTON_PRESSED(BUTTON_R)) {
-    //     if (player.currentSprite->abilityFunc) {
-    //         player.currentSprite->abilityFunc();
-    //         return;
-    //     }
-    // }
+    if (BUTTON_HELD(BUTTON_R)) {
+        if (player.currentSprite->abilityFunc && player.currentSprite == &seerMaster) {
+            player.currentSprite->abilityFunc();
+            return;
+        }
+    }
 
     for (int i = 0; i < currentLevel->numNPCS; i++) {
         //Temp solution

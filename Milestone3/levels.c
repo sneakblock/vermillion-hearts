@@ -99,21 +99,19 @@ void glitchDMA(int duration) {
     goToGame();
 }
 
-void crushPalette(int duration) {
-    for (int i = 0; i < duration; i++) {
+void crushPalette() {
+    
+    waitForVBlank();
 
-        waitForVBlank();
+    PALETTE[rand() % 16] = PALETTE[rand() % 16];
 
-        if (!soundB.isPlaying) {
+    if (!soundB.isPlaying) {
+
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % SOUND_FREQ);
-        
-        PALETTE[rand() % 16] = PALETTE[rand() % 16];
-
-        }
-
+    
     }
 
-    loadLevel(currentLevel, 0);
+    // loadLevel(currentLevel, 0);
     
 }
 

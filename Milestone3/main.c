@@ -293,7 +293,8 @@ void dialogue() {
             goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
-            currentTarget->dialoguesIndex = 0;
+            //changed this!
+            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
         }
         

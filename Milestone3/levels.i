@@ -1648,7 +1648,7 @@ extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
-void crushPalette(int duration);
+void crushPalette();
 
 void initStart();
 
@@ -1919,21 +1919,19 @@ void glitchDMA(int duration) {
     goToGame();
 }
 
-void crushPalette(int duration) {
-    for (int i = 0; i < duration; i++) {
+void crushPalette() {
 
-        waitForVBlank();
+    waitForVBlank();
 
-        if (!soundB.isPlaying) {
+    ((unsigned short *)0x5000000)[rand() % 16] = ((unsigned short *)0x5000000)[rand() % 16];
+
+    if (!soundB.isPlaying) {
+
         playSoundB(&trackB_data[rand() % trackB_length], 500, 0, rand() % 11025);
-
-        ((unsigned short *)0x5000000)[rand() % 16] = ((unsigned short *)0x5000000)[rand() % 16];
-
-        }
 
     }
 
-    loadLevel(currentLevel, 0);
+
 
 }
 
@@ -2090,9 +2088,9 @@ void initLevel1() {
     level1.midgroundPalLen = 2;
     level1.backgroundPal = level1backgroundPal;
     level1.backgroundPalLen = 4;
-# 291 "levels.c"
-    level1.numNPCS = 0;
-
+# 289 "levels.c"
+    level1.numNPCS = 1;
+    level1.npcs[0] = initSeerMaster();
 
 
 
@@ -2173,7 +2171,7 @@ void initLevel2() {
     level2.worldPixelWidth = 256;
     level2.worldPixelHeight = 256;
     level2.collisionMap = (unsigned char*) level2collisionmapBitmap;
-# 383 "levels.c"
+# 381 "levels.c"
     level2.foregroundTiles = level2foregroundTiles;
     level2.foregroundMap = level2foregroundMap;
     level2.foregroundTilesLen = 49728;
@@ -2181,7 +2179,7 @@ void initLevel2() {
 
     level2.foregroundPal = level2foregroundPal;
     level2.foregroundPalLen = 64;
-# 403 "levels.c"
+# 401 "levels.c"
     level2.backgroundTiles = level2midgroundTiles;
     level2.backgroundMap = level2midgroundMap;
     level2.backgroundTilesLen = 3840;
@@ -2214,13 +2212,13 @@ void unlockGateLevel0() {
 }
 
 void animateLevel2() {
-# 443 "levels.c"
+# 441 "levels.c"
     int randInt = rand();
 
     DMANow(3, randInt, &((charblock *)0x6000000)[2], 3840 / 2);
 
     ((unsigned short *)0x5000000)[0] = 0;
-# 475 "levels.c"
+# 473 "levels.c"
 }
 
 void animateLevel0() {

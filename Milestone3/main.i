@@ -1678,7 +1678,7 @@ extern LEVEL level2;
 
 void glitchPalette(int duration);
 void glitchDMA(int duration);
-void crushPalette(int duration);
+void crushPalette();
 
 void initStart();
 
@@ -1967,7 +1967,8 @@ void dialogue() {
             goToDialogue();
         }
         else if (currentTarget->dialogues[currentTarget->dialoguesIndex].endsConversation) {
-            currentTarget->dialoguesIndex = 0;
+
+            currentTarget->dialoguesIndex = currentTarget->postConvoIndex;
             goToGame();
         }
 
@@ -1985,7 +1986,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 322 "main.c"
+# 323 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 
     loadLevel(&pauseLevel, 0);

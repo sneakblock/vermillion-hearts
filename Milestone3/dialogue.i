@@ -77,7 +77,7 @@ typedef struct
 
     int recognizesNPCS;
 
-    struct NPC* recognizedNPCS[3];
+    char* recognizedNPCS[3];
 
     int recognizedAindex;
     int recognizedBindex;
@@ -159,6 +159,7 @@ typedef struct {
 
     int levelSize;
     unsigned char* collisionMap;
+    int BPP;
 
     int worldPixelWidth;
     int worldPixelHeight;

@@ -351,94 +351,77 @@ crushPalette:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	subs	r5, r0, #0
-	ble	.L35
-	mov	r4, #0
-	ldr	r8, .L40
-	ldr	r7, .L40+4
-	ldr	r6, .L40+8
-	ldr	fp, .L40+12
-	b	.L37
-.L36:
-	cmp	r5, r4
-	beq	.L35
-.L37:
-	mov	lr, pc
-	bx	r8
-	ldr	r9, [r7, #12]
-	cmp	r9, #0
-	add	r4, r4, #1
-	bne	.L36
-	mov	lr, pc
-	bx	r6
-	ldr	r1, [fp]
-	ldr	r3, .L40+16
+	push	{r4, r5, r6, lr}
+	ldr	r3, .L38
+	ldr	r5, .L38+4
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L40+20
-	add	r10, r3, r1
 	mov	lr, pc
-	bx	r6
-	mov	r1, r0
-	ldr	r3, .L40+24
-	smull	r2, r3, r0, r3
+	bx	r5
+	mov	r4, r0
+	mov	lr, pc
+	bx	r5
+	rsbs	r3, r4, #0
+	and	r3, r3, #15
+	and	r4, r4, #15
+	ldr	r2, .L38+8
+	rsbpl	r4, r3, #0
+	rsbs	r3, r0, #0
+	and	r3, r3, #15
+	lsl	r4, r4, #1
+	ldr	r6, [r2, #12]
+	and	r0, r0, #15
+	add	r4, r4, #83886080
+	rsbpl	r0, r3, #0
+	lsl	r0, r0, #1
+	ldrh	r3, [r4]
+	add	r0, r0, #83886080
+	cmp	r6, #0
+	strh	r3, [r0]	@ movhi
+	beq	.L37
+	pop	{r4, r5, r6, lr}
+	bx	lr
+.L37:
+	mov	lr, pc
+	bx	r5
+	ldr	r2, .L38+12
+	ldr	r3, .L38+16
+	ldr	r1, [r2]
+	mov	lr, pc
+	bx	r3
+	ldr	r4, .L38+20
+	add	r4, r4, r1
+	mov	lr, pc
+	bx	r5
+	mov	r3, r0
+	ldr	ip, .L38+24
+	smull	r1, r2, ip, r0
 	asr	ip, r0, #31
-	rsb	ip, ip, r3, asr #11
+	rsb	ip, ip, r2, asr #11
 	add	ip, ip, ip, lsl #2
 	add	ip, ip, ip, lsl #2
 	rsb	ip, ip, ip, lsl #3
 	rsb	ip, ip, ip, lsl #6
-	sub	r3, r1, ip
-	mov	r2, r9
+	mov	r0, r4
+	mov	r2, r6
+	ldr	r4, .L38+28
 	mov	r1, #500
-	ldr	ip, .L40+28
-	mov	r0, r10
+	sub	r3, r3, ip
 	mov	lr, pc
-	bx	ip
-	mov	lr, pc
-	bx	r6
-	mov	r9, r0
-	mov	lr, pc
-	bx	r6
-	rsbs	r3, r9, #0
-	and	r3, r3, #15
-	and	r9, r9, #15
-	rsbpl	r9, r3, #0
-	rsbs	r3, r0, #0
-	and	r3, r3, #15
-	lsl	r9, r9, #1
-	and	r0, r0, #15
-	add	r9, r9, #83886080
-	rsbpl	r0, r3, #0
-	lsl	r0, r0, #1
-	ldrh	r3, [r9]
-	add	r0, r0, #83886080
-	cmp	r5, r4
-	strh	r3, [r0]	@ movhi
-	bne	.L37
-.L35:
-	ldr	r3, .L40+32
-	mov	r1, #0
-	ldr	r0, [r3]
-	ldr	r3, .L40+36
-	mov	lr, pc
-	bx	r3
-	pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	bx	r4
+	pop	{r4, r5, r6, lr}
 	bx	lr
-.L41:
+.L39:
 	.align	2
-.L40:
+.L38:
 	.word	waitForVBlank
-	.word	soundB
 	.word	rand
+	.word	soundB
 	.word	trackB_length
 	.word	__aeabi_uidivmod
 	.word	trackB_data
 	.word	797831567
 	.word	playSoundB
-	.word	currentLevel
-	.word	loadLevel
 	.size	crushPalette, .-crushPalette
 	.align	2
 	.global	initStart
@@ -458,32 +441,32 @@ initStart:
 	mov	r4, #1888
 	mov	ip, #4
 	mov	r0, #1
-	ldr	r3, .L44
+	ldr	r3, .L42
 	str	r1, [r3]
 	str	r1, [r3, #8]
-	ldr	r1, .L44+4
+	ldr	r1, .L42+4
 	str	r1, [r3, #44]
-	ldr	r1, .L44+8
+	ldr	r1, .L42+8
 	str	lr, [r3, #96]
 	str	r1, [r3, #48]
-	ldr	lr, .L44+12
-	ldr	r1, .L44+16
+	ldr	lr, .L42+12
+	ldr	r1, .L42+16
 	str	lr, [r3, #36]
 	str	r1, [r3, #84]
-	ldr	lr, .L44+20
-	ldr	r1, .L44+24
+	ldr	lr, .L42+20
+	ldr	r1, .L42+24
 	str	lr, [r3, #60]
 	str	r1, [r3, #64]
-	ldr	lr, .L44+28
-	ldr	r1, .L44+32
+	ldr	lr, .L42+28
+	ldr	r1, .L42+32
 	str	lr, [r3, #52]
 	str	r1, [r3, #92]
-	ldr	lr, .L44+36
-	ldr	r1, .L44+40
+	ldr	lr, .L42+36
+	ldr	r1, .L42+40
 	str	lr, [r3, #76]
 	str	r1, [r3, #80]
-	ldr	lr, .L44+44
-	ldr	r1, .L44+48
+	ldr	lr, .L42+44
+	ldr	r1, .L42+48
 	str	r5, [r3, #88]
 	str	r4, [r3, #68]
 	str	lr, [r3, #100]
@@ -494,9 +477,9 @@ initStart:
 	str	r0, [r1]
 	pop	{r4, r5, lr}
 	bx	lr
-.L45:
+.L43:
 	.align	2
-.L44:
+.L42:
 	.word	startLevel
 	.word	startforegroundTiles
 	.word	startforegroundMap
@@ -521,35 +504,35 @@ animateStart:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r3, .L55
+	ldr	r3, .L53
 	push	{r4, lr}
 	mov	lr, pc
 	bx	r3
-	ldr	ip, .L55+4
-	ldr	r3, .L55+8
+	ldr	ip, .L53+4
+	ldr	r3, .L53+8
 	ldr	r2, [ip]
 	smull	r0, r1, r3, r2
 	asr	r3, r2, #31
 	rsb	r3, r3, r1, asr #3
 	add	r3, r3, r3, lsl #2
 	cmp	r2, r3, lsl #2
-	beq	.L47
-	ldr	r1, .L55+12
-	ldr	r3, .L55+16
+	beq	.L45
+	ldr	r1, .L53+12
+	ldr	r3, .L53+16
 	add	r0, r2, #1
 	ldr	r3, [r3]
 	ldr	r2, [r1]
-.L48:
-	ldr	lr, .L55+20
+.L46:
+	ldr	lr, .L53+20
 	cmp	r2, #10
 	ldr	r2, [lr]
-	bne	.L53
+	bne	.L51
 	cmp	r2, #49
 	movle	r4, #0
 	addle	r2, r2, #1
 	strle	r2, [lr]
 	strle	r4, [r1]
-.L53:
+.L51:
 	mov	r1, #67108864
 	mov	r4, #5
 	mov	lr, #10
@@ -564,9 +547,9 @@ animateStart:
 	strh	r2, [r1, #26]	@ movhi
 	pop	{r4, lr}
 	bx	lr
-.L47:
-	ldr	r2, .L55+24
-	ldr	r1, .L55+16
+.L45:
+	ldr	r2, .L53+24
+	ldr	r1, .L53+16
 	ldr	r3, [r2]
 	cmp	r3, #0
 	ldr	r3, [r1]
@@ -576,20 +559,20 @@ animateStart:
 	str	r3, [r1]
 	movle	r1, #1
 	strle	r1, [r2]
-	ble	.L52
+	ble	.L50
 	cmp	r3, #24
 	movgt	r1, #0
 	strgt	r1, [r2]
-.L52:
+.L50:
 	mov	r0, #1
-	ldr	r1, .L55+12
+	ldr	r1, .L53+12
 	ldr	r2, [r1]
 	add	r2, r2, r0
 	str	r2, [r1]
-	b	.L48
-.L56:
+	b	.L46
+.L54:
 	.align	2
-.L55:
+.L53:
 	.word	waitForVBlank
 	.word	textAniTimer
 	.word	1717986919
@@ -613,14 +596,14 @@ initInstructions:
 	mov	r2, #0
 	mov	r1, #67108864
 	mov	r0, #32
-	ldr	r3, .L59
-	ldr	ip, .L59+4
+	ldr	r3, .L57
+	ldr	ip, .L57+4
 	str	ip, [r3, #44]
-	ldr	ip, .L59+8
+	ldr	ip, .L57+8
 	str	lr, [r3, #40]
 	str	ip, [r3, #48]
-	ldr	lr, .L59+12
-	ldr	ip, .L59+16
+	ldr	lr, .L57+12
+	ldr	ip, .L57+16
 	str	lr, [r3, #36]
 	str	r2, [r3]
 	str	r2, [r3, #8]
@@ -630,9 +613,9 @@ initInstructions:
 	strh	r2, [r1, #18]	@ movhi
 	strh	r2, [r1, #16]	@ movhi
 	bx	lr
-.L60:
+.L58:
 	.align	2
-.L59:
+.L57:
 	.word	instructionsLevel
 	.word	instructionsforegroundTiles
 	.word	instructionsforegroundMap
@@ -655,12 +638,12 @@ initPause:
 	mov	lr, #2048
 	mov	r1, #67108864
 	mov	r0, #32
-	ldr	r3, .L63
-	ldr	ip, .L63+4
+	ldr	r3, .L61
+	ldr	ip, .L61+4
 	str	ip, [r3, #44]
-	ldr	ip, .L63+8
+	ldr	ip, .L61+8
 	str	ip, [r3, #48]
-	ldr	ip, .L63+12
+	ldr	ip, .L61+12
 	str	r4, [r3, #36]
 	str	lr, [r3, #40]
 	str	r2, [r3]
@@ -671,9 +654,9 @@ initPause:
 	strh	r2, [r1, #18]	@ movhi
 	strh	r2, [r1, #16]	@ movhi
 	bx	lr
-.L64:
+.L62:
 	.align	2
-.L63:
+.L61:
 	.word	pauseLevel
 	.word	pauseTiles
 	.word	pauseMap
@@ -689,79 +672,85 @@ initLevel1:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, r9, lr}
-	mov	lr, #256
+	mov	r2, #256
 	mov	ip, #2
-	mov	r2, #4096
-	mov	r9, #16384
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	mov	r3, #4096
+	mov	lr, #18
+	mov	r10, #16384
+	mov	r9, #0
 	mov	r8, #512
 	mov	r7, #177
 	mov	r6, #64
 	mov	r5, #6336
-	mov	r4, #18
-	mov	r1, #0
 	mov	r0, #4
-	ldr	r3, .L67
-	str	lr, [r3, #16]
-	add	lr, lr, #194
-	str	lr, [r3, #20]
-	sub	lr, lr, #188
-	str	lr, [r3, #28]
-	ldr	lr, .L67+4
-	str	lr, [r3, #4]
-	ldr	lr, .L67+8
-	str	ip, [r3, #96]
-	str	lr, [r3, #44]
-	ldr	ip, .L67+12
-	ldr	lr, .L67+16
-	str	ip, [r3, #52]
-	str	lr, [r3, #48]
-	ldr	ip, .L67+20
-	ldr	lr, .L67+24
-	str	ip, [r3, #64]
-	str	lr, [r3, #60]
-	ldr	ip, .L67+28
-	ldr	lr, .L67+32
-	str	ip, [r3, #76]
-	str	lr, [r3, #68]
-	ldr	ip, .L67+36
-	ldr	lr, .L67+40
-	str	ip, [r3, #84]
-	str	lr, [r3, #80]
-	ldr	ip, .L67+44
-	ldr	lr, .L67+48
-	str	r9, [r3]
-	str	r8, [r3, #12]
-	str	r7, [r3, #24]
-	str	r6, [r3, #32]
-	str	r5, [r3, #36]
-	str	r4, [r3, #88]
-	str	lr, [r3, #92]
-	str	ip, [r3, #100]
-	str	r0, [r3, #104]
-	str	r1, [r3, #8]
-	str	r1, [r3, #116]
-	str	r2, [r3, #40]
-	str	r2, [r3, #56]
-	str	r2, [r3, #72]
-	pop	{r4, r5, r6, r7, r8, r9, lr}
+	mov	r1, #1
+	ldr	r4, .L65
+	str	r2, [r4, #16]
+	add	r2, r2, #194
+	str	r2, [r4, #20]
+	sub	r2, r2, #188
+	str	r2, [r4, #28]
+	ldr	r2, .L65+4
+	str	r2, [r4, #4]
+	ldr	r2, .L65+8
+	str	r2, [r4, #44]
+	ldr	r2, .L65+12
+	str	ip, [r4, #96]
+	ldr	ip, .L65+16
+	str	r2, [r4, #48]
+	ldr	r2, .L65+20
+	str	ip, [r4, #52]
+	ldr	ip, .L65+24
+	str	r2, [r4, #60]
+	ldr	r2, .L65+28
+	str	ip, [r4, #64]
+	ldr	ip, .L65+32
+	str	r2, [r4, #68]
+	ldr	r2, .L65+36
+	str	ip, [r4, #76]
+	ldr	ip, .L65+40
+	str	r2, [r4, #80]
+	ldr	r2, .L65+44
+	str	ip, [r4, #84]
+	ldr	ip, .L65+48
+	str	r2, [r4, #92]
+	ldr	r2, .L65+52
+	str	r10, [r4]
+	str	r9, [r4, #8]
+	str	r8, [r4, #12]
+	str	r7, [r4, #24]
+	str	r6, [r4, #32]
+	str	r5, [r4, #36]
+	str	lr, [r4, #88]
+	str	ip, [r4, #100]
+	str	r0, [r4, #104]
+	str	r1, [r4, #116]
+	str	r3, [r4, #40]
+	str	r3, [r4, #56]
+	str	r3, [r4, #72]
+	mov	lr, pc
+	bx	r2
+	str	r0, [r4, #120]
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
 	bx	lr
-.L68:
+.L66:
 	.align	2
-.L67:
+.L65:
 	.word	level1
 	.word	level1collisionmapBitmap
 	.word	level1foregroundTiles
-	.word	5280
 	.word	level1foregroundMap
-	.word	level1midgroundMap
+	.word	5280
 	.word	level1midgroundTiles
-	.word	level1backgroundTiles
+	.word	level1midgroundMap
 	.word	17216
-	.word	level1foregroundPal
+	.word	level1backgroundTiles
 	.word	level1backgroundMap
-	.word	level1backgroundPal
+	.word	level1foregroundPal
 	.word	level1midgroundPal
+	.word	level1backgroundPal
+	.word	initSeerMaster
 	.size	initLevel1, .-initLevel1
 	.align	2
 	.global	initLevel0
@@ -782,13 +771,13 @@ initLevel0:
 	mov	r5, #0
 	mov	r6, #118
 	mov	r0, #512
-	ldr	r4, .L71
+	ldr	r4, .L69
 	str	r1, [r4, #28]
-	ldr	r1, .L71+4
+	ldr	r1, .L69+4
 	str	r1, [r4, #32]
-	ldr	r1, .L71+8
+	ldr	r1, .L69+8
 	str	r3, [r4, #12]
-	ldr	r3, .L71+12
+	ldr	r3, .L69+12
 	str	lr, [r4, #24]
 	str	ip, [r4]
 	str	r1, [r4, #4]
@@ -798,11 +787,11 @@ initLevel0:
 	str	r5, [r4, #8]
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L71+16
+	ldr	r3, .L69+16
 	str	r0, [r4, #120]
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L71+20
+	ldr	r3, .L69+20
 	str	r0, [r4, #124]
 	mov	lr, pc
 	bx	r3
@@ -813,27 +802,27 @@ initLevel0:
 	mov	r6, #9792
 	mov	lr, #6
 	mov	ip, #2
-	ldr	r2, .L71+24
+	ldr	r2, .L69+24
 	str	r2, [r4, #44]
-	ldr	r2, .L71+28
+	ldr	r2, .L69+28
 	str	r2, [r4, #48]
-	ldr	r2, .L71+32
+	ldr	r2, .L69+32
 	str	r2, [r4, #84]
-	ldr	r2, .L71+36
+	ldr	r2, .L69+36
 	str	r2, [r4, #60]
-	ldr	r2, .L71+40
+	ldr	r2, .L69+40
 	str	r1, [r4, #68]
 	str	r2, [r4, #64]
-	ldr	r1, .L71+44
-	ldr	r2, .L71+48
+	ldr	r1, .L69+44
+	ldr	r2, .L69+48
 	str	r1, [r4, #92]
 	str	r2, [r4, #76]
-	ldr	r1, .L71+52
-	ldr	r2, .L71+56
+	ldr	r1, .L69+52
+	ldr	r2, .L69+56
 	str	r1, [r4, #80]
 	str	r2, [r4, #100]
-	ldr	r1, .L71+60
-	ldr	r2, .L71+64
+	ldr	r1, .L69+60
+	ldr	r2, .L69+64
 	str	r0, [r4, #128]
 	str	r8, [r4, #36]
 	str	r7, [r4, #88]
@@ -847,9 +836,9 @@ initLevel0:
 	str	r3, [r4, #72]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L72:
+.L70:
 	.align	2
-.L71:
+.L69:
 	.word	level0
 	.word	347
 	.word	level0collisionmapBitmap
@@ -889,25 +878,25 @@ initLevel2:
 	mov	r0, #0
 	mov	r1, #256
 	mov	r2, #2048
-	ldr	r3, .L75
+	ldr	r3, .L73
 	str	lr, [r3, #8]
-	ldr	lr, .L75+4
+	ldr	lr, .L73+4
 	str	ip, [r3, #68]
 	str	lr, [r3, #4]
-	ldr	ip, .L75+8
-	ldr	lr, .L75+12
+	ldr	ip, .L73+8
+	ldr	lr, .L73+12
 	str	ip, [r3, #48]
 	str	lr, [r3, #44]
-	ldr	ip, .L75+16
-	ldr	lr, .L75+20
+	ldr	ip, .L73+16
+	ldr	lr, .L73+20
 	str	ip, [r3, #84]
 	str	lr, [r3, #36]
-	ldr	ip, .L75+24
-	ldr	lr, .L75+28
+	ldr	ip, .L73+24
+	ldr	lr, .L73+28
 	str	ip, [r3, #80]
 	str	lr, [r3, #76]
-	ldr	ip, .L75+32
-	ldr	lr, .L75+36
+	ldr	ip, .L73+32
+	ldr	lr, .L73+36
 	str	r8, [r3, #20]
 	str	r7, [r3, #24]
 	str	r6, [r3, #28]
@@ -922,9 +911,9 @@ initLevel2:
 	str	r2, [r3, #72]
 	pop	{r4, r5, r6, r7, r8, lr}
 	bx	lr
-.L76:
+.L74:
 	.align	2
-.L75:
+.L73:
 	.word	level2
 	.word	level2collisionmapBitmap
 	.word	level2foregroundMap
@@ -949,14 +938,14 @@ unlockGateLevel0:
 	mov	r1, #7360
 	mov	ip, #4096
 	push	{r4, lr}
-	ldr	r3, .L79
-	ldr	r2, .L79+4
-	ldr	lr, .L79+8
-	ldr	r0, .L79+12
+	ldr	r3, .L77
+	ldr	r2, .L77+4
+	ldr	lr, .L77+8
+	ldr	r0, .L77+12
 	str	r1, [r3, #36]
-	ldr	r1, .L79+16
+	ldr	r1, .L77+16
 	str	r2, [r3, #44]
-	ldr	r2, .L79+20
+	ldr	r2, .L77+20
 	str	lr, [r3, #48]
 	str	ip, [r3, #40]
 	str	r0, [r3, #4]
@@ -965,9 +954,9 @@ unlockGateLevel0:
 	bx	r2
 	pop	{r4, lr}
 	bx	lr
-.L80:
+.L78:
 	.align	2
-.L79:
+.L77:
 	.word	level0
 	.word	level0foreground2Tiles
 	.word	level0foreground2Map

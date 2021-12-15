@@ -424,7 +424,7 @@ dialogue:
 	ldr	r3, [ip, #96]
 	cmp	r3, #0
 	beq	.L73
-	mov	r3, #0
+	ldr	r3, [r2, #1688]
 	str	r3, [r2, #1684]
 	bl	goToGame
 	ldr	r3, [r4]

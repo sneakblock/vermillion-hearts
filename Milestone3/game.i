@@ -1670,12 +1670,14 @@ extern NPC cloud;
 extern NPC plantMerchant;
 extern NPC seer;
 extern NPC knight;
+extern NPC seerMaster;
 
 void initNPCS();
 NPC* initCloud();
 NPC* initPlantMerchant();
 NPC* initSeer();
 NPC* initKnight();
+NPC* initSeerMaster();
 
 void openGate();
 # 15 "game.c" 2
@@ -1934,7 +1936,14 @@ void updatePlayer() {
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3))))) {
         goToPause();
     }
-# 288 "game.c"
+
+    if ((!(~(oldButtons) & ((1 << 8))) && (~buttons & ((1 << 8))))) {
+        if (player.currentSprite->abilityFunc && player.currentSprite == &seerMaster) {
+            player.currentSprite->abilityFunc();
+            return;
+        }
+    }
+
     for (int i = 0; i < currentLevel->numNPCS; i++) {
 
         if (collision(player.worldCol, player.worldRow, player.width, player.height, currentLevel->npcs[i]->worldCol, currentLevel->npcs[i]->worldRow, currentLevel->npcs[i]->width, currentLevel->npcs[i]->height)) {
