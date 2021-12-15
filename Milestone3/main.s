@@ -283,30 +283,24 @@ goToDialogue:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, lr}
+	push	{r4, r5, r6, r7, r8, lr}
 	ldr	r5, .L28
-	sub	sp, sp, #20
 	mov	lr, pc
 	bx	r5
-	ldr	ip, .L28+4
-	add	r3, ip, #16
-	ldm	r3, {r0, r1, r2, r3}
-	ldr	r4, .L28+8
-	stm	sp, {r0, r1, r2, r3}
-	ldm	ip, {r0, r1, r2, r3}
+	ldr	r3, .L28+4
 	mov	lr, pc
-	bx	r4
+	bx	r3
 	mov	r4, #0
 	mov	r2, #67108864
 	mov	r3, #83886080
 	mvn	r1, #32768
-	ldr	r0, .L28+12
-	ldr	r6, .L28+16
+	ldr	r0, .L28+8
+	ldr	r6, .L28+12
 	strh	r4, [r2]	@ movhi
 	strh	r4, [r3]	@ movhi
 	strh	r0, [r2]	@ movhi
 	strh	r1, [r3, #2]	@ movhi
-	ldr	r3, .L28+20
+	ldr	r3, .L28+16
 	mov	lr, pc
 	bx	r3
 	ldr	r3, [r6]
@@ -315,7 +309,7 @@ goToDialogue:
 	mov	r1, #16
 	mov	r0, #124
 	ldr	r2, [r3, #104]
-	ldr	r7, .L28+24
+	ldr	r7, .L28+20
 	mov	r3, #1
 	mov	lr, pc
 	bx	r7
@@ -324,25 +318,22 @@ goToDialogue:
 	add	r3, r3, r2, lsl #5
 	ldr	r3, [r3, #84]
 	cmp	r3, r4
-	ldrne	r3, .L28+28
+	ldrne	r3, .L28+24
 	strne	r4, [r3]
 	mov	lr, pc
 	bx	r5
-	ldr	r3, .L28+32
+	ldr	r3, .L28+28
 	mov	lr, pc
 	bx	r3
 	mov	r2, #2
-	ldr	r3, .L28+36
+	ldr	r3, .L28+32
+	pop	{r4, r5, r6, r7, r8, lr}
 	str	r2, [r3]
-	add	sp, sp, #20
-	@ sp needed
-	pop	{r4, r5, r6, r7, lr}
 	bx	lr
 .L29:
 	.align	2
 .L28:
 	.word	waitForVBlank
-	.word	soundB
 	.word	stopSound
 	.word	1044
 	.word	currentTarget

@@ -1484,7 +1484,7 @@ initDutchess:
 	str	r3, [r0, #660]
 	str	r3, [r0, #672]
 	str	r3, [r0, #676]
-	str	r3, [r0, #692]
+	str	r2, [r0, #692]
 	str	r3, [r0, #704]
 	str	r3, [r0, #708]
 	str	r3, [r0, #724]
@@ -1589,8 +1589,8 @@ initDutchess:
 	str	ip, [r0, #1296]
 	str	r1, [r0, #1308]
 	ldr	r1, .L42+220
-	mov	r6, #120
-	mov	r5, #78
+	mov	r6, #124
+	mov	r5, #76
 	str	r1, [r0, #1352]
 	mov	r1, #21
 	str	r3, [r0, #1312]

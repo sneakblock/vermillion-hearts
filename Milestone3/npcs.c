@@ -921,8 +921,8 @@ NPC* initDutchess() {
     dutchess.dialoguesIndex = 0;
     dutchess.postConvoIndex = 21;
 
-    dutchess.worldCol = 120;
-    dutchess.worldRow = 78;
+    dutchess.worldCol = 124;
+    dutchess.worldRow = 76;
 
     dutchess.convoFunc = unlockDutchess;
 

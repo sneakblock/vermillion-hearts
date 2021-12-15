@@ -1216,7 +1216,7 @@ NPC* initDutchess() {
 
     end18.choiceAIndex = 20;
     end18.choiceBIndex = 23;
-    end18.promptsChoice = 0;
+    end18.promptsChoice = 1;
     end18.endsConversation = 0;
     end18.satisfiesBool = 0;
 
@@ -1411,8 +1411,8 @@ NPC* initDutchess() {
     dutchess.dialoguesIndex = 0;
     dutchess.postConvoIndex = 21;
 
-    dutchess.worldCol = 120;
-    dutchess.worldRow = 78;
+    dutchess.worldCol = 124;
+    dutchess.worldRow = 76;
 
     dutchess.convoFunc = unlockDutchess;
 

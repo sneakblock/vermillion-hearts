@@ -581,13 +581,13 @@ void initLevel3() {
 
     // =========== MIDGROUND ============
     
-    // level0.midgroundTiles = level0midgroundTiles;
-    // level0.midgroundMap = level0midgroundMap;
-    // level0.midgroundTilesLen = level0midgroundTilesLen;
-    // level0.midgroundMapLen = level0midgroundMapLen;
+    // level3.midgroundTiles = startbackgroundTiles;
+    // level3.midgroundMap = startbackgroundMap;
+    // level3.midgroundTilesLen = startbackgroundTilesLen;
+    // level3.midgroundMapLen = startbackgroundMapLen;
 
-    // level0.midgroundPal = level0midgroundPal;
-    // level0.midgroundPalLen = level0midgroundPalLen;
+    // level3.midgroundPal = startbackgroundPal;
+    // level3.midgroundPalLen = startbackgroundPalLen;
 
     // =========== BACKGROUND ============
     

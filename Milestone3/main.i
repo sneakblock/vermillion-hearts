@@ -2,13 +2,7 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "main.c"
-
-
-
-
-
-
-
+# 11 "main.c"
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 1 3
 # 10 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/machine/ieeefp.h" 1 3
@@ -817,7 +811,7 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdlib.h" 3
 
-# 9 "main.c" 2
+# 12 "main.c" 2
 # 1 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 1 3
 # 36 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 # 1 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/9.1.0/include/stddef.h" 1 3 4
@@ -1228,7 +1222,7 @@ _putchar_unlocked(int _c)
 }
 # 797 "/opt/devkitpro/devkitARM/arm-none-eabi/include/stdio.h" 3
 
-# 10 "main.c" 2
+# 13 "main.c" 2
 # 1 "myLib.h" 1
 
 
@@ -1330,7 +1324,7 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 typedef void (*ihp)(void);
 # 312 "myLib.h"
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 11 "main.c" 2
+# 14 "main.c" 2
 
 
 # 1 "game.h" 1
@@ -1594,7 +1588,7 @@ void changeSprite();
 
 
 void rotateCollisionMap();
-# 14 "main.c" 2
+# 17 "main.c" 2
 
 
 # 1 "spritesheet.h" 1
@@ -1603,7 +1597,7 @@ extern const unsigned short SPRITESHEETTiles[16384];
 
 
 extern const unsigned short SPRITESHEETPal[16];
-# 17 "main.c" 2
+# 20 "main.c" 2
 
 
 # 1 "text.h" 1
@@ -1614,7 +1608,7 @@ void drawString3(int col, int row, char *str, unsigned short color);
 
 void drawChar4(int col, int row, char ch, unsigned char colorIndex);
 void drawString4(int col, int row, char *str, unsigned char colorIndex);
-# 20 "main.c" 2
+# 23 "main.c" 2
 
 # 1 "talkingheadtest.h" 1
 # 21 "talkingheadtest.h"
@@ -1622,7 +1616,7 @@ extern const unsigned short talkingheadtestBitmap[8816];
 
 
 extern const unsigned short talkingheadtestPal[256];
-# 22 "main.c" 2
+# 25 "main.c" 2
 
 # 1 "dialogue.h" 1
 # 25 "dialogue.h"
@@ -1635,7 +1629,7 @@ void typeDialogue(int textboxCol, int textboxRow, char* string, unsigned char co
 void drawChoices();
 void drawSelector();
 void selectChoice();
-# 24 "main.c" 2
+# 27 "main.c" 2
 
 # 1 "sound.h" 1
 void setupSounds();
@@ -1662,21 +1656,21 @@ typedef struct{
 
 SOUND soundA;
 SOUND soundB;
-# 26 "main.c" 2
+# 29 "main.c" 2
 # 1 "trackA.h" 1
 
 
 extern const unsigned int trackA_sampleRate;
 extern const unsigned int trackA_length;
 extern const signed char trackA_data[];
-# 27 "main.c" 2
+# 30 "main.c" 2
 # 1 "trackB.h" 1
 
 
 extern const unsigned int trackB_sampleRate;
 extern const unsigned int trackB_length;
 extern const signed char trackB_data[];
-# 28 "main.c" 2
+# 31 "main.c" 2
 
 # 1 "levels.h" 1
 extern LEVEL startLevel;
@@ -1708,7 +1702,7 @@ void initLevel2();
 void animateLevel2();
 
 void initLevel3();
-# 30 "main.c" 2
+# 33 "main.c" 2
 
 # 1 "seerscreen.h" 1
 # 21 "seerscreen.h"
@@ -1716,7 +1710,7 @@ extern const unsigned short seerscreenTiles[1616];
 
 
 extern const unsigned short seerscreenMap[1024];
-# 32 "main.c" 2
+# 35 "main.c" 2
 
 # 1 "winImage.h" 1
 # 21 "winImage.h"
@@ -1724,7 +1718,7 @@ extern const unsigned short winImageBitmap[19200];
 
 
 extern const unsigned short winImagePal[256];
-# 34 "main.c" 2
+# 37 "main.c" 2
 
 
 void initialize();
@@ -1980,7 +1974,7 @@ void goToDialogue() {
 
     waitForVBlank();
 
-    stopSound(soundB);
+    stopSound();
 
 
     (*(volatile unsigned short *)0x4000000) = 0;
@@ -2047,7 +2041,7 @@ void dialogue() {
 
 
 void goToPause() {
-# 364 "main.c"
+# 367 "main.c"
     (*(volatile unsigned short *)0x4000000) = 0;
     (*(volatile unsigned short *)0x4000000) = 0 | (1 << 8);
 

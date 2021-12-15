@@ -1793,7 +1793,7 @@ extern const unsigned short level2collisionmapPal[256];
 
 # 1 "level3foreground.h" 1
 # 22 "level3foreground.h"
-extern const unsigned short level3foregroundTiles[14448];
+extern const unsigned short level3foregroundTiles[6144];
 
 
 extern const unsigned short level3foregroundMap[1024];
@@ -2357,7 +2357,7 @@ void initLevel3() {
 
     level3.foregroundTiles = level3foregroundTiles;
     level3.foregroundMap = level3foregroundMap;
-    level3.foregroundTilesLen = 28896;
+    level3.foregroundTilesLen = 12288;
     level3.foregroundMapLen = 2048;
 
     level3.foregroundPal = level3foregroundPal;

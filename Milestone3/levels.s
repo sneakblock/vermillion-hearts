@@ -1035,16 +1035,16 @@ initLevel3:
 	str	r0, [r4, #136]
 	mov	lr, pc
 	bx	r1
+	mov	ip, #12288
 	mov	r1, #2048
 	mov	r3, #32
 	ldr	r2, .L93+12
 	str	r0, [r4, #140]
 	str	r2, [r4, #64]
-	ldr	ip, .L93+16
-	ldr	r0, .L93+20
-	ldr	r2, .L93+24
-	str	ip, [r4, #68]
-	str	r0, [r4, #56]
+	ldr	r0, .L93+16
+	ldr	r2, .L93+20
+	str	r0, [r4, #68]
+	str	ip, [r4, #56]
 	str	r1, [r4, #60]
 	str	r2, [r4, #104]
 	str	r3, [r4, #108]
@@ -1058,7 +1058,6 @@ initLevel3:
 	.word	initDutchess
 	.word	level3foregroundTiles
 	.word	level3foregroundMap
-	.word	28896
 	.word	level3foregroundPal
 	.size	initLevel3, .-initLevel3
 	.comm	movingUp,4,4
