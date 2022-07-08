@@ -1,0 +1,14 @@
+{
+  "files.associations": {
+    "lose.h": "c",
+    "pause.h": "c",
+    "selector.h": "c",
+    "level0background.h": "c",
+    "level0midground.h": "c",
+    "instructionsforeground.h": "c",
+    "level2foreground.h": "c",
+    "level0collisionmap2.h": "c",
+    "level2collisionmap.h": "c",
+    "level1background.h": "c"
+  }
+}
